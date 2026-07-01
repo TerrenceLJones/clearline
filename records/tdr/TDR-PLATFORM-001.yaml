@@ -2,11 +2,11 @@ metadata:
   tdr_id: TDR-PLATFORM-001
   epic_id: PLATFORM-001
   decision_scope_level: platform
-  title: "fintech-portfolio — Platform Baseline Technology Decisions"
-  decision_date: "2026-06-30"
-  version: "1.0"
-  author: "Technology Strategy Agent"
-  research_window: "2026-06-30 (single-day research pass; all sources cited with access dates)"
+  title: 'fintech-portfolio — Platform Baseline Technology Decisions'
+  decision_date: '2026-06-30'
+  version: '1.0'
+  author: 'Technology Strategy Agent'
+  research_window: '2026-06-30 (single-day research pass; all sources cited with access dates)'
 
 technology_decision_scope:
   level: platform
@@ -21,15 +21,15 @@ technology_decision_scope:
 app_registry:
   - app_slug: clearline-web
     status: planned
-    description: "B2B spend management / payments frontend demo. Web-only, no mobile companion. First app in the portfolio; detailed app-level TDR (TDR-CLEARLINE-001) follows this one and inherits from it."
+    description: 'B2B spend management / payments frontend demo. Web-only, no mobile companion. First app in the portfolio; detailed app-level TDR (TDR-CW-WEB-001) follows this one and inherits from it.'
 
 # ---------------------------------------------------------------------------
 # Technology decisions
 # ---------------------------------------------------------------------------
 technology_decisions:
   monorepo_management:
-    selected: "Nx"
-    version: "21.x (latest stable as of mid-2026)"
+    selected: 'Nx'
+    version: '21.x (latest stable as of mid-2026)'
     decision_type: human_specified
     override_rationale: >
       Human-specified, not researched. The comparative "Turborepo vs Nx vs
@@ -54,8 +54,8 @@ technology_decisions:
       Nx 17–19.
 
   package_manager:
-    selected: "pnpm"
-    version: "9.x (latest stable as of mid-2026)"
+    selected: 'pnpm'
+    version: '9.x (latest stable as of mid-2026)'
     decision_type: human_specified
     override_rationale: >
       Human-specified, not researched, paired with the Nx decision above.
@@ -69,8 +69,8 @@ technology_decisions:
     research_sources: []
 
   typescript_version:
-    selected: "TypeScript 6.0"
-    version: "6.0.3 (latest patch as of research date)"
+    selected: 'TypeScript 6.0'
+    version: '6.0.3 (latest patch as of research date)'
     decision_type: researched
     rationale: >
       6.0 is the current stable release and is explicitly positioned by the
@@ -83,21 +83,21 @@ technology_decisions:
       the new `--stableTypeOrdering` flag now is recommended to ease a
       future 6→7 migration.
     alternatives_considered:
-      - option: "TypeScript 7.0 (Release Candidate)"
-        rejected_because: "Not GA at time of decision; adopting an RC compiler as the platform baseline is unnecessary risk for a solo-maintained project with no urgency to be on the bleeding edge."
-      - option: "TypeScript 5.x (prior major)"
-        rejected_because: "Superseded by 6.0; no reason to start a greenfield project one major version behind current stable."
+      - option: 'TypeScript 7.0 (Release Candidate)'
+        rejected_because: 'Not GA at time of decision; adopting an RC compiler as the platform baseline is unnecessary risk for a solo-maintained project with no urgency to be on the bleeding edge.'
+      - option: 'TypeScript 5.x (prior major)'
+        rejected_because: 'Superseded by 6.0; no reason to start a greenfield project one major version behind current stable.'
     research_sources:
-      - url: "https://devblogs.microsoft.com/typescript/announcing-typescript-6-0/"
+      - url: 'https://devblogs.microsoft.com/typescript/announcing-typescript-6-0/'
         note: "Official 6.0 announcement, confirms 'stepping-stone' framing and module-resolution deprecations. Accessed 2026-06-30."
-      - url: "https://devblogs.microsoft.com/typescript/typescript-native-port/"
-        note: "TypeScript 7 / native Go port performance claims (~10x faster). Accessed 2026-06-30."
-      - url: "https://www.npmjs.com/package/typescript"
-        note: "Confirmed 6.0.3 as latest dist-tag, published 2026-04-16; 7.0.1-rc also published. Accessed 2026-06-30."
+      - url: 'https://devblogs.microsoft.com/typescript/typescript-native-port/'
+        note: 'TypeScript 7 / native Go port performance claims (~10x faster). Accessed 2026-06-30.'
+      - url: 'https://www.npmjs.com/package/typescript'
+        note: 'Confirmed 6.0.3 as latest dist-tag, published 2026-04-16; 7.0.1-rc also published. Accessed 2026-06-30.'
 
   nodejs_version:
     selected: 'Node.js 24 ("Krypton")'
-    version: "24.x — current Active LTS"
+    version: '24.x — current Active LTS'
     decision_type: researched
     rationale: >
       Node 24 has been Active LTS since 2025-10-28 and remains in Active
@@ -107,16 +107,16 @@ technology_decisions:
       October 2026, making it premature for a baseline today.
     alternatives_considered:
       - option: 'Node.js 22 ("Jod")'
-        rejected_because: "Now in Maintenance LTS (since 2025-10-21); offers no advantage over 24 for a greenfield project and has a shorter remaining support runway."
+        rejected_because: 'Now in Maintenance LTS (since 2025-10-21); offers no advantage over 24 for a greenfield project and has a shorter remaining support runway.'
       - option: 'Node.js 26 ("Current")'
         rejected_because: "Not yet Active LTS as of decision date (won't be until ~2026-10-28); too new for a baseline meant to be stable across multiple apps."
     research_sources:
-      - url: "https://github.com/nodejs/Release"
-        note: "Official Node.js release schedule (Release working group). Confirmed Node 24 Active LTS window and Node 22/26 status. Accessed 2026-06-30."
+      - url: 'https://github.com/nodejs/Release'
+        note: 'Official Node.js release schedule (Release working group). Confirmed Node 24 Active LTS window and Node 22/26 status. Accessed 2026-06-30.'
 
   linter_formatter:
-    selected: "ESLint + Prettier"
-    version: "ESLint 9.x (flat config) + Prettier 3.x — latest stable as of research date"
+    selected: 'ESLint + Prettier'
+    version: 'ESLint 9.x (flat config) + Prettier 3.x — latest stable as of research date'
     decision_type: researched
     rationale: >
       Selected over Biome v2 specifically because research surfaced real,
@@ -152,33 +152,33 @@ technology_decisions:
       being the kind of thing that surfaces mid-project once a specific
       framework rule is needed and missing.
     alternatives_considered:
-      - option: "Biome v2 (primary, single-binary)"
+      - option: 'Biome v2 (primary, single-binary)'
         rejected_because: "Faster and dramatically simpler to configure, but has no official Nx plugin (manual wiring only), thin Next.js/React-Compiler rule coverage, and only ~75-85% parity with typescript-eslint's type-aware rules — gaps that are well-documented as of mid-2026 and that this platform should not build around for apps that may need full framework-rule coverage. Worth re-evaluating in a future platform TDR revision if Biome's Nx integration and framework coverage mature."
-      - option: "Oxlint (Oxc toolchain)"
+      - option: 'Oxlint (Oxc toolchain)'
         rejected_because: "Emerging and notably favored by Nx's own 2026 roadmap for future integration work, but has even less mature ecosystem adoption and documentation today than Biome; not yet a credible default for a project starting now."
     research_sources:
-      - url: "https://biomejs.dev/blog/biome-v2/"
+      - url: 'https://biomejs.dev/blog/biome-v2/'
         note: "Biome v2 'Biotype' announcement (2025-06-17): type-aware linting without tsc, noFloatingPromises ~75% parity with typescript-eslint (self-reported). Accessed 2026-06-30."
-      - url: "https://biomejs.dev/blog/biome-v2-5/"
-        note: "v2.5 release notes: 500+ lint rules milestone, ~13% perf improvement. Accessed 2026-06-30."
-      - url: "https://github.com/biomejs/biome/releases"
-        note: "Confirmed v2.5.1 as latest published release (2026-06-23). Accessed 2026-06-30."
-      - url: "https://nx.dev/blog/integrate-biome-in-20-minutes"
+      - url: 'https://biomejs.dev/blog/biome-v2-5/'
+        note: 'v2.5 release notes: 500+ lint rules milestone, ~13% perf improvement. Accessed 2026-06-30.'
+      - url: 'https://github.com/biomejs/biome/releases'
+        note: 'Confirmed v2.5.1 as latest published release (2026-06-23). Accessed 2026-06-30.'
+      - url: 'https://nx.dev/blog/integrate-biome-in-20-minutes'
         note: "Nx's own blog post (2025-09-16) confirming no official @nx/biome plugin exists; manual nx:run-commands wiring is the documented pattern. Accessed 2026-06-30."
-      - url: "https://nx.dev/blog/nx-2026-roadmap"
+      - url: 'https://nx.dev/blog/nx-2026-roadmap'
         note: "Nx 2026 roadmap (2026-02-04): Nx is investing in oxlint integration, describes Biome as a tool they are 'watching' rather than building first-party support for. Accessed 2026-06-30."
-      - url: "https://github.com/biomejs/biome/discussions/5290"
-        note: "Confirms React Compiler lint rules unimplemented in Biome as of late June 2026."
-      - url: "https://eslint.org/blog/2025/08/multithread-linting"
-        note: "ESLint 9.34 (Aug 2025) added multithreaded linting, narrowing the historical performance gap with Biome. Accessed 2026-06-30."
-      - url: "https://news.ycombinator.com/item?id=43913950"
-        note: "61-comment HN thread (May 2025) on a real ESLint→Biome migration; primary source for documented production friction (CI linting breakage, JSX/TSX rule gaps, import-sort bugs) balanced against praise for dependency simplification. Accessed 2026-06-30."
-      - url: "https://2025.stateofjs.com/en-US/other-tools/"
-        note: "State of JS 2025: Biome usage ~16.3% of utility-question respondents (1,762/10,812) vs ESLint ~89.7%, Prettier ~86.0% — confirms Biome is fast-growing but still a minority choice industry-wide. Accessed 2026-06-30."
+      - url: 'https://github.com/biomejs/biome/discussions/5290'
+        note: 'Confirms React Compiler lint rules unimplemented in Biome as of late June 2026.'
+      - url: 'https://eslint.org/blog/2025/08/multithread-linting'
+        note: 'ESLint 9.34 (Aug 2025) added multithreaded linting, narrowing the historical performance gap with Biome. Accessed 2026-06-30.'
+      - url: 'https://news.ycombinator.com/item?id=43913950'
+        note: '61-comment HN thread (May 2025) on a real ESLint→Biome migration; primary source for documented production friction (CI linting breakage, JSX/TSX rule gaps, import-sort bugs) balanced against praise for dependency simplification. Accessed 2026-06-30.'
+      - url: 'https://2025.stateofjs.com/en-US/other-tools/'
+        note: 'State of JS 2025: Biome usage ~16.3% of utility-question respondents (1,762/10,812) vs ESLint ~89.7%, Prettier ~86.0% — confirms Biome is fast-growing but still a minority choice industry-wide. Accessed 2026-06-30.'
 
   shared_design_system_tooling:
     selected: "Tailwind CSS v4, with platform-level shared theme/tokens distributed via a libs/design-tokens package using v4's CSS-first @theme configuration"
-    version: "4.3.1 (latest stable as of research date)"
+    version: '4.3.1 (latest stable as of research date)'
     decision_type: researched
     rationale: >
       Tailwind v4's CSS-first configuration (design tokens defined via
@@ -196,17 +196,17 @@ technology_decisions:
       since it isn't yet clear it's needed before a second app exists to
       validate real reuse.
     alternatives_considered:
-      - option: "No shared Tailwind config — each app configures Tailwind independently"
-        rejected_because: "Misses an easy, low-risk win: a shared token package costs little to set up now and prevents visual drift across apps from day one, which matters for a portfolio meant to look like one coherent body of work."
-      - option: "Tailwind v3 (prior major, JS-config-based)"
-        rejected_because: "Superseded by v4; starting greenfield on v3 would mean an unnecessary future migration with no offsetting benefit."
+      - option: 'No shared Tailwind config — each app configures Tailwind independently'
+        rejected_because: 'Misses an easy, low-risk win: a shared token package costs little to set up now and prevents visual drift across apps from day one, which matters for a portfolio meant to look like one coherent body of work.'
+      - option: 'Tailwind v3 (prior major, JS-config-based)'
+        rejected_because: 'Superseded by v4; starting greenfield on v3 would mean an unnecessary future migration with no offsetting benefit.'
     research_sources:
-      - url: "https://github.com/tailwindlabs/tailwindcss/releases"
-        note: "Confirmed 4.3.1 as latest stable release. Accessed 2026-06-30."
-      - url: "https://nx.dev/blog/sharing-tailwind-styles-nx-monorepo"
+      - url: 'https://github.com/tailwindlabs/tailwindcss/releases'
+        note: 'Confirmed 4.3.1 as latest stable release. Accessed 2026-06-30.'
+      - url: 'https://nx.dev/blog/sharing-tailwind-styles-nx-monorepo'
         note: "Nx's own blog documenting the shared-theme-CSS-package pattern for Tailwind v4 in Nx monorepos. Accessed 2026-06-30."
-      - url: "https://eosl.date/eol/product/tailwind-css/"
-        note: "Confirms Tailwind 4.3.1 is current supported release as of June 2026, alongside 3.4 (supported until 2027-02-28). Accessed 2026-06-30."
+      - url: 'https://eosl.date/eol/product/tailwind-css/'
+        note: 'Confirms Tailwind 4.3.1 is current supported release as of June 2026, alongside 3.4 (supported until 2027-02-28). Accessed 2026-06-30.'
 
   shared_mock_backend_strategy:
     decision_type: locked_in_not_researched
@@ -218,8 +218,8 @@ technology_decisions:
       v2-specific capability (WebSocket interception) the decision depends
       on.
     msw_version:
-      selected: "MSW (Mock Service Worker) v2"
-      version: "2.14.6 (latest published as of research date)"
+      selected: 'MSW (Mock Service Worker) v2'
+      version: '2.14.6 (latest published as of research date)'
       currency_check: >
         Confirmed current and actively maintained: no v3 has shipped, the
         official site/GitHub show v2 as the current major version, and
@@ -230,15 +230,15 @@ technology_decisions:
         MSW 2.0 feature, confirming v2 is required (not optional) for the
         WebSocket-based real-time-feed demos this platform anticipates.
       research_sources:
-        - url: "https://www.npmjs.com/package/msw"
-          note: "Confirmed 2.14.6 latest published version. Accessed 2026-06-30."
-        - url: "https://github.com/mswjs/msw/releases"
-          note: "Confirmed active release cadence, no v3. Accessed 2026-06-30."
-        - url: "https://mswjs.io/blog/introducing-msw-2.0/"
-          note: "Confirms WebSocket support (ws namespace) was introduced in MSW 2.0, not present in v1."
-        - url: "https://mswjs.io/docs/websocket/"
-          note: "Current WebSocket interception docs, v2-only."
-    architectural_pattern: "services-first, handlers-second"
+        - url: 'https://www.npmjs.com/package/msw'
+          note: 'Confirmed 2.14.6 latest published version. Accessed 2026-06-30.'
+        - url: 'https://github.com/mswjs/msw/releases'
+          note: 'Confirmed active release cadence, no v3. Accessed 2026-06-30.'
+        - url: 'https://mswjs.io/blog/introducing-msw-2.0/'
+          note: 'Confirms WebSocket support (ws namespace) was introduced in MSW 2.0, not present in v1.'
+        - url: 'https://mswjs.io/docs/websocket/'
+          note: 'Current WebSocket interception docs, v2-only.'
+    architectural_pattern: 'services-first, handlers-second'
     architectural_pattern_description: >
       Small, stateful TypeScript service classes hold the real invariants
       (e.g., for Clearline: ledger, idempotency, payment-intent services;
@@ -248,13 +248,13 @@ technology_decisions:
       platform-level convention every app's libs/mock-backend/ should
       follow; the specific services are app-specific, the pattern is
       shared.
-    structural_convention: "libs/mock-backend/{services,handlers,fixtures}/ + browser.ts (dev/Storybook) + server.ts (Vitest/Playwright)"
+    structural_convention: 'libs/mock-backend/{services,handlers,fixtures}/ + browser.ts (dev/Storybook) + server.ts (Vitest/Playwright)'
     structural_convention_note: >
       Standard shape reused per-app, with app-specific service/handler
       contents. App-level TDRs should adopt this directory shape directly
       rather than inventing their own.
     contract_testing:
-      selected: "Rejected platform-wide: no Pact (or other consumer-driven contract testing tool)"
+      selected: 'Rejected platform-wide: no Pact (or other consumer-driven contract testing tool)'
       decision_type: locked_in_not_researched
       rationale: >
         No second, independently-verifying provider exists for any app in
@@ -280,8 +280,8 @@ technology_decisions:
       reconsider. The Clearline app TDR should cite this section directly.
 
   error_tracking:
-    selected: "Sentry (Developer/free plan)"
-    version: "Sentry Developer plan, current free tier as of research date"
+    selected: 'Sentry (Developer/free plan)'
+    version: 'Sentry Developer plan, current free tier as of research date'
     decision_type: researched
     status: adopted
     rationale: >
@@ -306,21 +306,21 @@ technology_decisions:
       a strict Content-Security-Policy, since that's a documented failure
       mode for silent SDK breakage.
     revisit_triggers:
-      - "5,000 events/month free-tier ceiling is approached — re-evaluate paid tier vs. self-hosted GlitchTip at that point."
-      - "A real backend/auth layer is added — extend Sentry to backend error tracking too, or re-evaluate scope at that time."
-    fallback_alternative: "GlitchTip — MIT-licensed, self-hostable, free hosted tier capped at 1,000 events/month; worth it only if self-hosting becomes preferable to a SaaS account."
+      - '5,000 events/month free-tier ceiling is approached — re-evaluate paid tier vs. self-hosted GlitchTip at that point.'
+      - 'A real backend/auth layer is added — extend Sentry to backend error tracking too, or re-evaluate scope at that time.'
+    fallback_alternative: 'GlitchTip — MIT-licensed, self-hostable, free hosted tier capped at 1,000 events/month; worth it only if self-hosting becomes preferable to a SaaS account.'
     alternatives_considered:
-      - option: "No error tracking (defer indefinitely)"
-        rejected_because: "The original deferral rationale (no production traffic to generate signal) is real, but the free-tier cost of adopting Sentry now is zero, and catching demo-time JS errors plus the observability-as-skill angle outweigh the small setup cost — not worth waiting for a trigger event that may never come for a portfolio project."
-      - option: "Bugsnag"
-        rejected_because: "Free tier exists but offers no advantage over Sentry for this use case (unpublished exact event cap, no differentiating feature relevant here)."
+      - option: 'No error tracking (defer indefinitely)'
+        rejected_because: 'The original deferral rationale (no production traffic to generate signal) is real, but the free-tier cost of adopting Sentry now is zero, and catching demo-time JS errors plus the observability-as-skill angle outweigh the small setup cost — not worth waiting for a trigger event that may never come for a portfolio project.'
+      - option: 'Bugsnag'
+        rejected_because: 'Free tier exists but offers no advantage over Sentry for this use case (unpublished exact event cap, no differentiating feature relevant here).'
     research_sources:
-      - url: "https://sentry.io/pricing/"
-        note: "Confirmed Developer/free plan: 5,000 events/mo, unlimited projects, 30-day retention, no card required. Accessed 2026-06-30."
-      - url: "https://glitchtip.com/pricing/"
-        note: "Confirmed GlitchTip free hosted tier (1,000 events/mo) and self-host option. Accessed 2026-06-30."
-      - url: "https://www.bugsnag.com/pricing/"
-        note: "Confirmed permanent free tier exists, 7-day retention; exact event cap not published. Accessed 2026-06-30."
+      - url: 'https://sentry.io/pricing/'
+        note: 'Confirmed Developer/free plan: 5,000 events/mo, unlimited projects, 30-day retention, no card required. Accessed 2026-06-30.'
+      - url: 'https://glitchtip.com/pricing/'
+        note: 'Confirmed GlitchTip free hosted tier (1,000 events/mo) and self-host option. Accessed 2026-06-30.'
+      - url: 'https://www.bugsnag.com/pricing/'
+        note: 'Confirmed permanent free tier exists, 7-day retention; exact event cap not published. Accessed 2026-06-30.'
 
 # ---------------------------------------------------------------------------
 # Infrastructure providers — real, currently-priced selections for what's
@@ -329,8 +329,8 @@ technology_decisions:
 # ---------------------------------------------------------------------------
 infrastructure_providers:
   frontend_hosting:
-    selected: "Vercel"
-    plan: "Hobby (free tier)"
+    selected: 'Vercel'
+    plan: 'Hobby (free tier)'
     decision_type: researched
     rationale: >
       Vercel has the most mature native Nx/Turborepo monorepo tooling of
@@ -358,36 +358,36 @@ infrastructure_providers:
       exempt).
     known_caveats:
       - "Hobby tier is explicitly restricted to non-commercial personal use per Vercel's Fair Use Guidelines. A portfolio of demo apps (not a revenue-generating product) is the textbook non-commercial case, but flagging this for human awareness — if any app starts processing real payments or running ads, budget the $20/mo Pro seat."
-      - "Hobby allows only 1 concurrent build — independent app builds in the monorepo will queue/serialize rather than run in parallel, which is acceptable at solo-dev change cadence but worth knowing."
+      - 'Hobby allows only 1 concurrent build — independent app builds in the monorepo will queue/serialize rather than run in parallel, which is acceptable at solo-dev change cadence but worth knowing.'
     alternatives_considered:
-      - option: "Netlify"
+      - option: 'Netlify'
         evaluated_state: "Free tier underwent a major restructuring on 2025-09-04 to credit-based pricing for new accounts (300 credits/mo, ~20 production deploys/mo equivalent); 1 concurrent build; Nx auto-detection exists but per-site rebuild-skipping requires a manual ignore script per site rather than Vercel's more automatic affected-based skip."
         rejected_because: "Workable, but Nx integration is less automatic than Vercel's, and the recent pricing-model change (credits vs. the historical build-minutes model) adds near-term uncertainty for budgeting against a fixed $0–20/mo target."
-      - option: "Cloudflare Pages"
+      - option: 'Cloudflare Pages'
         evaluated_state: "Most generous raw free tier (unlimited static bandwidth, 500 builds/mo), but capped at 5 Pages projects per single repo and Nx-specific guidance comes only from Nx's own blog post, not official Cloudflare docs."
         rejected_because: "The 5-projects-per-repo cap is a real constraint for a platform explicitly designed to host multiple independent apps from one monorepo over time, and the thinner first-party Nx documentation is a step down in 'zero-DevOps' ergonomics relative to Vercel today. Worth re-evaluating if the portfolio outgrows Vercel's comfort zone or true high-traffic free bandwidth becomes the binding constraint."
     research_sources:
-      - url: "https://vercel.com/docs/plans/hobby"
-        note: "Hobby tier limits, non-commercial restriction. last_updated 2026-06-16. Accessed 2026-06-30."
-      - url: "https://vercel.com/docs/limits"
-        note: "Bandwidth/function/project/build limits, Hobby vs Pro comparison. last_updated 2026-06-16. Accessed 2026-06-30."
-      - url: "https://vercel.com/pricing"
-        note: "Pro tier $20/seat/mo pricing, included usage. Accessed 2026-06-30."
-      - url: "https://vercel.com/docs/monorepos/nx"
-        note: "Official Vercel↔Nx integration guide (nx-ignore mechanism). last_updated 2026-03-11. Accessed 2026-06-30."
-      - url: "https://vercel.com/docs/limits/fair-use-guidelines"
-        note: "Verbatim non-commercial-use restriction text. Accessed 2026-06-30."
-      - url: "https://vercel.com/changelog/hobby-projects-now-default-to-30-day-deployment-retention"
-        note: "30-day Hobby deployment retention change, effective 2026-04-29."
-      - url: "https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/credit-based-pricing-plans/"
-        note: "Netlify credit-based free tier (300 credits/mo), effective for accounts created on/after 2025-09-04."
-      - url: "https://developers.cloudflare.com/pages/configuration/monorepos/"
-        note: "Cloudflare Pages monorepo support, 5-projects-per-repo cap."
-      - url: "https://nx.dev/blog/pnpm-monorepo-cloudflare-pages"
+      - url: 'https://vercel.com/docs/plans/hobby'
+        note: 'Hobby tier limits, non-commercial restriction. last_updated 2026-06-16. Accessed 2026-06-30.'
+      - url: 'https://vercel.com/docs/limits'
+        note: 'Bandwidth/function/project/build limits, Hobby vs Pro comparison. last_updated 2026-06-16. Accessed 2026-06-30.'
+      - url: 'https://vercel.com/pricing'
+        note: 'Pro tier $20/seat/mo pricing, included usage. Accessed 2026-06-30.'
+      - url: 'https://vercel.com/docs/monorepos/nx'
+        note: 'Official Vercel↔Nx integration guide (nx-ignore mechanism). last_updated 2026-03-11. Accessed 2026-06-30.'
+      - url: 'https://vercel.com/docs/limits/fair-use-guidelines'
+        note: 'Verbatim non-commercial-use restriction text. Accessed 2026-06-30.'
+      - url: 'https://vercel.com/changelog/hobby-projects-now-default-to-30-day-deployment-retention'
+        note: '30-day Hobby deployment retention change, effective 2026-04-29.'
+      - url: 'https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/credit-based-pricing-plans/'
+        note: 'Netlify credit-based free tier (300 credits/mo), effective for accounts created on/after 2025-09-04.'
+      - url: 'https://developers.cloudflare.com/pages/configuration/monorepos/'
+        note: 'Cloudflare Pages monorepo support, 5-projects-per-repo cap.'
+      - url: 'https://nx.dev/blog/pnpm-monorepo-cloudflare-pages'
         note: "Nx's own (not Cloudflare's) guide for deploying an Nx/pnpm monorepo to Cloudflare Pages, dated ~2026-04."
 
   ci_cd_provider:
-    selected: "GitHub Actions"
+    selected: 'GitHub Actions'
     decision_type: researched
     rationale: >
       Confirmed rather than assumed: GitHub Actions remains free and
@@ -412,45 +412,45 @@ infrastructure_providers:
       repos (Free plan); 20 concurrent jobs total (max 5 concurrent
       macOS); 10GB cache per repo; 500MB artifact storage.
     alternatives_considered:
-      - option: "CircleCI"
+      - option: 'CircleCI'
         rejected_because: "More generous free compute (~30,000 credits/mo ≈ 3,000 build-minutes, 30 concurrent jobs) but adds a second CI vendor/account for a solo maintainer to set up and maintain, for no benefit at this project's scale; worth revisiting only if GitHub Actions' 2,000-minute private-repo allowance is ever actually exceeded."
-      - option: "GitLab CI (GitLab.com SaaS)"
-        rejected_because: "Free tier capped at 400 compute-minutes/month per namespace — repeatedly described in current comparisons as too small for even light solo use, and stable at that level since an October 2020 cut with no 2025/2026 increase."
+      - option: 'GitLab CI (GitLab.com SaaS)'
+        rejected_because: 'Free tier capped at 400 compute-minutes/month per namespace — repeatedly described in current comparisons as too small for even light solo use, and stable at that level since an October 2020 cut with no 2025/2026 increase.'
     research_sources:
-      - url: "https://docs.github.com/en/billing/concepts/product-billing/github-actions"
-        note: "Official free-tier minutes/storage limits. Accessed 2026-06-30."
-      - url: "https://docs.github.com/en/actions/reference/limits"
-        note: "Concurrent job limits (20 total, 5 macOS). Accessed 2026-06-30."
-      - url: "https://github.blog/changelog/2025-12-16-coming-soon-simpler-pricing-and-a-better-experience-for-github-actions/"
-        note: "Original pricing-overhaul announcement, including the later-postponed self-hosted-runner fee. Accessed 2026-06-30."
-      - url: "https://github.com/orgs/community/discussions/182186"
-        note: "Confirms the self-hosted-runner fee was postponed after community backlash."
-      - url: "https://circleci.com/pricing/"
-        note: "CircleCI free tier: 30,000 credits/mo, ≈3,000 build-min on Medium Linux. Accessed 2026-06-30."
-      - url: "https://about.gitlab.com/pricing/"
-        note: "GitLab CI free tier: 400 compute-minutes/mo. Accessed 2026-06-30."
-      - url: "https://nx.dev/ci/recipes/set-up/monorepo-ci-github-actions"
-        note: "Official Nx GitHub Actions recipe, confirms first-party generator support."
+      - url: 'https://docs.github.com/en/billing/concepts/product-billing/github-actions'
+        note: 'Official free-tier minutes/storage limits. Accessed 2026-06-30.'
+      - url: 'https://docs.github.com/en/actions/reference/limits'
+        note: 'Concurrent job limits (20 total, 5 macOS). Accessed 2026-06-30.'
+      - url: 'https://github.blog/changelog/2025-12-16-coming-soon-simpler-pricing-and-a-better-experience-for-github-actions/'
+        note: 'Original pricing-overhaul announcement, including the later-postponed self-hosted-runner fee. Accessed 2026-06-30.'
+      - url: 'https://github.com/orgs/community/discussions/182186'
+        note: 'Confirms the self-hosted-runner fee was postponed after community backlash.'
+      - url: 'https://circleci.com/pricing/'
+        note: 'CircleCI free tier: 30,000 credits/mo, ≈3,000 build-min on Medium Linux. Accessed 2026-06-30.'
+      - url: 'https://about.gitlab.com/pricing/'
+        note: 'GitLab CI free tier: 400 compute-minutes/mo. Accessed 2026-06-30.'
+      - url: 'https://nx.dev/ci/recipes/set-up/monorepo-ci-github-actions'
+        note: 'Official Nx GitHub Actions recipe, confirms first-party generator support.'
 
   error_tracking_provider:
-    selected: "Sentry (Developer/free plan) — see technology_decisions.error_tracking for full rationale"
+    selected: 'Sentry (Developer/free plan) — see technology_decisions.error_tracking for full rationale'
     status: adopted
     cost_estimate_monthly_usd: 0
-    free_tier_coverage: "5,000 error events/month, unlimited projects, 30-day retention, single user (no card required)."
+    free_tier_coverage: '5,000 error events/month, unlimited projects, 30-day retention, single user (no card required).'
 
   # --- Deferred: real backend infra, no real backend exists yet anywhere
   #     in this platform. Recorded as a deliberate choice, not an omission.
   database_provider:
     status: deferred_until_real_backend_required
-    rationale: "No app in this portfolio has a real backend yet; decide for real when the first app that needs one is scoped."
+    rationale: 'No app in this portfolio has a real backend yet; decide for real when the first app that needs one is scoped.'
 
   auth_provider:
     status: deferred_until_real_backend_required
-    rationale: "No app in this portfolio has a real backend yet; decide for real when the first app that needs one is scoped."
+    rationale: 'No app in this portfolio has a real backend yet; decide for real when the first app that needs one is scoped.'
 
   backend_hosting:
     status: deferred_until_real_backend_required
-    rationale: "No app in this portfolio has a real backend yet; decide for real when the first app that needs one is scoped."
+    rationale: 'No app in this portfolio has a real backend yet; decide for real when the first app that needs one is scoped.'
 
   real_time_provider:
     status: deferred_until_real_backend_required
@@ -468,43 +468,43 @@ infrastructure_providers:
 # ---------------------------------------------------------------------------
 performance_targets:
   ci_pipeline_duration:
-    target: "< 10 minutes for a typical PR build, using nx affected to scope work to changed projects only"
-    rationale: "Keeps the GitHub Actions free-tier 2,000 min/month private-repo allowance comfortably unconsumed even with frequent solo iteration."
+    target: '< 10 minutes for a typical PR build, using nx affected to scope work to changed projects only'
+    rationale: 'Keeps the GitHub Actions free-tier 2,000 min/month private-repo allowance comfortably unconsumed even with frequent solo iteration.'
   vercel_build_duration:
-    target: "Well under the 45-minute hard cap per deployment; realistically low single-digit minutes for a frontend-only demo app"
+    target: 'Well under the 45-minute hard cap per deployment; realistically low single-digit minutes for a frontend-only demo app'
     rationale: "Vercel's Hobby tier hard-caps any single build at 45 minutes; this is a sanity ceiling, not a stretch target."
   lint_format_execution_time:
-    target: "Low-single-digit-second to low-double-digit-second full-repo ESLint+Prettier runs, scoped via nx affected for incremental/PR runs"
+    target: 'Low-single-digit-second to low-double-digit-second full-repo ESLint+Prettier runs, scoped via nx affected for incremental/PR runs'
     rationale: "ESLint 9.34's multithreaded linting (Aug 2025) keeps this acceptable for a solo maintainer despite being slower than Biome; full rule coverage was prioritized over raw speed for this decision, so this is a sanity target rather than the primary justification for the tool choice."
   note: >
     Categories like page load / Core Web Vitals / Time to Interactive are
     intentionally not set at the platform level — they depend on each
     app's specific framework and content and belong in the app-level TDR
-    (e.g. TDR-CLEARLINE-001), not here.
+    (e.g. TDR-CW-WEB-001), not here.
 
 # ---------------------------------------------------------------------------
 # Cost analysis — across active (non-deferred) selections only
 # ---------------------------------------------------------------------------
 cost_analysis:
   active_selections:
-    - item: "Vercel Hobby (frontend hosting)"
+    - item: 'Vercel Hobby (frontend hosting)'
       monthly_cost_usd: 0
-    - item: "GitHub Actions (CI/CD, free tier)"
+    - item: 'GitHub Actions (CI/CD, free tier)'
       monthly_cost_usd: 0
-    - item: "Sentry Developer plan (error tracking, free tier)"
+    - item: 'Sentry Developer plan (error tracking, free tier)'
       monthly_cost_usd: 0
-    - item: "ESLint + Prettier (linter/formatter, open source)"
+    - item: 'ESLint + Prettier (linter/formatter, open source)'
       monthly_cost_usd: 0
-    - item: "Tailwind CSS v4 (shared design tokens, open source)"
+    - item: 'Tailwind CSS v4 (shared design tokens, open source)'
       monthly_cost_usd: 0
-    - item: "MSW v2 (mock backend, open source)"
+    - item: 'MSW v2 (mock backend, open source)'
       monthly_cost_usd: 0
-    - item: "Nx + pnpm (monorepo tooling, open source)"
+    - item: 'Nx + pnpm (monorepo tooling, open source)'
       monthly_cost_usd: 0
   deferred_selections_cost_usd: 0
   total_monthly_cost_usd: 0
-  budget_target_usd: "0-20/month"
-  budget_status: "Well within target. All active selections land on free tiers; the full $0-20/month budget is unused headroom, available if any free-tier ceiling is approached (most likely candidate: Vercel Pro at $20/seat/month if non-commercial-use or build-concurrency limits ever bind)."
+  budget_target_usd: '0-20/month'
+  budget_status: 'Well within target. All active selections land on free tiers; the full $0-20/month budget is unused headroom, available if any free-tier ceiling is approached (most likely candidate: Vercel Pro at $20/seat/month if non-commercial-use or build-concurrency limits ever bind).'
 
 # ---------------------------------------------------------------------------
 # Validation
@@ -532,11 +532,11 @@ validation:
   compatibility_check:
     status: confirmed
     findings:
-      - "Vercel + Nx: natively documented (vercel.com/docs/monorepos/nx), no conflict."
-      - "GitHub Actions + Nx: first-party generator support, no conflict."
-      - "ESLint + Prettier + Nx: first-party, well-documented Nx ESLint plugin/executor support, no conflict."
-      - "MSW v2 WebSocket interception + any frontend framework: framework-agnostic, no conflict."
-      - "Node 24 + TypeScript 6.0 + pnpm + Nx 21: standard, widely-used combination as of mid-2026, no known conflicts."
+      - 'Vercel + Nx: natively documented (vercel.com/docs/monorepos/nx), no conflict.'
+      - 'GitHub Actions + Nx: first-party generator support, no conflict.'
+      - 'ESLint + Prettier + Nx: first-party, well-documented Nx ESLint plugin/executor support, no conflict.'
+      - 'MSW v2 WebSocket interception + any frontend framework: framework-agnostic, no conflict.'
+      - 'Node 24 + TypeScript 6.0 + pnpm + Nx 21: standard, widely-used combination as of mid-2026, no known conflicts.'
       - "Tailwind v4 CSS-first config + Nx shared-package pattern: documented directly by Nx's own blog, no conflict."
     open_items_for_human_review:
       - "Vercel Hobby's non-commercial-use restriction — confirm this reading is acceptable before relying on it long-term; flagged, not silently assumed fine."

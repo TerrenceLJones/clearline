@@ -53,6 +53,9 @@ importers:
       '@sentry/cli':
         specifier: ^3.6.0
         version: 3.6.0
+      '@sentry/react':
+        specifier: ^10.62.0
+        version: 10.62.0(react@19.2.7)
       vercel:
         specifier: ^54.18.6
         version: 54.18.6(@emnapi/core@1.4.5)(@emnapi/runtime@1.4.5)
@@ -1339,6 +1342,14 @@ packages:
       rollup:
         optional: true
 
+  '@sentry/browser-utils@10.62.0':
+    resolution: {integrity: sha512-mS9HVVuWIdye9o0xUGFmzNOBqktF4n5kugrF8NCOYYDrr5ZV8Cx7BlquHQn5UpCeViVhZtcDlEm4iOK7++Px7A==}
+    engines: {node: '>=18'}
+
+  '@sentry/browser@10.62.0':
+    resolution: {integrity: sha512-uJi0yPssB3Nt/cZ8/S8opW42gaM59/6IyNtPFYD7C0ciudi/nIo5QMVpCYBBI3jnKFOIQLlsMT4pDlOLuxxNuQ==}
+    engines: {node: '>=18'}
+
   '@sentry/cli-darwin@3.6.0':
     resolution: {integrity: sha512-C2SWHKaEP8NoYkLDr5jwrzklTwlJkzPIx7lu2LZrwBuHG/sNhWdili0ED2mD86b6Q90hlcMtuBm5IHUwcZ6FTQ==}
     engines: {node: '>=18'}
@@ -1390,6 +1401,28 @@ packages:
     resolution: {integrity: sha512-79XC8o59G/i3VqmnoQD74a/QD/422eQQlUqiPd3sEvcYCxnaZialRVAsxuNEFd6sx4aVGpqt775MMDT9cV/lMg==}
     engines: {node: '>= 18'}
     hasBin: true
+
+  '@sentry/core@10.62.0':
+    resolution: {integrity: sha512-tV69fMg2sS5DUFmQSnS7Jd5qJAp0izxwcsvBVz2ieTM9VMRi99IfOSYW9UYr3p1yfuksk41kefN5PEbeedUE+A==}
+    engines: {node: '>=18'}
+
+  '@sentry/feedback@10.62.0':
+    resolution: {integrity: sha512-d0BVjJVny6qpBgGJgWL0fbcoQHjtD3z3R8EK/KzTS3RO92JX5n3A536n5D/rh0gZFgcIwiUzBXegmyPOSQn9ng==}
+    engines: {node: '>=18'}
+
+  '@sentry/react@10.62.0':
+    resolution: {integrity: sha512-PChimVpY0wzs3H/hJqyl87/ITTHwIZWTSY68QoENZyLnp7DvLcFiZYub/gFws1pzDPhtIQXVLU72fbmUjT5PSg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      react: ^16.14.0 || 17.x || 18.x || 19.x
+
+  '@sentry/replay-canvas@10.62.0':
+    resolution: {integrity: sha512-CzPAxmpe5US/ABGA1TzpjFKOFZN5uqlzrRh/uM9/daVuzLVKIAQ0XRNxo/PPEXvlDm/PoMdI5L0qIODuIKnyyw==}
+    engines: {node: '>=18'}
+
+  '@sentry/replay@10.62.0':
+    resolution: {integrity: sha512-rWp4hBhZOmdQhisxcKzAwTGiRk/LvWnNaElWe7nbRhjsM/usp2095yfjq4iJ47v9MtO7xxY6eUz++fLBycqXKg==}
+    engines: {node: '>=18'}
 
   '@sinclair/typebox@0.25.24':
     resolution: {integrity: sha512-XJfwUVUKDHF5ugKwIcxEgc9k8b7HbznCp6eUfWgu710hMPNIO4aw4/zB5RogDQz8nd6gyCDpU9O/m6qYEWY6yQ==}
@@ -2820,6 +2853,10 @@ packages:
   raw-body@2.4.1:
     resolution: {integrity: sha512-9WmIKF6mkvA0SLmA2Knm9+qj89e+j1zqgyn8aXGd7+nAduPoqgI9lO57SAZNn/Byzo5P7JhXTyg9PzaJbH73bA==}
     engines: {node: '>= 0.8'}
+
+  react@19.2.7:
+    resolution: {integrity: sha512-HNe9WslTbXmFK8o8cmwgAeJFSBvt1bPdHCVKtaaV+WlAN36mpT4hcRpwbf3fY56ar2oIXzsBpOAiIRHAdY0OlQ==}
+    engines: {node: '>=0.10.0'}
 
   readable-stream@3.6.2:
     resolution: {integrity: sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA==}
@@ -4604,6 +4641,18 @@ snapshots:
       estree-walker: 2.0.2
       picomatch: 4.0.4
 
+  '@sentry/browser-utils@10.62.0':
+    dependencies:
+      '@sentry/core': 10.62.0
+
+  '@sentry/browser@10.62.0':
+    dependencies:
+      '@sentry/browser-utils': 10.62.0
+      '@sentry/core': 10.62.0
+      '@sentry/feedback': 10.62.0
+      '@sentry/replay': 10.62.0
+      '@sentry/replay-canvas': 10.62.0
+
   '@sentry/cli-darwin@3.6.0':
     optional: true
 
@@ -4643,6 +4692,28 @@ snapshots:
       '@sentry/cli-win32-arm64': 3.6.0
       '@sentry/cli-win32-i686': 3.6.0
       '@sentry/cli-win32-x64': 3.6.0
+
+  '@sentry/core@10.62.0': {}
+
+  '@sentry/feedback@10.62.0':
+    dependencies:
+      '@sentry/core': 10.62.0
+
+  '@sentry/react@10.62.0(react@19.2.7)':
+    dependencies:
+      '@sentry/browser': 10.62.0
+      '@sentry/core': 10.62.0
+      react: 19.2.7
+
+  '@sentry/replay-canvas@10.62.0':
+    dependencies:
+      '@sentry/core': 10.62.0
+      '@sentry/replay': 10.62.0
+
+  '@sentry/replay@10.62.0':
+    dependencies:
+      '@sentry/browser-utils': 10.62.0
+      '@sentry/core': 10.62.0
 
   '@sinclair/typebox@0.25.24': {}
 
@@ -6395,6 +6466,8 @@ snapshots:
       http-errors: 1.7.3
       iconv-lite: 0.4.24
       unpipe: 1.0.0
+
+  react@19.2.7: {}
 
   readable-stream@3.6.2:
     dependencies:

@@ -21,7 +21,7 @@ Double-entry ledger with derived balances, idempotent payment flows, multi-level
 ```
 fintech-portfolio/
   apps/                  # deployable applications (one per project)
-    clearline-web/       # placeholder — frontend framework TBD (TDR-CLEARLINE-001)
+    clearline-web/       # placeholder — frontend framework TBD (TDR-CW-WEB-001)
   libs/                  # shared libraries — domain logic, UI, data-access, utilities
     design-tokens/       # shared Tailwind v4 theme/tokens
     mock-backend/        # MSW v2 mock backend convention (services-first, handlers-second)
@@ -40,7 +40,7 @@ mock-backend strategy, hosting, CI/CD) are recorded in
 ## Project status
 
 Platform baseline bootstrap (DevOps Mode 1): monorepo tooling, workspace structure, and shared
-lib scaffolding are in place. `apps/clearline-web` is a placeholder until `TDR-CLEARLINE-001`
+lib scaffolding are in place. `apps/clearline-web` is a placeholder until `TDR-CW-WEB-001`
 selects the frontend framework — `pnpm nx run clearline-web:*` targets are not wired up yet.
 
 ---

@@ -1,0 +1,114 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-018'
+app: 'clearline-web'
+feature_area: 'analytics'
+title: 'Streaming AI Spend Insights'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 8
+dependencies: ['US-CW-015']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-012'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-012'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-012'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'finance manager'
+  capability: 'view AI-generated spend insights that stream progressively into the UI, with the ability to cancel mid-stream and clear signaling when content is incomplete, rate-limited, uncertain, or refused'
+  business_value: 'I can quickly understand spend patterns through low-latency, trustworthy AI summaries without waiting for a full response, while remaining confident the system fails gracefully and never leaks credentials'
+  description: |
+    As a finance manager
+    I want AI-generated spend insights to stream into the UI token by token, with cancellation, interruption handling, rate-limit messaging, uncertainty caveats, and refusal handling all clearly surfaced
+    So that I get fast, transparent, and trustworthy spend summaries without being blocked by slow responses or misled by incomplete or uncertain output
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I request a spend summary for the current month
+      When the AI begins generating a response
+      Then tokens stream progressively into the UI as they arrive
+      And a visible cancel button is available throughout
+      And the API key used to call the underlying model is never exposed to the client
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given an insight is actively streaming
+      When I click "Cancel"
+      Then the in-flight request is aborted
+      And the partial text already rendered remains visible, marked as incomplete
+      And no further tokens are appended after cancellation
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given an insight is streaming
+      When the connection drops before the response completes
+      Then I see "The response was cut off." with a "Retry" action
+      And the partial content is preserved but visually marked as incomplete
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given the AI insights service has hit a rate limit
+      When I request an insight
+      Then I see "Insights are busy right now. Try again in a moment."
+      And no broken or empty response is rendered
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given the AI-generated insight includes a numeric estimate rather than an exact figure
+      When the insight is rendered
+      Then a caveat is shown inline: "This is an estimate and may not be exact."
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given a request results in the model declining to respond
+      When this occurs
+      Then I see a neutral, non-blaming message: "I can't help with that one. Try rephrasing."
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Requires a server-side proxy/edge function that holds the underlying model's API key; per AC-01 the key must
+  never be exposed to the client, so all model calls are made from a backend service that streams tokens to the
+  browser over a transport such as Server-Sent Events or chunked HTTP rather than handing the client direct
+  model credentials. Cancellation must abort the in-flight upstream request (not just stop rendering client-side)
+  to avoid wasted compute and must leave already-rendered partial text intact with an "incomplete" visual marker.
+  Dropped-connection handling needs to distinguish a clean stream completion from a truncated one so the
+  "response was cut off" + Retry affordance only appears on genuine interruption. Rate-limit responses from the
+  AI service must be caught and mapped to the friendly busy message rather than surfacing raw provider errors.
+
+# Edge Cases
+edge_cases: |
+  - User clicks Cancel while tokens are mid-flight; no further tokens may be appended after the abort.
+  - Network/connection drop occurs before the stream completes, requiring partial content to be preserved and marked incomplete with a Retry action.
+  - Underlying AI service returns a rate-limit error; response must be replaced with a friendly busy message and no broken/empty UI state.
+  - AI response contains an estimated/approximate numeric value, requiring an inline uncertainty caveat.
+  - AI declines or is filtered from responding, requiring a neutral non-blaming refusal message rather than an error or blank state.
+  - (inferred) User triggers Cancel and then immediately issues a new insight request before the prior abort has fully resolved, requiring the UI to avoid mixing tokens from the cancelled and new streams.
+  - (inferred) Retry action is clicked multiple times in quick succession after a cut-off stream, requiring de-duplication of in-flight retry requests.
+
+# Implementation Status
+implementation_status: |
+  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
+  specification pass for clearline-web — no application code exists yet.

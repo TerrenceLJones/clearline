@@ -1,0 +1,90 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-011'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'Expense Submission & Policy Enforcement'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 3
+dependencies: ['US-CW-001']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-006'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-006'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-006'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'Employee'
+  capability: 'submit an expense for reimbursement with the required category, amount, and receipt details, and receive real-time feedback when company spending policy is violated'
+  business_value: 'expenses are routed correctly for approval and policy compliance is enforced at the point of entry, reducing rework and approval delays'
+  description: |
+    As an Employee
+    I want to submit an expense with a category, amount, and receipt, and see real-time policy feedback as I fill out the form
+    So that my expense is correctly routed for approval and I can correct policy violations before submission instead of after rejection
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I am logged in as an Employee
+      When I submit an expense of $300.00 with a receipt attached and a category selected
+      Then the expense enters "Pending approval" status
+      And it is routed to my designated approver based on amount and policy
+      And I receive a confirmation "Expense submitted for approval"
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given company policy requires a receipt for expenses over $75.00
+      When I submit an expense of $120.00 without a receipt
+      Then I see an inline error "A receipt is required for expenses over $75.00."
+      And submission is blocked until a receipt is attached
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given a category has a per-transaction policy limit of $200.00
+      When I enter an amount of $350.00 in that category
+      Then I see an inline warning "This exceeds the $200.00 policy limit for this category" before I submit
+      And I may still submit, but the expense is flagged for additional scrutiny in the approval queue
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Receipt-required and per-transaction policy-limit thresholds must be evaluated client-side in real time
+  (on field change, prior to submission) and re-validated server-side at submission time to prevent bypass.
+  Routing logic must resolve the designated approver based on both expense amount and applicable policy
+  rules at submission time. Submission must be blocked synchronously when a required receipt is missing,
+  while policy-limit violations are advisory only and must not block submission, instead setting a flag
+  that the approval queue can surface for additional scrutiny.
+
+# Edge Cases
+edge_cases: |
+  - Expense amount exactly at the $75.00 receipt-required threshold (inferred)
+  - Expense amount exactly at the $200.00 per-transaction policy limit (inferred)
+  - Submission attempted without a receipt above the $75.00 threshold — submission blocked until receipt attached
+  - Amount entered exceeds category policy limit — inline warning shown but submission still permitted with scrutiny flag
+  - No category selected at submission time (inferred)
+
+# Implementation Status
+implementation_status: |
+  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
+  specification pass for clearline-web — no application code exists yet.

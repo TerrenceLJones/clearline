@@ -1,0 +1,111 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-015'
+app: 'clearline-web'
+feature_area: 'analytics'
+title: 'Spend Analytics Dashboard'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 8
+dependencies: ['US-CW-006']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-009'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-009'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-009'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'Finance Manager'
+  capability: 'view a real-time spend analytics dashboard broken down by category, department, and vendor, with anomaly flags, resilient section-level error handling, and data freshness indicators'
+  business_value: 'I can monitor company spend accurately and respond quickly to unusual transactions without being blocked by partial system failures or stale data'
+  description: |
+    As a Finance Manager
+    I want a real-time spend analytics dashboard that breaks down spend by category, department, and vendor, flags anomalous transactions, handles date filtering and partial load failures gracefully, and shows data freshness
+    So that I can monitor company spend accurately and respond quickly to unusual transactions without being blocked by partial system failures or stale data
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I am a Finance Manager viewing the spend dashboard
+      When the page loads
+      Then I see spend broken down by category, department, and vendor for the selected period
+      And monetary values render from skeleton loading states, never as "$0.00" while loading
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given a transaction is flagged by the anomaly detection model as unusual
+      When I view that transaction in the dashboard
+      Then it displays a warning icon and the text "Unusual amount" alongside its normal styling
+      And the anomaly indicator is never conveyed by color alone
+      And an AI confidence level is shown alongside the flag
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given I select a date range with no transactions
+      When the dashboard updates
+      Then I see an empty state: "No transactions in this date range" — not an error
+      And a suggestion to adjust the date range is shown
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given I am setting a custom date range filter
+      When I select an end date earlier than the start date
+      Then I see an inline error "End date must be after the start date."
+      And the filter is not applied until corrected
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given the dashboard has multiple independent sections (spend-by-category, top vendors, budget status)
+      When the "top vendors" section fails to load due to a backend error
+      Then the other sections continue to render normally
+      And only the "top vendors" section shows "This section couldn't load. Retry." with a scoped retry button
+      And the failure is isolated by a dedicated error boundary that does not affect the rest of the page
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given the dashboard's underlying data was last refreshed 10 minutes ago
+      When I view the dashboard
+      Then I see a "Last updated 10 minutes ago" timestamp
+      And a manual "Refresh" action is available
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Dashboard sections (spend-by-category, top vendors, budget status) must be implemented as independently
+  data-fetched components, each wrapped in its own error boundary so a single section's backend failure does
+  not cascade to the rest of the page. Monetary values must use skeleton placeholders during loading rather
+  than defaulting to a zero-value render, to avoid implying a false "$0.00" spend state. Anomaly flags require
+  integration with an anomaly detection model that returns both a flag and a confidence score, and must be
+  rendered with an icon plus text label (not color alone) for accessibility. Date range filtering needs
+  client-side validation (start/end ordering) prior to triggering any data refetch, and the dashboard must
+  track and surface a "last refreshed" timestamp with a manual refresh trigger.
+
+# Edge Cases
+edge_cases: |
+  - Date range selected with zero matching transactions (empty state, not error)
+  - End date earlier than start date in the custom range filter (inline validation error)
+  - Backend failure isolated to a single dashboard section (top vendors) while others succeed
+  - Anomaly flag must not rely on color alone for accessibility/colorblind users
+  - Stale data display when last refresh exceeds a noticeable time threshold
+  - (inferred) Retry action on a failed section re-fetches only that section's data without reloading the full dashboard
+  - (inferred) Concurrent section failures (e.g., both top vendors and budget status fail) each show independent scoped retry states without affecting spend-by-category

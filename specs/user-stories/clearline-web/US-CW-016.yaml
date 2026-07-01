@@ -1,0 +1,106 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-016'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'Bank Feed Reconciliation'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 8
+dependencies: ['US-CW-007']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-010'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-010'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-010'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'accounting operations specialist'
+  capability: 'automated matching of bank feed transactions against ledger entries, with exception handling, fuzzy-match suggestions, and manual split capability'
+  business_value: 'I can close the books accurately and quickly without manually cross-checking every bank transaction against the ledger'
+  description: |
+    As an accounting operations specialist
+    I want bank feed transactions to be automatically reconciled against ledger entries, with unmatched and ambiguous items surfaced for review
+    So that I can close the books accurately and quickly without manually cross-checking every bank transaction against the ledger
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given a $5,000.00 ledger entry exists for a vendor payment
+      And the corresponding bank feed transaction of $5,000.00 arrives
+      When the nightly reconciliation job runs
+      Then the two records are automatically matched
+      And the reconciliation status for that entry shows "Matched"
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given a bank feed transaction has no corresponding ledger entry
+      When reconciliation runs
+      Then the transaction appears in the exceptions queue
+      And it is labeled "Unmatched" with a warning icon
+      And it remains actionable (assign, dismiss, manually match) rather than hidden
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given a bank feed transaction is for "ABC Corp" and a ledger entry is for "ABC Corporation" with the same amount and a nearby date
+      When reconciliation runs
+      Then the system surfaces a suggested match with a similarity score
+      And I can confirm or reject the suggested match
+      And confirming creates a permanent match; rejecting sends it to the exceptions queue
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given the sum of all ledger postings for an account does not net to the expected derived balance
+      When this discrepancy is detected
+      Then the affected balance is not displayed as a normal number
+      And I see "We're double-checking your balance. This may take a moment." with a support reference ID
+      And this is treated as a Fatal-tier error requiring investigation before the balance is shown again
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given an unmatched bank transaction actually corresponds to two separate ledger entries
+      When I select "Split match" and assign portions of the amount to each entry
+      Then the system validates that the split amounts sum exactly to the original transaction amount
+      And if they do not sum correctly, I see "The split amounts must add up to the full transaction amount."
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Reconciliation runs as a nightly batch job that performs exact-match comparison on amount plus
+  corresponding ledger entry before falling back to fuzzy matching on vendor name similarity, amount,
+  and date proximity, with a computed similarity score surfaced to the user. Internal ledger balance
+  integrity must be continuously verified (postings sum to derived balance) before any balance is
+  rendered to the user; a mismatch must trigger a Fatal-tier error path with a support reference ID
+  rather than displaying a potentially incorrect number. Split-match operations require server-side
+  validation that split amounts sum exactly (to the cent) to the original transaction amount before
+  the split is committed. Exceptions, fuzzy-match suggestions, and split actions must all remain
+  visible and actionable in a persistent exceptions queue rather than being silently dropped.
+
+# Edge Cases
+edge_cases: |
+  - Bank feed transaction arrives with no corresponding ledger entry (unmatched exception)
+  - Vendor name mismatch between bank feed and ledger ("ABC Corp" vs "ABC Corporation") requiring fuzzy match
+  - Rejected fuzzy-match suggestion must route to the exceptions queue rather than being discarded
+  - Internal ledger balance fails to net to its expected derived value (Fatal-tier error, balance hidden)
+  - Manual split amounts do not sum exactly to the original transaction amount
+  - (inferred) Duplicate bank feed transactions for the same amount and vendor arriving on the same day, risking an incorrect auto-match

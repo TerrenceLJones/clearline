@@ -1,0 +1,124 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-010'
+app: 'clearline-web'
+feature_area: 'payments'
+title: 'Step-Up Authentication for High-Value Payments'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 8
+dependencies: ['US-CW-007']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-005'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-005'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-005'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'Accounts payable manager submitting a high-value B2B payment'
+  capability: 'be challenged with a step-up authentication (OTP or biometric) when a payment exceeds the configured risk threshold, with clear recovery paths for failures, abandonment, expiry, and connectivity loss'
+  business_value: 'the platform can satisfy 3DS-style strong customer authentication requirements on sensitive payments while preserving a single, idempotent payment attempt, reducing fraud risk without creating duplicate charges or confusing dead ends for the user'
+  description: |
+    As an accounts payable manager submitting a high-value B2B payment
+    I want the system to require step-up authentication when the payment exceeds the risk threshold, and to clearly guide me through challenge success, failure, expiry, abandonment, or connectivity loss
+    So that high-risk payments are strongly authenticated while my payment intent stays safe, idempotent, and recoverable at every step
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given the step-up threshold is $10,000.00
+      When I submit a payment of $12,000.00
+      Then before the payment is confirmed, a step-up authentication challenge is presented
+      And the PaymentIntent transitions to "requires_action"
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given I am presented with a step-up challenge (OTP or biometric)
+      When I complete the challenge correctly
+      Then the PaymentIntent transitions to "processing"
+      And I see a pending confirmation state
+      And the original idempotency key is preserved across the entire flow
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given a step-up challenge modal is open
+      When I close the modal without completing the challenge
+      Then the PaymentIntent remains in "requires_action" or reverts to "requires_payment_method"
+      And no charge or transfer is created
+      And when I return to the payment screen, I see "Authentication wasn't completed. Try again to finish your payment."
+      And a "Retry" button re-opens the challenge using the same idempotency key
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given I am completing a step-up challenge
+      When I enter an incorrect OTP code
+      Then I see "We couldn't verify your identity. Try again or use a different verification method."
+      And this is distinguished from a network failure in the challenge itself
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given I am waiting for an OTP via SMS
+      When 30 seconds pass without receiving it
+      Then a "Didn't get the code? Resend" link becomes active
+      And an alternative method link ("Try another method") is also shown
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given an OTP was issued 10 minutes ago and has expired
+      When I attempt to submit the expired code
+      Then I see "That code expired. We've sent a new one."
+      And the previous OTP is invalidated server-side before the new one is issued
+    status: 'active'
+  - id: 'AC-07'
+    description: |
+      Given I am mid-challenge and the network drops
+      When the challenge request fails due to connectivity
+      Then I see "We lost connection during verification. Try again." distinct from an authentication failure message
+      And I am able to retry without losing my place in the payment flow
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  The PaymentIntent state machine must support a "requires_action" state gating confirmation until the step-up
+  challenge resolves, with a defined fallback transition to "requires_payment_method" on abandonment. The same
+  idempotency key must be threaded through the entire challenge lifecycle (initial submission, retries, resend,
+  alternative method, and final confirmation) to guarantee no duplicate charge or transfer is ever created.
+  OTP issuance must be server-side time-bound (10-minute expiry) with strict invalidation of the prior code before
+  a replacement is issued, and a 30-second client-side timer must gate enabling of the resend/alternative-method
+  affordances. Distinct, user-facing error copy must be maintained for authentication failure versus network/connectivity
+  failure so the UI and any monitoring can disambiguate fraud-relevant failures from infrastructure failures.
+
+# Edge Cases
+edge_cases: |
+  - Step-up challenge modal closed/abandoned before completion, requiring safe state reversion and retry via the same idempotency key
+  - Incorrect OTP entry or failed biometric match, requiring distinct messaging from network failure
+  - OTP not received within 30 seconds, requiring resend and alternative-method affordances
+  - OTP expired after 10 minutes, requiring server-side invalidation before a new code is issued
+  - Network/connectivity failure mid-challenge, requiring retry without loss of payment flow position
+  - Payment amount exactly at the step-up threshold boundary (inferred)
+  - Repeated step-up failures potentially requiring rate-limiting or lockout to prevent brute-force OTP guessing (inferred)
+
+# Implementation Status
+implementation_status: |
+  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
+  specification pass for clearline-web — no application code exists yet.

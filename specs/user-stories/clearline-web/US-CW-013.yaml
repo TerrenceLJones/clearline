@@ -1,0 +1,106 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-013'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'Batch Approval & Bulk Actions'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 5
+dependencies: ['US-CW-012']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-007'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-007'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-007'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'approver managing a high volume of pending expenses'
+  capability: 'select multiple expenses and approve or reject them together in a single batch action, with clear per-item feedback when some items fail'
+  business_value: 'I can process large volumes of expense approvals efficiently without sacrificing accuracy, and can recover gracefully from partial failures or network interruptions without risking duplicate actions'
+  description: |
+    As an approver managing a high volume of pending expenses
+    I want to select multiple expenses and approve or reject them in bulk, with safe partial-failure and retry handling
+    So that I can process approvals efficiently while ensuring duplicate or lost actions never occur and every employee is notified individually
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I select 10 pending expenses
+      When I click "Approve selected"
+      Then all 10 expenses transition to "Approved"
+      And I see a toast "10 approved"
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given I select 10 pending expenses
+      And 2 of them will fail (one exceeds my approval limit, one was already actioned by someone else)
+      When I click "Approve selected"
+      Then 8 expenses are successfully approved and committed
+      And I see a summary banner "8 of 10 approved. 2 couldn't be processed — review and retry."
+      And each of the 2 failed rows displays its specific failure reason
+      And a "Retry failed (2)" action is available that retries only those 2 items
+      And retrying does not re-apply or duplicate the 8 already-successful approvals
+      And each item in the batch carries its own idempotency key so partial retries are safe
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given I initiate a batch approval of 20 items
+      When the network drops after 5 items have been confirmed by the server
+      Then the 5 confirmed items remain approved
+      And the remaining 15 are shown as "Not yet processed"
+      And I can resume by retrying only the unprocessed 15
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given I select 5 expenses
+      When I click "Reject selected" and provide a single shared rejection reason
+      Then all 5 expenses are rejected with that reason attached individually to each
+      And each affected employee is notified individually
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Each item within a batch must carry its own idempotency key so that retries of failed or
+  unprocessed items never re-apply or duplicate already-successful approvals. Batch processing
+  must be resilient to mid-batch network failures, tracking per-item confirmation state from the
+  server so that confirmed items are preserved and only unconfirmed items are retried. Batch
+  approval enforces per-approver limits and concurrent-action conflict detection (e.g., an item
+  already actioned by someone else) at the individual item level, not the batch level. Bulk
+  rejection applies one shared reason text to all selected items while still recording and
+  notifying each affected employee independently.
+
+# Edge Cases
+edge_cases: |
+  - Partial failure where some items exceed the approver's approval limit
+  - Partial failure where an item was already actioned by another approver before the batch completed
+  - Network failure mid-batch leaving some items confirmed and others unprocessed
+  - Retrying a failed/unprocessed subset must not duplicate or re-apply already-successful approvals
+  - Bulk rejection with a single shared reason must still notify each employee individually
+  - (inferred) Retry of failed items itself partially fails again, requiring repeated retry cycles
+  - (inferred) User attempts a bulk action with zero items selected
+
+# Implementation Status
+implementation_status: |
+  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
+  specification pass for clearline-web — no application code exists yet.

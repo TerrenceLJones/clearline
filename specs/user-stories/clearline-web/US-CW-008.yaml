@@ -1,0 +1,125 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-008'
+app: 'clearline-web'
+feature_area: 'payments'
+title: 'Payment Validation, Limits & Recipient Checks'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 8
+dependencies: ['US-CW-006']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-004'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-004'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-004'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'Controller'
+  capability: 'have vendor payments validated against available balance, daily transfer limits, and recipient account status before funds are moved'
+  business_value: 'I am stopped from making invalid, over-limit, or misdirected transfers with clear, actionable error messages instead of discovering problems after the fact'
+  description: |
+    As a Controller
+    I want vendor payments validated against available balance, daily transfer limits, and recipient account status before funds are moved
+    So that I am stopped from making invalid, over-limit, or misdirected transfers with clear, actionable error messages instead of discovering problems after the fact
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I am logged in as a Controller
+      And I am on the "New Payment" form
+      Given my account's available balance is $3,000.00 (derived from the ledger)
+      When I attempt to submit a payment of $5,000.00
+      Then the submission is blocked client-side before any network call
+      And I see "You don't have enough available balance for this transfer. Available: $3,000.00."
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given I am logged in as a Controller
+      And I am on the "New Payment" form
+      Given my daily transfer limit is $20,000.00
+      And I have already transferred $18,000.00 today
+      When I attempt to submit a payment of $5,000.00
+      Then I see "This exceeds your daily transfer limit of $20,000.00. Request a higher limit or enter a smaller amount."
+      And a "Request limit increase" call to action is shown
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given I am logged in as a Controller
+      And I am on the "New Payment" form
+      Given I enter recipient details that do not match any known account
+      When I submit the payment
+      Then I see "We couldn't find that recipient account. Check the details and try again."
+      And the recipient field is highlighted for correction
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given I am logged in as a Controller
+      And I am on the "New Payment" form
+      Given the recipient's account has been closed
+      When I submit the payment
+      Then the payment is rejected
+      And I see "This recipient's account is no longer active. Contact them to get updated details."
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given I am logged in as a Controller
+      And I am on the "New Payment" form
+      Given the recipient account matches my own account
+      When I attempt to submit the payment
+      Then I see "You can't transfer to the same account."
+      And the submit action is blocked
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given I am logged in as a Controller
+      And I am on the "New Payment" form
+      Given the recipient's account uses a non-USD currency
+      When I enter the payment amount in USD
+      Then I see a banner "This recipient uses {currency}. Review the converted amount before sending."
+      And the converted amount and exchange rate are displayed before I can confirm
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Available balance and daily transfer limit checks must execute client-side prior to any network call where the
+  data is already known (e.g. balance derived from the ledger), to provide immediate feedback and avoid unnecessary
+  server round-trips. Daily transfer limit tracking must aggregate same-day transfers in real time. Recipient
+  resolution must distinguish "not found" from "closed" from "self-match" as distinct validation failures with
+  distinct messaging. Cross-currency payments require a live exchange rate lookup and explicit user confirmation of
+  the converted amount before submission proceeds.
+
+# Edge Cases
+edge_cases: |
+  - Submission amount exceeds available ledger-derived balance
+  - Cumulative same-day transfers plus new payment exceed the daily transfer limit
+  - Recipient account details do not match any known account
+  - Recipient account exists but has been closed
+  - Recipient account is identical to the sender's own account (self-transfer)
+  - Recipient account currency differs from the payment's entered currency (USD)
+  - (inferred) Exchange rate lookup fails or is stale at the moment of confirmation
+
+# Implementation Status
+implementation_status: |
+  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
+  specification pass for clearline-web — no application code exists yet.

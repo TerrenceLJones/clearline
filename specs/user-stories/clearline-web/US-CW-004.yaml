@@ -1,0 +1,125 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-004'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'Business Onboarding Flow'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 8
+dependencies: []
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-002'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-002'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-002'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'business owner setting up a new Clearline account'
+  capability: 'complete a guided, save-and-resume multi-step onboarding flow that captures business information and beneficial ownership data, verifies the entity, and culminates in account approval'
+  business_value: 'I can stand up my Clearline account efficiently and confidently, picking up where I left off if interrupted, and gain full transacting capability as soon as verification clears'
+  description: |
+    As a business owner setting up a new Clearline account
+    I want a guided, save-and-resume onboarding wizard that collects business info and beneficial owner details and verifies them
+    So that I can efficiently complete KYB requirements and unlock full transacting capability without losing progress or encountering confusing errors
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I have created a Clearline account
+      When I start the onboarding flow
+      Then I see a multi-step wizard: Business Info → Beneficial Owners → Document Upload → Review
+      And my progress is saved after each step (save-and-resume)
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given I completed the "Business Info" step previously
+      And I closed the browser before completing later steps
+      When I return to Clearline and log in
+      Then I am taken directly to the "Beneficial Owners" step
+      And my previously entered Business Info is pre-filled and unchanged
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given I am on the Business Info step
+      When I enter a valid legal business name, EIN, and registered address
+      And I submit the step
+      Then the entity is verified against business registries
+      And I am advanced to the Beneficial Owners step
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given I am on the Business Info step
+      When I enter an EIN that does not match any registered business
+      And I submit the step
+      Then I see an inline error "We couldn't verify this EIN. Please check and try again."
+      And the field is highlighted for correction
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given I am on the Beneficial Owners step
+      When I add an owner with 25% or greater ownership
+      Then that owner is flagged as requiring individual identity verification (KYC)
+      And I must provide their name, date of birth, and SSN/ITIN
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given I have been inactive on an onboarding step for over 30 minutes
+      When I return to the page
+      Then I see "Your verification session timed out. Let's start again from where you left off."
+      And I resume from my last successfully completed step, not from the very beginning
+    status: 'active'
+  - id: 'AC-07'
+    description: |
+      Given a business with the same EIN already has a Clearline account
+      When I attempt to onboard that same business
+      Then I see "It looks like your business already has an account. Sign in instead."
+      And a "Sign in" call to action is shown
+    status: 'active'
+  - id: 'AC-08'
+    description: |
+      Given all verification steps pass
+      When the review is completed
+      Then I receive an email and in-app notification "Your account is approved"
+      And full transacting capability (payments, card issuance) is unlocked
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Onboarding state must persist server-side after every step completion to support save-and-resume across
+  sessions and devices, with resumption always routing to the last successfully completed step. Business Info
+  submission requires a synchronous integration with a business registry / EIN verification service, and
+  beneficial owner records with ownership >= 25% must trigger a downstream individual KYC verification workflow
+  capturing name, date of birth, and SSN/ITIN. Session activity must be tracked with a 30-minute inactivity
+  timeout that invalidates the in-progress step without discarding previously saved steps. EIN uniqueness must
+  be enforced at submission time to detect duplicate business accounts before a new onboarding record is created.
+
+# Edge Cases
+edge_cases: |
+  - EIN entered does not match any registered business (failed registry verification)
+  - Session inactive for over 30 minutes during onboarding, requiring resumption from last completed step
+  - Duplicate business account detected via matching EIN
+  - Browser closed mid-flow before later steps are completed, requiring resume logic on next login
+  - Beneficial owner added at or above the 25% ownership threshold requiring additional KYC data collection
+  - (inferred) Network or registry-service outage during Business Info submission preventing entity verification
+  - (inferred) Concurrent onboarding attempts for the same EIN from two different sessions

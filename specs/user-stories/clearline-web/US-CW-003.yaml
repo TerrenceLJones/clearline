@@ -1,0 +1,93 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-003'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'Password Reset'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 3
+dependencies: ['US-CW-001']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-001'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-001'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-001'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'Clearline user who has forgotten their password'
+  capability: 'request a password reset via email and securely set a new password through a time-limited link, without the system revealing whether a given email is registered'
+  business_value: 'I can regain access to my account on my own without contacting support, while the platform protects against email enumeration and ensures a compromised password is fully neutralized across all sessions'
+  description: |
+    As a Clearline user who has forgotten their password
+    I want to request a password reset email and set a new password via a time-limited link
+    So that I can securely regain account access while the system reveals nothing about which emails are registered and immediately revokes all prior sessions once my password is changed
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I am on the "Forgot password" page
+      When I enter a registered email address
+      And I submit the form
+      Then I see "If that email is registered, we've sent a reset link" regardless of whether the email exists
+      And if the email is registered, a time-limited reset link is emailed
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given I received a password reset email more than 1 hour ago
+      When I click the reset link
+      Then I see "This link has expired. Request a new one."
+      And a "Resend link" button is shown
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given I have a valid, unexpired reset link
+      When I set a new password meeting complexity requirements
+      And I submit the form
+      Then my password is updated
+      And all existing refresh tokens for my account are revoked
+      And I am redirected to the login page with a success message
+      And I receive an email notifying me that my password was changed
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  The "forgot password" endpoint must return an identical response regardless of whether the submitted email exists,
+  to prevent user enumeration, and reset link generation/dispatch must happen asynchronously so timing does not leak
+  account existence either. Reset tokens must be single-use, cryptographically random, and expire 1 hour after
+  issuance, with the expired-state flow offering a resend affordance. On successful password reset, all existing
+  refresh tokens for the account must be revoked server-side (forcing logout everywhere) and a notification email
+  sent to the account owner as a security signal of the change.
+
+# Edge Cases
+edge_cases: |
+  - Password reset requested for an email address that is not registered
+  - Reset link clicked after more than 1 hour has elapsed since issuance
+  - Resending a new link after the original has expired
+  - New password failing complexity requirements on submission (inferred)
+  - Reset link reused after it has already been consumed once (inferred)
+
+# Implementation Status
+implementation_status: |
+  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
+  specification pass for clearline-web — no application code exists yet.

@@ -1,0 +1,116 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-017'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'AI-Assisted Invoice Coding & Three-Way Match'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 8
+dependencies: ['US-CW-006']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-011'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-011'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-011'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'Accounts Payable specialist'
+  capability: 'have invoices automatically extracted, coded, and three-way matched by AI, with low-confidence fields and PO/receipt mismatches routed for human review before posting'
+  business_value: 'I can process a higher volume of invoices accurately and quickly while retaining human control over exceptions and final approval, reducing manual data entry and posting errors'
+  description: |
+    As an Accounts Payable specialist
+    I want invoices to be automatically extracted, coded, and three-way matched by AI, with uncertain fields and mismatches flagged for my review
+    So that I can process invoices faster while ensuring only verified, human-approved data is posted to the ledger
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I upload an invoice image or PDF
+      When the AI extraction completes
+      Then vendor name, amount, line items, and a suggested GL code are populated
+      And each suggested field displays a confidence level
+      And high-confidence fields are pre-filled but remain editable
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given the AI's confidence for the extracted GL code is below the configured threshold
+      When the extraction results are displayed
+      Then that field is flagged "Needs review" rather than being auto-applied
+      And I must manually confirm or correct it before the invoice can be approved
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given an invoice, its associated purchase order, and a goods receipt all show matching quantities and amounts
+      When the three-way match runs
+      Then the invoice is marked "Matched" and routed for standard approval
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given the invoice quantity does not match the purchase order quantity
+      When the three-way match runs
+      Then the invoice is routed to an exception queue
+      And the specific mismatch is highlighted (e.g., "Invoiced: 50 units — PO: 45 units")
+      And the invoice cannot proceed to payment until a human resolves the discrepancy
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given the AI extraction service is unavailable or times out
+      When I upload an invoice
+      Then I see "We couldn't read this invoice automatically. You can enter the details manually."
+      And a manual entry form is presented as a fallback
+      And manual entry is never blocked by an AI service outage
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given an invoice has been AI-coded with all fields at or above the confidence threshold
+      When a human reviewer clicks "Approve"
+      Then the invoice is posted to the ledger
+      And an audit event records that a human approved it, distinct from the AI suggestion itself
+      And the AI never posts an invoice to the ledger unilaterally
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Requires an AI extraction pipeline (OCR/document understanding) capable of producing per-field confidence
+  scores for vendor name, amount, line items, and GL code, with a configurable confidence threshold setting.
+  The three-way match engine must compare invoice, purchase order, and goods receipt records on quantity and
+  amount, and route mismatches to a dedicated exception queue with the specific discrepancy values surfaced.
+  The AI extraction service must be treated as a non-blocking dependency — invoice intake and manual entry
+  must remain fully functional during AI service outages or timeouts. All ledger postings must originate from
+  an explicit human approval action, with audit logging that distinguishes AI suggestions from human decisions.
+
+# Edge Cases
+edge_cases: |
+  - AI-extracted GL code confidence falls below the configured threshold and must be flagged "Needs review"
+  - Invoice quantity does not match purchase order quantity, triggering three-way match failure and exception routing
+  - AI extraction service is unavailable or times out during invoice upload
+  - Invoice cannot proceed to payment while a three-way match discrepancy remains unresolved
+  - AI must never post an invoice to the ledger without explicit human approval
+  - (inferred) Goods receipt is missing or not yet recorded at the time the three-way match runs
+  - (inferred) Uploaded file is corrupted or in an unsupported format, preventing extraction from starting at all
+
+# Implementation Status
+implementation_status: |
+  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
+  specification pass for clearline-web — no application code exists yet.

@@ -1,0 +1,115 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-001'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'User Login'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 5
+dependencies: []
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-001'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-001'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-001'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'registered Clearline user'
+  capability: 'securely log in with my email and password and receive clear, non-revealing feedback when authentication fails'
+  business_value: "I can reliably and safely access my company's spend dashboard while the platform protects my account and the system as a whole from credential-guessing and brute-force attacks"
+  description: |
+    As a registered Clearline user
+    I want to log in with my email and password and receive clear feedback on success or failure, including protection against repeated failed attempts and resilience during outages
+    So that I can safely and reliably reach my spend dashboard without my login attempts exposing whether an account exists or weakening the platform's security posture
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I am a registered Clearline user with a verified account
+      And I am on the login page
+      When I enter my correct email and password
+      And I submit the login form
+      Then I am redirected to the spend dashboard
+      And an access token is stored in memory only
+      And a refresh token is stored in an httpOnly, Secure, SameSite=Strict cookie
+      And an audit event is recorded with my user ID, timestamp, and IP address
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given I am on the login page
+      When I enter a registered email and an incorrect password
+      And I submit the login form
+      Then I see an inline error "Incorrect email or password"
+      And the password field is cleared
+      And no audit event reveals whether the email exists in the system
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given I am on the login page
+      When I enter an email that is not registered
+      And I submit the login form
+      Then I see the same inline error "Incorrect email or password"
+      And the system does not reveal that the email is unregistered
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given I have failed to log in 5 times within 15 minutes
+      When I attempt to log in again with any credentials
+      Then I see "Your account is temporarily locked for your protection. Contact support to restore access."
+      And a support reference ID is displayed
+      And an audit event records the lockout
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given I am on the login page
+      And the authentication service is unreachable
+      When I submit valid credentials
+      Then I see "Something went wrong on our end. Retrying…"
+      And the client retries the request up to 3 times with exponential backoff
+      And after 3 failed retries I see a manual "Try again" button
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Access tokens must be held in memory only (never localStorage/sessionStorage) to limit XSS exfiltration risk, while
+  refresh tokens are issued as httpOnly, Secure, SameSite=Strict cookies to prevent client-side script access and
+  cross-site leakage. Authentication failures must be indistinguishable between "wrong password" and "unregistered
+  email" at both the UI and audit-log layer to prevent user enumeration. Account lockout requires a server-side
+  counter of failed attempts scoped to a 5-attempts-in-15-minutes rolling window, with a generated support reference
+  ID surfaced to the user for lockout recovery. The login client must implement retry with exponential backoff
+  (max 3 attempts) for transient authentication-service unavailability, falling back to a manual retry affordance.
+
+# Edge Cases
+edge_cases: |
+  - Incorrect password on a valid, registered email
+  - Login attempt against an unregistered email address
+  - Account lockout after 5 failed attempts within a 15-minute window
+  - Authentication service unreachable during login submission (network outage)
+  - Exhausting all 3 automatic retries without success, requiring manual "Try again" action
+  - Login submitted with an unverified account (inferred)
+
+# Implementation Status
+implementation_status: |
+  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
+  specification pass for clearline-web — no application code exists yet.

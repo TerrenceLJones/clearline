@@ -1,0 +1,125 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-014'
+app: 'clearline-web'
+feature_area: 'payments'
+title: 'Virtual Card Issuance & Real-Time Controls'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 8
+dependencies: ['US-CW-006']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-008'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-008'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-008'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'Controller'
+  capability: 'issue virtual cards to employees with configurable monthly limits and merchant category restrictions, and monitor and control card activity in real time'
+  business_value: 'spend stays within policy automatically, suspicious or out-of-policy transactions are blocked at authorization time, and the company has an auditable, real-time view of card activity without manual reconciliation'
+  description: |
+    As a Controller
+    I want to issue virtual cards with monthly limits and MCC restrictions, and control them in real time (freeze, view live transactions, view declines)
+    So that employee spend stays within policy automatically and I have an auditable, real-time view of card activity without manual reconciliation
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I am a Controller
+      When I create a new virtual card for an employee with a $2,000.00 monthly limit and MCC restrictions for "Software" and "Office Supplies"
+      Then the card is issued and visible in the employee's wallet
+      And an audit event records the card creation with its limits and restrictions
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given a virtual card has a $2,000.00 monthly limit
+      When a $150.00 transaction is authorized on that card
+      Then the transaction appears in the real-time feed within seconds via WebSocket
+      And the card's remaining available limit updates to reflect $1,850.00 (derived, not stored)
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given a card is restricted to "Software" and "Office Supplies" merchant categories
+      When a transaction is attempted at a merchant categorized as "Restaurants"
+      Then the transaction is declined
+      And the cardholder receives a notification "Transaction declined — this card can't be used at this type of merchant"
+      And the decline appears in the transaction feed with the reason "MCC restricted"
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given a card has $50.00 of its monthly limit remaining
+      When a $75.00 transaction is attempted
+      Then the transaction is declined
+      And I see "Transaction declined — insufficient limit remaining"
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given I am viewing an active virtual card
+      When I toggle "Freeze card"
+      Then the card immediately stops authorizing new transactions
+      And the card's visual state updates to show a "Frozen" badge (icon + text, not color alone)
+      And an audit event records who froze the card and when
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given I am viewing the real-time transaction feed
+      When the WebSocket connection drops
+      Then the feed displays a "Reconnecting…" banner
+      And previously loaded transactions remain visible but are not implied to be the complete current state
+      And the feed automatically reconnects with exponential backoff
+    status: 'active'
+  - id: 'AC-07'
+    description: |
+      Given a card transaction is declined because the card was reported lost or stolen
+      When the cardholder views the decline notification
+      Then the message reads generically: "This card was declined. Please contact support for more information."
+      And the true reason (lost/stolen/fraudulent) is never shown to the cardholder in the UI
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Card available limit must be computed as a derived value (monthly limit minus authorized spend) rather than
+  persisted as mutable state, to avoid drift between stored and actual balances. The transaction feed requires a
+  WebSocket connection with automatic reconnect using exponential backoff, and the UI must distinguish "stale but
+  visible" data from a confirmed complete/current state during disconnects. Card freeze must take effect immediately
+  at the authorization layer (not just in the UI) to guarantee no new transactions are approved once frozen.
+  Frozen-state indicators must satisfy accessibility requirements by pairing icon and text, not relying on color
+  alone. Decline reasons exposed to cardholders must be filtered through a security-gating layer so that sensitive
+  reasons (lost/stolen/fraud) are never surfaced verbatim in client-facing UI, while MCC- and limit-based declines
+  can show specific, actionable messaging. All card creation and freeze actions must emit audit events capturing
+  actor, timestamp, and relevant card parameters.
+
+# Edge Cases
+edge_cases: |
+  - Transaction attempted at a merchant outside the card's allowed MCC restrictions is declined with a specific MCC-restricted message.
+  - Transaction amount exceeds the remaining available monthly limit and is declined with an insufficient-limit message.
+  - WebSocket connection to the real-time transaction feed drops mid-session, requiring a reconnecting state and backoff retry.
+  - Card decline reason is security-sensitive (lost/stolen/fraudulent) and must be masked behind a generic message to the cardholder.
+  - Freezing a card must immediately block in-flight authorization attempts, not just future ones (inferred).
+  - Concurrent transactions racing against the remaining limit could both pass a stale limit check unless authorization is serialized per card (inferred).
+
+# Implementation Status
+implementation_status: |
+  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
+  specification pass for clearline-web — no application code exists yet.

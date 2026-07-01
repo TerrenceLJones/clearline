@@ -1,0 +1,121 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-006'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'Role-Based Navigation & Approval Authority'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 8
+dependencies: ['US-CW-001']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-003'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-003'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-003'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'Finance team member (Employee, Finance Manager, or Controller) operating within Clearline'
+  capability: 'see only the navigation, screens, and approval actions my role and approval limit entitle me to, with those entitlements enforced consistently by both the UI and the server'
+  business_value: 'the organization can trust that financial actions are restricted to the right people at the right authority level, preventing unauthorized approvals, conflicts of interest, and confusion when access changes'
+  description: |
+    As a Clearline user with an assigned role (Employee, Finance Manager, or Controller)
+    I want my navigation, approval actions, and approval limits to reflect exactly what my role authorizes — enforced on both the client and server, and kept current if my role changes mid-session
+    So that financial controls are reliably enforced, unauthorized actions are blocked even if someone bypasses the UI, and the organization avoids approval fraud and segregation-of-duties violations
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I am logged in with the "Employee" role
+      When I view the main navigation
+      Then I see only "My Expenses" and "My Cards"
+      And I do not see "Approvals," "Reconciliation," or "Admin Settings"
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given I am logged in with the "Finance Manager" role
+      When I view the main navigation
+      Then I see "My Expenses," "Approvals," and "Reconciliation"
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given I am logged in with the "Controller" role
+      When I view the main navigation
+      Then I see all Finance Manager capabilities plus "Budget Management" and "Audit Log"
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given I am logged in with the "Employee" role
+      When I navigate directly to the "/approvals" URL
+      Then I am redirected to an access-denied page
+      And I see "You don't have access to this. Ask an admin if you need it."
+      And the server independently rejects the underlying API call with a 403, regardless of UI navigation
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given I am logged in with the "Finance Manager" role
+      And an admin downgrades my role to "Employee" while I am active
+      When I make my next request
+      Then I see a banner "Your access changed. Some features may no longer be available."
+      And previously visible Finance Manager features are hidden or disabled without a hard crash
+      And any in-progress action requiring the removed permission is cancelled gracefully
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given I am a Finance Manager with a $10,000 approval limit
+      When I attempt to approve an expense of $15,000
+      Then the approval action is blocked
+      And I see "This exceeds your approval limit of $10,000. Route it to a Controller for approval."
+      And a one-click "Escalate to Controller" action is offered
+    status: 'active'
+  - id: 'AC-07'
+    description: |
+      Given I am a Finance Manager
+      And I submitted an expense myself
+      When I view that expense in the approval queue
+      Then the "Approve" action is disabled for that specific expense
+      And I see "You can't approve your own expense. It needs another approver."
+      And the server independently enforces this rule even if the client check is bypassed
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Authorization must be enforced redundantly: the UI conditionally renders navigation and actions based on role/permission
+  state, but every protected API endpoint (e.g. /approvals) must independently validate the caller's role and return 403
+  Forbidden regardless of client-side state, as must self-approval and approval-limit checks. Role and permission state
+  must be re-evaluated on each request (not cached indefinitely client-side) so that a mid-session role downgrade by an
+  admin is reflected on the user's "next request" without requiring re-login. Approval limits are per-user numeric
+  attributes that must be compared against expense amounts server-side before allowing an approval to persist, with an
+  escalation pathway that reassigns/routes the expense to a Controller. Self-approval prevention requires the approval
+  queue and approval endpoint to compare the expense submitter identity against the acting approver identity.
+
+# Edge Cases
+edge_cases: |
+  - Employee attempting direct URL navigation to a restricted route (/approvals) instead of using hidden nav links
+  - Server-side 403 rejection of the underlying API call even when UI navigation is somehow bypassed
+  - Role downgraded by an admin while the user has an active session, requiring graceful mid-session degradation
+  - In-progress action that depends on a permission removed mid-session must be cancelled without a hard crash
+  - Approval amount exceeding the approver's configured limit, requiring escalation rather than outright failure
+  - Finance Manager attempting to approve an expense they personally submitted (conflict of interest)
+  - Server-side enforcement of self-approval restriction even if the client-side disabled state is bypassed (e.g. direct API call)
+  - Role with no approval limit configured attempting any approval action (inferred)

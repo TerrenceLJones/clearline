@@ -1,0 +1,102 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-005'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'Identity Document Verification & Compliance Screening'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 5
+dependencies: ['US-CW-004']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-002'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-002'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-002'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'business owner or beneficial owner completing identity verification during onboarding'
+  capability: 'receive immediate, actionable feedback on document image quality and document type during upload, be routed to support after repeated failures, and have compliance screening results communicated to me in neutral language'
+  business_value: 'I can successfully submit valid identification on the first few attempts, know exactly how to fix a failed capture, and am not exposed to sensitive compliance terminology or blocked from the product while my application is screened'
+  description: |
+    As a business owner or beneficial owner completing identity verification during onboarding
+    I want clear, specific feedback when my document photo fails quality or type checks, an escalation path after repeated failures, and a neutral status message if compliance screening flags my application
+    So that I can correct document issues quickly, get help when automated verification can't succeed, and continue exploring the product without being shown alarming compliance language
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I am uploading a government-issued ID for a beneficial owner
+      When the captured image has excessive glare
+      Then I see "We couldn't read your document. Make sure it's well-lit, in focus, and fully in frame."
+      And I am prompted to retake the photo before proceeding
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given I am uploading a document
+      When the image fails a client-side blur-detection check
+      Then I see "Hold the camera steady and try again."
+      And the document is not submitted until quality passes
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given the system expects a government-issued photo ID
+      When I upload an unrelated document
+      Then I see "This doesn't look like a valid ID. Please upload a driver's license, passport, or state ID."
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given I have failed document verification 3 times
+      When I attempt to upload again
+      Then I see "We couldn't verify your documents. Contact support to continue."
+      And a support reference ID and contact link are shown
+      And further automatic retries are blocked until support intervenes
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given my business or a beneficial owner matches a watchlist screening
+      When the screening completes
+      Then I see a neutral message: "Your application is under review. We'll email you within 2–3 business days."
+      And the UI never reveals the word "sanctions," "watchlist," or "flagged"
+      And I am not blocked from exploring non-financial parts of the product while pending
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Document capture requires client-side image quality checks (glare detection, blur detection) that run before
+  any upload is submitted to the backend, so invalid captures never reach document verification services.
+  Document type classification must distinguish valid government-issued photo IDs (driver's license, passport,
+  state ID) from unrelated uploads. A retry counter scoped to the verification session must cap automatic
+  retries at 3 attempts, after which further automated submission is blocked and a support reference ID is
+  generated and surfaced. Compliance/sanctions screening results must never leak restricted terminology
+  ("sanctions," "watchlist," "flagged") into any user-facing copy, and a pending-review state must not gate
+  access to non-financial areas of the product.
+
+# Edge Cases
+edge_cases: |
+  - Captured ID image has excessive glare preventing automated reading
+  - Captured document image is blurry and fails client-side blur-detection
+  - Uploaded document is not a government-issued photo ID (wrong document type)
+  - Document verification has failed 3 times, triggering a hard stop requiring support intervention
+  - Business or beneficial owner matches a sanctions/watchlist screening, requiring neutral-language messaging and non-blocking pending state
+  - (inferred) Support reference ID generation fails or is delayed after the 3rd failed attempt

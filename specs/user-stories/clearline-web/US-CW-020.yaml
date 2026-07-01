@@ -1,0 +1,115 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-020'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'WCAG 2.1 AA Accessibility Compliance'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 5
+dependencies: []
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-014'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-014'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-014'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'assistive-technology user (e.g., screen reader or keyboard-only operator) managing company spend'
+  capability: "perceive, navigate, and operate every part of Clearline's spend management UI without relying on color, a mouse, or sighted interaction alone"
+  business_value: 'I can independently and confidently review financial status, submit payments, and correct errors, meeting WCAG 2.1 AA so the product is usable and legally compliant for all operators regardless of ability'
+  description: |
+    As an assistive-technology user (e.g., screen reader or keyboard-only operator) managing company spend
+    I want to perceive, navigate, and operate every part of Clearline's spend management UI without relying on color, a mouse, or sighted interaction alone
+    So that I can independently and confidently review financial status, submit payments, and correct errors, meeting WCAG 2.1 AA so the product is usable and legally compliant for all operators regardless of ability
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given any UI element conveys a positive, negative, warning, or critical state
+      When it is rendered
+      Then it includes an icon and explicit text label in addition to color
+      And this holds true across PercentageChange, RiskIndicator, TransactionStatusBadge, and budget gauges
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given I am navigating using only a keyboard
+      When I tab through the "New Payment" form
+      Then focus moves in a logical order through all interactive elements
+      And each focused element has a visible focus ring of at least 3px
+      And I can submit the form entirely via keyboard, including the confirmation dialog
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given a screen reader user views a MoneyDisplay component showing $1,999.00
+      When the value is read aloud
+      Then the aria-label provides the full spoken amount, e.g., "One thousand nine hundred ninety-nine dollars"
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given I submit a form with a validation error
+      When the error appears
+      Then it is associated with its field via aria-describedby
+      And it is announced to screen readers via a role="status" or role="alert" live region
+      And the erroring field is identified in text, not by color or position alone
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given a "You're about to send $5,000.00 to Acme Corp" confirmation dialog is open
+      When it is displayed
+      Then focus is trapped within the dialog until it is dismissed or confirmed
+      And a countdown timer (if present) is announced to screen readers
+      And pressing Escape cancels the action without submitting
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  All status, risk, and budget indicator components (PercentageChange, RiskIndicator, TransactionStatusBadge, budget gauges)
+  must pair color with an icon and explicit text label, never conveying state via color alone. Interactive forms (e.g., "New
+  Payment") require a logical tab order and a visible focus indicator of at least 3px on every focusable element, with full
+  keyboard operability including modal confirmation dialogs. MoneyDisplay components must expose a fully spoken aria-label
+  (e.g., "$1,999.00" -> "One thousand nine hundred ninety-nine dollars") rather than relying on the raw numeric/symbol text.
+  Form validation errors must be programmatically associated with their field via aria-describedby and announced through a
+  role="status" or role="alert" live region, with the erroring field identified in text. Confirmation dialogs for irreversible
+  actions must implement a focus trap, announce any countdown timer to assistive technology, and support Escape-to-cancel
+  without submitting.
+
+# Edge Cases
+edge_cases: |
+  - Status/risk/budget indicators rendered with color only and no icon or text label (must be rejected).
+  - Keyboard user tabbing through "New Payment" form encounters illogical focus order or a missing/sub-3px focus ring.
+  - Keyboard user reaches the confirmation dialog and cannot complete submission without a mouse.
+  - Screen reader encounters a MoneyDisplay value with no aria-label or a literal/unspoken numeric readout.
+  - Form validation error rendered without aria-describedby association to its field.
+  - Form validation error not announced via role="status" or role="alert" live region.
+  - Erroring field identified only by color or visual position, with no text identification.
+  - Confirmation dialog for an irreversible action (e.g., sending $5,000.00) allows focus to escape the dialog while open.
+  - Countdown timer present in a confirmation dialog but not announced to screen readers.
+  - Escape key press on a confirmation dialog submits the action instead of canceling it.
+  - Mobile touch-target sizing requirement (Clearline Mobile) is out of scope for clearline-web and intentionally excluded from this story.
+  - (inferred) High-contrast or browser-level forced-colors mode strips custom focus ring styling, leaving no visible focus indicator.
+
+# Implementation Status
+implementation_status: |
+  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
+  specification pass for clearline-web — no application code exists yet.

@@ -1,0 +1,126 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-007'
+app: 'clearline-web'
+feature_area: 'payments'
+title: 'Vendor Payment Submission & Idempotency'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 8
+dependencies: ['US-CW-006']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-004'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-004'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-004'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'Controller'
+  capability: 'submit vendor payments through the New Payment form with guaranteed exactly-once processing, even across double-clicks, network timeouts, server errors, and retries'
+  business_value: 'I can trust that money moves exactly once per payment intent, with clear status feedback, so I never accidentally duplicate a vendor payment or lose track of whether a transfer went through'
+  description: |
+    As a Controller
+    I want to submit vendor payments through the New Payment form with guaranteed exactly-once processing, even across double-clicks, network timeouts, server errors, and retries
+    So that I can trust that money moves exactly once per payment intent, with clear status feedback, and never accidentally duplicate a vendor payment or lose track of whether a transfer went through
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I am logged in as a Controller
+      And I am on the "New Payment" form
+      Given I enter a valid vendor, amount of $5,000.00, and payment method
+      When I submit the payment
+      Then a UUID v4 idempotency key is generated once for this payment intent
+      And the key is sent in the "Idempotency-Key" header
+      And the submit button is disabled to prevent double-submission
+      And I see a "Processing…" state, not an immediate "Success" state
+      And the payment is confirmed server-side before I see "Payment submitted — pending"
+      And an immutable ledger entry is created with matching debit and credit postings
+      And an audit event records the payment attempt
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given I am logged in as a Controller
+      And I am on the "New Payment" form
+      Given I have submitted a payment and the request is in flight
+      When I click "Submit" a second time before the first request resolves
+      Then the second click is a no-op
+      And the same idempotency key is reused
+      And only one payment is ultimately created
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given I am logged in as a Controller
+      And I am on the "New Payment" form
+      Given I submit a $5,000.00 payment
+      When the request exceeds the 30-second timeout with no response
+      Then I see "We're still confirming your payment. We'll update this in a moment — don't resubmit."
+      And the client polls or awaits a webhook for the definitive PaymentIntent status
+      And the original idempotency key is reused for any retry
+      And no duplicate payment is created regardless of how many times the network retries
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given I am logged in as a Controller
+      And I am on the "New Payment" form
+      Given I submit a payment
+      When the server responds with a 500 error
+      Then the client automatically retries up to 3 times using exponential backoff with jitter
+      And the same idempotency key is used on every retry
+      And if all retries fail, I see a persistent banner "Couldn't process this payment. Try again." with a manual Retry button
+      And my entered amount and recipient remain populated in the form
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given I am logged in as a Controller
+      And I am on the "New Payment" form
+      Given a payment was previously submitted with idempotency key K and amount $5,000.00
+      When I attempt to submit a different amount using the same key K
+      Then the server returns an idempotency mismatch error
+      And the client generates a new idempotency key only because this is a genuinely new operation
+      And I see "Something changed since your last attempt — resubmitting as a new payment."
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Idempotency keys must be UUID v4, generated client-side exactly once per payment intent and transmitted via an
+  "Idempotency-Key" request header; the same key must be reused across in-flight duplicate clicks, network timeouts,
+  and automatic retries. The client must enforce a 30-second request timeout with subsequent polling or webhook-driven
+  status resolution rather than re-issuing a new request. Server error retries are capped at 3 attempts using
+  exponential backoff with jitter, and the UI must keep submit disabled and form fields populated throughout. All
+  successful submissions must produce an immutable ledger entry with matching debit/credit postings and a
+  corresponding audit event.
+
+# Edge Cases
+edge_cases: |
+  - Double-click on Submit while the original request is still in flight
+  - Network timeout (30s) with no server response, requiring poll/webhook-based status resolution instead of resubmission
+  - Server returns a 500 error, triggering automatic retry with exponential backoff and jitter
+  - All automatic retries exhausted, requiring a manual Retry action
+  - Idempotency key reused with a different payload (amount mismatch), requiring server-side rejection and client-side new-key generation
+  - (inferred) Idempotency key collision from a stale browser tab/session submitting after the user has navigated away
+
+# Implementation Status
+implementation_status: |
+  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
+  specification pass for clearline-web — no application code exists yet.

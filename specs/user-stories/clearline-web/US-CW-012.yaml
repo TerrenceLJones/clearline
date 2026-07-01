@@ -1,0 +1,120 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-012'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'Expense Approval Workflow'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 8
+dependencies: ['US-CW-011', 'US-CW-006']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-006'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-006'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-006'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'Approver (Finance Manager / Controller)'
+  capability: 'review, approve, reject, and batch-process expenses in my queue, with automatic enforcement of approval limits, conflict-of-interest rules, and concurrency safety'
+  business_value: 'expense approvals are accurate, auditable, and free of self-dealing or stale-data conflicts, ensuring financial controls are upheld at scale'
+  description: |
+    As an Approver
+    I want to approve or reject expenses in my queue — individually or in batch — with automatic limit-based escalation, conflict-of-interest protection, and stale-action conflict detection
+    So that the company's financial controls are consistently enforced and every approval decision is accurate and auditable
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given an expense of $300.00 is pending in my approval queue
+      And I am a Finance Manager with a $10,000.00 approval limit
+      When I click "Approve"
+      Then the expense status updates to "Approved"
+      And a ledger entry is created
+      And the employee is notified
+      And an audit event records who approved it and when
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given an expense is pending in my approval queue
+      When I click "Reject" and provide a required reason
+      Then the expense status updates to "Rejected"
+      And the employee sees the rejection reason
+      And the employee may resubmit a corrected version
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given I submitted an expense myself
+      When I view it in my own approval queue
+      Then the "Approve" button is disabled
+      And I see "You can't approve your own expense. It needs another approver."
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given an expense of $25,000.00 is submitted
+      And the assigned Finance Manager has a $10,000.00 limit
+      When the expense enters the approval workflow
+      Then it is automatically routed to a Controller (L2) instead
+      And the status badge reads "Pending L2 approval"
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given an expense was already approved by another approver moments ago
+      When I attempt to approve the same expense from my (now-outdated) queue view
+      Then I receive a 409 conflict response
+      And I see "This expense was already approved by {name}."
+      And my queue view refreshes to reflect the current state without my action being applied twice
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given a batch of 10 expenses includes one that I submitted myself
+      When I select all 10 and click "Approve selected"
+      Then 9 expenses are approved
+      And the 1 self-submitted expense is skipped with a reason "Cannot approve own expense"
+      And the result summary clearly separates successes from skips
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Approval/rejection must be transactional: an approval atomically updates expense status, writes a ledger
+  entry, triggers an employee notification, and records an immutable audit event with approver identity and
+  timestamp. Approval actions must use optimistic concurrency control (e.g., version/ETag check) so that a
+  stale queue view produces a 409 conflict rather than a duplicate approval, and the client must refresh
+  queue state on conflict. Approval routing must compare expense amount against the assigned approver's
+  configured limit and auto-escalate to the next approval tier (Controller/L2) when exceeded. Conflict-of-
+  interest checks (submitter == approver) must be enforced both in the UI (disabled control) and server-side
+  for every action path, including batch operations, with per-item results reported back to the client.
+
+# Edge Cases
+edge_cases: |
+  - Approver attempts to approve their own submitted expense — Approve button disabled with explanatory message
+  - Expense amount exceeds the assigned approver's limit — auto-escalated to Controller (L2) with updated status badge
+  - Approval attempted on an item already actioned by another approver — 409 conflict returned and queue view refreshed
+  - Rejection submitted without a required reason (inferred)
+  - Batch approval containing a mix of approvable and self-submitted (conflict-of-interest) items — partial success with itemized skip reasons
+  - Expense amount exactly at the approver's limit threshold (inferred)
+
+# Implementation Status
+implementation_status: |
+  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
+  specification pass for clearline-web — no application code exists yet.

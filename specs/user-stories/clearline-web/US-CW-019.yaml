@@ -1,0 +1,94 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-019'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'Department Budget Management'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 5
+dependencies: ['US-CW-006']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-013'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-013'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-013'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'Controller'
+  capability: 'set, monitor, and review monthly department budgets with visual threshold and overage indicators'
+  business_value: 'spend stays within approved limits and stakeholders are proactively alerted before and after budgets are exceeded'
+  description: |
+    As a Controller
+    I want to set department budgets and see real-time visual indicators of spend against those budgets, including threshold and overage alerts
+    So that spend stays within approved limits and stakeholders are proactively alerted before and after budgets are exceeded
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I am a Controller
+      When I set the "Engineering" department's monthly budget to $50,000.00
+      Then the budget is saved
+      And the budget gauge on the dashboard reflects $0.00 spent of $50,000.00
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given the "Engineering" department has spent $40,000.00 of its $50,000.00 budget (80%)
+      When the threshold is crossed
+      Then the budget gauge changes to an amber/warning visual state with the text "80% of budget used"
+      And department stakeholders receive a notification
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given the "Engineering" department has spent $52,000.00 against a $50,000.00 budget
+      When I view the budget gauge
+      Then it displays in a critical state with the text "104% of budget used — $2,000.00 over"
+      And this is shown with icon and text, never color alone
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given a department's budget period ends at midnight on the last day of the month
+      When the new period begins
+      Then a new budget tracking period starts at $0.00 spent
+      And historical data for the prior period remains accessible in a "Budget history" view
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Budget amounts and spend totals must be stored and rendered with full currency precision (two decimal places)
+  to support exact percentage and overage calculations such as "104% of budget used — $2,000.00 over". Threshold
+  crossing (e.g. 80%) must trigger an asynchronous notification to department stakeholders, implying an event-driven
+  or scheduled recalculation of spend-to-budget ratio rather than purely on-demand computation. Budget gauge states
+  (normal/amber-warning/critical) must be accessible — encoded with icon and text, not color alone — per the
+  explicit "never color alone" requirement. Period rollover must run on a scheduled job at midnight on the last day
+  of the month, atomically resetting the active tracking period to $0.00 while archiving the prior period's data
+  for the Budget History view.
+
+# Edge Cases
+edge_cases: |
+  - Budget threshold (80%) crossed exactly at a transaction boundary — notification must fire reliably without duplication
+  - Spend exceeds budget (over 100%) — gauge must show critical state with exact overage amount, not just a percentage
+  - Budget period rollover occurring precisely at midnight on the last day of the month — must not drop or double-count transactions at the boundary
+  - Accessibility: budget state must never rely on color alone, requiring icon and text pairing in all visual states
+  - (inferred) Department budget changed mid-period after spend has already accrued — gauge must recalculate percentage against the new amount without losing prior spend history
+  - (inferred) Department with no budget set — gauge display behavior when budget is $0.00 or undefined

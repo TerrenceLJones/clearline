@@ -1,0 +1,97 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-009'
+app: 'clearline-web'
+feature_area: 'payments'
+title: 'Payment Compliance Holds, Reversals & Status Handling'
+
+# Lifecycle status
+status: 'APPROVED'
+story_points: 5
+dependencies: ['US-CW-006']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-004'
+created_date: '2026-06-30'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-004'
+    action: 'created'
+    date: '2026-06-30'
+  - epic_id: 'EPIC-CW-004'
+    action: 'approved'
+    date: '2026-06-30'
+
+# Status timestamps — set when status transitions occur
+approved_date: '2026-06-30'
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'Controller'
+  capability: "see accurate, neutral payment status information for payments under compliance review, payments that were reversed, or payments in a status the client doesn't recognize"
+  business_value: 'I always get clear, non-alarming, accurate status information without being exposed to sensitive compliance terminology or confusing technical states'
+  description: |
+    As a Controller
+    I want to see accurate, neutral payment status information for payments under compliance review, payments that were reversed, or payments in a status the client doesn't recognize
+    So that I always get clear, non-alarming, accurate status information without being exposed to sensitive compliance terminology or confusing technical states
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I am logged in as a Controller
+      And I am on the "New Payment" form
+      Given the recipient or transaction matches a compliance screening rule
+      When I submit the payment
+      Then the payment enters a "Pending review" state
+      And I see "This transfer is under review. We'll email you once it's complete."
+      And no mention of sanctions, watchlists, or fraud appears anywhere in the UI
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given I am logged in as a Controller
+      And I am on the "New Payment" form
+      Given a previously completed payment of $5,000.00 is reversed by the bank
+      When the reversal webhook is received
+      Then a new reversing ledger entry is created (the original entry is never edited or deleted)
+      And the payment's status updates to "Reversed"
+      And I see in the transaction detail: "This payment was reversed on {date}. The funds were returned to your account."
+      And I receive a notification of the reversal
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given I am logged in as a Controller
+      And I am on the "New Payment" form
+      Given a payment returns a status code my client does not recognize
+      When I view that payment's detail page
+      Then I see a neutral "Status: Processing" rather than guessing a more specific state
+      And the raw unrecognized status is logged for engineering review without being shown to me
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Compliance-hold states must never surface sanctions, watchlist, or fraud terminology in any user-facing copy, to
+  avoid tipping off bad actors and to limit legal exposure. Reversals must be modeled as new, additive ledger
+  entries — the original ledger entry is immutable and must never be edited or deleted, preserving a full audit
+  trail. Reversal events must be driven by webhook and must trigger a user notification. Unrecognized payment status
+  codes must degrade gracefully to a neutral "Processing" display client-side while the raw status value is captured
+  in logs for engineering triage.
+
+# Edge Cases
+edge_cases: |
+  - Recipient or transaction matches a compliance screening rule, requiring a sanitized "Pending review" message
+  - Previously completed payment is reversed by the bank after settlement
+  - Payment detail page receives a status code unrecognized by the client
+  - (inferred) Reversal webhook is received more than once for the same payment (duplicate webhook delivery)
+
+# Implementation Status
+implementation_status: |
+  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
+  specification pass for clearline-web — no application code exists yet.

@@ -14,6 +14,8 @@ export { Button } from './atoms/Button';
 export type { ButtonProps, ButtonVariant, ButtonSize, ButtonTone } from './atoms/Button';
 export { TextField } from './atoms/TextField';
 export type { TextFieldProps, FieldState } from './atoms/TextField';
+export { PasswordField } from './atoms/PasswordField';
+export type { PasswordFieldProps } from './atoms/PasswordField';
 export { Alert } from './atoms/Alert';
 export type { AlertProps, AlertTone } from './atoms/Alert';
 export { SegmentedControl } from './atoms/SegmentedControl';

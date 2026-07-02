@@ -58,3 +58,5 @@ export { DataTable } from './organisms/DataTable';
 export type { DataTableProps, DataTableRow, Density } from './organisms/DataTable';
 export { AppShell } from './organisms/AppShell';
 export type { AppShellProps } from './organisms/AppShell';
+export { AuthLayout } from './organisms/AuthLayout';
+export type { AuthLayoutProps } from './organisms/AuthLayout';

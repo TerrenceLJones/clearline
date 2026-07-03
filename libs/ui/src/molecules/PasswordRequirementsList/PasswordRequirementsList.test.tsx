@@ -33,4 +33,12 @@ describe('PasswordRequirementsList', () => {
     const { container } = render(<PasswordRequirementsList items={[]} />);
     expect(container.querySelectorAll('[data-requirement-met]')).toHaveLength(0);
   });
+
+  it('exposes met/unmet status to assistive technology via text, not icon/color alone', () => {
+    const { container } = render(<PasswordRequirementsList items={ITEMS} />);
+    const rows = container.querySelectorAll('[data-requirement-met]');
+
+    expect(rows[0]).toHaveTextContent('Met: At least 12 characters');
+    expect(rows[2]).toHaveTextContent('Not met: A number');
+  });
 });

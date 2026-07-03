@@ -27,6 +27,8 @@ export function PasswordRequirementsList({ items }: PasswordRequirementsListProp
           }`}
         >
           <Icon name={item.met ? 'check' : 'x-circle'} size={13} className="shrink-0" />
+          {/* Status prefix for assistive tech only — visually the icon/color alone convey it. */}
+          <span className="sr-only">{item.met ? 'Met: ' : 'Not met: '}</span>
           {item.label}
         </div>
       ))}

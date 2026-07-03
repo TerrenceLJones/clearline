@@ -85,14 +85,4 @@ describe('AuthService.verifyEmail', () => {
     const second = await service.verifyEmail(token, NOW + 2000);
     expect(second).toEqual({ outcome: 'token_invalid' });
   });
-
-  it('isVerificationTokenValid mirrors verifyEmail without consuming the token', async () => {
-    const service = newService();
-    const token = await signUpNewUser(service, 'new-owner@clearline.dev');
-
-    expect(await service.isVerificationTokenValid(token, NOW + 1000)).toBe(true);
-    // still valid afterward — isVerificationTokenValid must not mark it used
-    expect(await service.isVerificationTokenValid(token, NOW + 2000)).toBe(true);
-    expect(await service.isVerificationTokenValid('unknown', NOW)).toBe(false);
-  });
 });

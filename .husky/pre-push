@@ -1,0 +1,2 @@
+pnpm exec nx affected --target=type-check --parallel=3
+pnpm exec nx affected --target=test --parallel=3

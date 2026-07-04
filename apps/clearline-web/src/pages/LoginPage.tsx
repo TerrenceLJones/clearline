@@ -7,6 +7,7 @@ import {
   useLogin,
   useSignUp,
 } from '@fintech-portfolio/data-access-auth';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 // Only redirect to a same-origin path carried in `next` — anything else (an absolute URL, or a
 // `//host` protocol-relative one) could send a just-authenticated user off Clearline entirely.
@@ -18,6 +19,7 @@ function resolveRedirectTarget(next: string | null): string {
 }
 
 export function LoginPage() {
+  usePageTitle('Sign in');
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();

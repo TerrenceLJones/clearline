@@ -2,8 +2,10 @@ import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { AuthLayout, AuthNotice, Text } from '@fintech-portfolio/ui';
 import { setAccessToken, useVerifyEmail } from '@fintech-portfolio/data-access-auth';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export function VerifyEmailPage() {
+  usePageTitle('Verify email');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');

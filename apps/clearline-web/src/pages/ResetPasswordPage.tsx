@@ -6,11 +6,13 @@ import {
   useResetPassword,
   useValidateResetToken,
 } from '@fintech-portfolio/data-access-auth';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const WEAK_PASSWORD_MESSAGE =
   'Password must be at least 10 characters and include an uppercase letter, a lowercase letter, and a number.';
 
 export function ResetPasswordPage() {
+  usePageTitle('Reset password');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');

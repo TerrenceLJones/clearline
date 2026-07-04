@@ -12,12 +12,14 @@ import {
 } from '@fintech-portfolio/ui';
 import { evaluateSignUpPassword, isValidSignUpPassword } from '@fintech-portfolio/domain-auth';
 import { useSignUp } from '@fintech-portfolio/data-access-auth';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const SIGNUP_HEADLINE = 'Set up your business account in minutes.';
 const SIGNUP_SUBCOPY =
   'Verify your email, complete a short onboarding, and start issuing cards and approving spend from an immutable ledger.';
 
 export function SignUpPage() {
+  usePageTitle('Sign up');
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

@@ -2,8 +2,10 @@ import { useState, type SubmitEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { Alert, AuthLayout, AuthNotice, Button, Text, TextField } from '@fintech-portfolio/ui';
 import { useRequestPasswordReset } from '@fintech-portfolio/data-access-auth';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export function ForgotPasswordPage() {
+  usePageTitle('Forgot password');
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);

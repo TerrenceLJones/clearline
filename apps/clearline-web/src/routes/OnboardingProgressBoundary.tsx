@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
 import type { OnboardingOverallStatus } from '@fintech-portfolio/contracts';
 import { useOnboardingStatus } from '@fintech-portfolio/data-access-onboarding';
-import { EmptyState } from '@fintech-portfolio/ui';
+import { Alert, EmptyState } from '@fintech-portfolio/ui';
 import { stepPath } from '../pages/onboarding/wizard-steps';
 
 const TERMINAL_STATUSES: OnboardingOverallStatus[] = [
@@ -56,5 +56,19 @@ export function OnboardingProgressBoundary() {
     );
   }
 
-  return <Outlet />;
+  const sessionTimedOut = (location.state as { sessionTimedOut?: boolean } | null)?.sessionTimedOut;
+
+  return (
+    <>
+      {sessionTimedOut && (
+        <div className="mx-auto max-w-md pt-6">
+          <Alert
+            tone="warning"
+            title="Your verification session timed out. Let's start again from where you left off."
+          />
+        </div>
+      )}
+      <Outlet />
+    </>
+  );
 }

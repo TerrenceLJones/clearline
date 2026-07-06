@@ -162,4 +162,20 @@ describe('DocumentUploadStepPage', () => {
       'true',
     );
   });
+
+  it('shows a generic error message when a document submission fails on the network/server', async () => {
+    setAccessToken('access_valid');
+    server.use(http.get('*/api/onboarding/status', () => HttpResponse.json(statusResponse())));
+    vi.spyOn(dataAccessOnboarding, 'useSubmitDocument').mockReturnValue({
+      mutate: () => {},
+      isPending: false,
+      isError: true,
+    } as never);
+
+    renderPage();
+
+    await waitFor(() =>
+      expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument(),
+    );
+  });
 });

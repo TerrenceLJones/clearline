@@ -88,4 +88,22 @@ describe('ReviewStepPage', () => {
 
     await waitFor(() => expect(screen.getByText('Status page stub')).toBeInTheDocument());
   });
+
+  it('shows a generic error message when the submission fails on the network/server', async () => {
+    setAccessToken('access_valid');
+    server.use(
+      http.get('*/api/onboarding/status', () => HttpResponse.json(statusResponse())),
+      http.post('*/api/onboarding/review/submit', () => HttpResponse.json({}, { status: 500 })),
+    );
+    const user = userEvent.setup();
+    renderPage();
+
+    await waitFor(() => expect(screen.getByText(/Northwind Labs, Inc\./)).toBeInTheDocument());
+    await user.click(screen.getByRole('checkbox'));
+    await user.click(screen.getByRole('button', { name: /submit for verification/i }));
+
+    await waitFor(() =>
+      expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument(),
+    );
+  });
 });

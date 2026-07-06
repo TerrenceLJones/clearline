@@ -222,6 +222,28 @@ describe('OnboardingService.submitReview', () => {
     expect(result.outcome).toBe('under_review');
     expect(service.getStatus('user_1', NOW).status).toBe('under_review');
   });
+
+  it('records an approval notification event on approval (US-CW-004 AC-08)', async () => {
+    const service = newService();
+    await service.submitBusinessInfo('user_1', business(), NOW);
+    service.submitReview('user_1', NOW);
+
+    expect(service.getSentNotifications()).toEqual([
+      expect.objectContaining({ type: 'onboarding_approved', userId: 'user_1', timestamp: NOW }),
+    ]);
+  });
+
+  it('does not record an approval notification when the outcome is under_review', async () => {
+    const service = newService();
+    await service.submitBusinessInfo(
+      'user_1',
+      business({ legalName: 'Vostok Trading LLC', ein: OTHER_KNOWN_EIN }),
+      NOW,
+    );
+    service.submitReview('user_1', NOW);
+
+    expect(service.getSentNotifications()).toEqual([]);
+  });
 });
 
 describe('OnboardingService inactivity resume', () => {
@@ -265,5 +287,16 @@ describe('OnboardingService.snapshot / restore', () => {
     restored.restore(snapshot);
 
     expect(restored.getStatus('user_1', NOW)).toEqual(service.getStatus('user_1', NOW));
+  });
+
+  it('round-trips sent notifications through a plain-object snapshot', async () => {
+    const service = newService();
+    await service.submitBusinessInfo('user_1', business(), NOW);
+    service.submitReview('user_1', NOW);
+
+    const restored = new OnboardingService();
+    restored.restore(service.snapshot());
+
+    expect(restored.getSentNotifications()).toEqual(service.getSentNotifications());
   });
 });

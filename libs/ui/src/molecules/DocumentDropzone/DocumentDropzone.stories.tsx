@@ -47,7 +47,7 @@ export const SelectingAFileMarksItAccepted: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const file = new File(['fake-bytes'], 'drivers-license-front.jpg', { type: 'image/jpeg' });
-    const input = canvas.getByLabelText('browse', { selector: 'input' });
+    const input = canvas.getByLabelText(/browse/i, { selector: 'input' });
 
     await userEvent.upload(input, file);
 

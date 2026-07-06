@@ -58,9 +58,18 @@ export interface SubmitReviewResult {
   outcome: SubmitReviewOutcome;
 }
 
+/** Mirrors AuthService's NotificationEvent — models the "email + in-app notification" a real backend would send (US-CW-004 AC-08), without an actual delivery mechanism. */
+export interface NotificationEvent {
+  type: 'onboarding_approved';
+  businessId: string;
+  userId: string;
+  timestamp: number;
+}
+
 /** Plain-object mirror of OnboardingService's internal Map, safe to JSON.stringify. */
 export interface OnboardingServiceSnapshot {
   records: [string, OnboardingRecord][];
+  notifications: NotificationEvent[];
 }
 
 /**
@@ -82,6 +91,7 @@ export class OnboardingService {
   private readonly recordsByUserId = new Map<string, OnboardingRecord>();
   /** Tracks which EIN each *created* onboarding record belongs to, for duplicate-account detection (US-CW-004 AC-07). */
   private readonly userIdByEin = new Map<string, string>();
+  private readonly notificationsSent: NotificationEvent[] = [];
 
   getStatus(userId: string, now: number = Date.now()): OnboardingStatusResponse {
     const record = this.getOrCreateRecord(userId, now);
@@ -128,8 +138,8 @@ export class OnboardingService {
       return { outcome: 'ein_not_found' };
     }
 
-    const existingOwner = this.userIdByEin.get(business.ein);
-    if (existingOwner && existingOwner !== userId) {
+    const existingUserId = this.userIdByEin.get(business.ein);
+    if (existingUserId && existingUserId !== userId) {
       return { outcome: 'duplicate_business' };
     }
 
@@ -228,18 +238,35 @@ export class OnboardingService {
     );
 
     record.status = matchesWatchlist ? 'under_review' : 'approved';
+
+    if (!matchesWatchlist) {
+      this.notificationsSent.push({
+        type: 'onboarding_approved',
+        businessId: record.businessId,
+        userId,
+        timestamp: now,
+      });
+    }
+
     return { outcome: matchesWatchlist ? 'under_review' : 'approved' };
+  }
+
+  getSentNotifications(): readonly NotificationEvent[] {
+    return this.notificationsSent;
   }
 
   snapshot(): OnboardingServiceSnapshot {
     return {
       records: [...this.recordsByUserId].map(([userId, record]) => [userId, { ...record }]),
+      notifications: [...this.notificationsSent],
     };
   }
 
   restore(snapshot: OnboardingServiceSnapshot): void {
     this.recordsByUserId.clear();
     this.userIdByEin.clear();
+    this.notificationsSent.length = 0;
+    this.notificationsSent.push(...snapshot.notifications);
     snapshot.records.forEach(([userId, record]) => {
       this.recordsByUserId.set(userId, record);
       if (record.business) this.userIdByEin.set(record.business.ein, userId);

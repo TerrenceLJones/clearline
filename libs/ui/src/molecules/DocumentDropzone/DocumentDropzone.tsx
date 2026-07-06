@@ -83,7 +83,7 @@ export function DocumentDropzone({ label, status, onFileSelected }: DocumentDrop
             id={inputId}
             type="file"
             accept={ACCEPTED_TYPES}
-            aria-label="browse"
+            aria-label={`browse — ${label}`}
             className="sr-only"
             onChange={(event) => handleFiles(event.target.files)}
           />
@@ -108,7 +108,7 @@ export function DocumentDropzone({ label, status, onFileSelected }: DocumentDrop
                 ref={retryInputRef}
                 type="file"
                 accept={ACCEPTED_TYPES}
-                aria-label={retryLabel}
+                aria-label={`${retryLabel} — ${label}`}
                 className="sr-only"
                 onChange={(event) => handleFiles(event.target.files)}
               />

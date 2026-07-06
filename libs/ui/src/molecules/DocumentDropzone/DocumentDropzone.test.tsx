@@ -79,4 +79,26 @@ describe('DocumentDropzone', () => {
 
     expect(onFileSelected).toHaveBeenCalledWith(file);
   });
+
+  it('scopes the browse input label to its owner so two dropzones stay individually addressable', () => {
+    render(
+      <>
+        <DocumentDropzone
+          label="Dara Reyes — Driver's license"
+          status="idle"
+          onFileSelected={() => {}}
+        />
+        <DocumentDropzone
+          label="Marcus Okafor — Driver's license"
+          status="idle"
+          onFileSelected={() => {}}
+        />
+      </>,
+    );
+
+    expect(screen.getByLabelText(/browse.*Dara Reyes/i, { selector: 'input' })).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/browse.*Marcus Okafor/i, { selector: 'input' }),
+    ).toBeInTheDocument();
+  });
 });

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { BeneficialOwner } from '@fintech-portfolio/contracts';
-import { AuthLayout, Avatar, Button, Stepper, Text, TextField } from '@fintech-portfolio/ui';
+import { Alert, AuthLayout, Avatar, Button, Stepper, Text, TextField } from '@fintech-portfolio/ui';
 import { useAddOwner, useCompleteStep } from '@fintech-portfolio/data-access-onboarding';
 import { ownerSchema, type OwnerFormValues } from './schemas';
 import { WIZARD_STEP_LABELS } from './wizard-steps';
@@ -78,22 +78,40 @@ export function BeneficialOwnersStepPage() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 mb-5">
-        <TextField label="Owner name" {...register('fullName')} error={errors.fullName?.message} />
+        <TextField
+          label="Owner name"
+          {...register('fullName')}
+          state={errors.fullName ? 'error' : undefined}
+          error={errors.fullName?.message}
+        />
         <TextField
           label="Ownership percent"
           {...register('ownershipPercent')}
+          state={errors.ownershipPercent ? 'error' : undefined}
           error={errors.ownershipPercent?.message}
         />
         <TextField
           label="Date of birth"
           {...register('dateOfBirth')}
+          state={errors.dateOfBirth ? 'error' : undefined}
           error={errors.dateOfBirth?.message}
         />
-        <TextField label="SSN / ITIN" {...register('ssnItin')} error={errors.ssnItin?.message} />
+        <TextField
+          label="SSN / ITIN"
+          {...register('ssnItin')}
+          state={errors.ssnItin ? 'error' : undefined}
+          error={errors.ssnItin?.message}
+        />
+        {addOwner.isError && (
+          <Alert tone="negative" title="Something went wrong. Please try again." />
+        )}
         <Button type="submit" variant="secondary" loading={addOwner.isPending} fullWidth>
           + Add owner
         </Button>
       </form>
+      {completeStep.isError && (
+        <Alert tone="negative" title="Something went wrong. Please try again." />
+      )}
 
       <div className="flex justify-end">
         <Button

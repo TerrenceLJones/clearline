@@ -92,4 +92,32 @@ describe('BusinessInfoStepPage', () => {
     );
     expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument();
   });
+
+  it('shows a visible, highlighted validation error when required fields are left blank', async () => {
+    setAccessToken('access_valid');
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(screen.getByRole('button', { name: /continue/i }));
+
+    const einInput = await screen.findByLabelText(/^ein$/i);
+    expect(screen.getByText('Legal business name is required')).toBeInTheDocument();
+    expect(einInput).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('shows a generic error message when the submission itself fails on the network/server', async () => {
+    setAccessToken('access_valid');
+    server.use(
+      http.post('*/api/onboarding/business', () => HttpResponse.json({}, { status: 500 })),
+    );
+    const user = userEvent.setup();
+    renderPage();
+
+    await fillValidForm(user);
+    await user.click(screen.getByRole('button', { name: /continue/i }));
+
+    await waitFor(() =>
+      expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument(),
+    );
+  });
 });

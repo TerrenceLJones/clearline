@@ -91,4 +91,35 @@ describe('BeneficialOwnersStepPage', () => {
 
     await waitFor(() => expect(screen.getByText('Documents step stub')).toBeInTheDocument());
   });
+
+  it('shows a visible, highlighted validation error when a required field is missing for a KYC-flagged owner', async () => {
+    setAccessToken('access_valid');
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByLabelText(/owner name/i), 'Dara Reyes');
+    await user.type(screen.getByLabelText(/ownership/i), '60');
+    await user.click(screen.getByRole('button', { name: /add owner/i }));
+
+    const dobInput = await screen.findByLabelText(/date of birth/i);
+    expect(
+      screen.getByText('Date of birth is required for owners at or above 25% ownership'),
+    ).toBeInTheDocument();
+    expect(dobInput).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('shows a generic error message when adding an owner fails on the network/server', async () => {
+    setAccessToken('access_valid');
+    server.use(http.post('*/api/onboarding/owners', () => HttpResponse.json({}, { status: 500 })));
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByLabelText(/owner name/i), 'Dara Reyes');
+    await user.type(screen.getByLabelText(/ownership/i), '10');
+    await user.click(screen.getByRole('button', { name: /add owner/i }));
+
+    await waitFor(() =>
+      expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument(),
+    );
+  });
 });

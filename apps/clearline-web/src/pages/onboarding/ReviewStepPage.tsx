@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useOnboardingStatus, useSubmitReview } from '@fintech-portfolio/data-access-onboarding';
-import { AuthLayout, Button, Checkbox, Stepper, Text } from '@fintech-portfolio/ui';
+import { Alert, AuthLayout, Button, Checkbox, Stepper, Text } from '@fintech-portfolio/ui';
 import { WIZARD_STEP_LABELS } from './wizard-steps';
 
 export function ReviewStepPage() {
@@ -60,6 +60,12 @@ export function ReviewStepPage() {
           account.
         </Text>
       </label>
+
+      {submitReview.isError && (
+        <div className="mb-4">
+          <Alert tone="negative" title="Something went wrong. Please try again." />
+        </div>
+      )}
 
       <Button
         onClick={handleSubmit}

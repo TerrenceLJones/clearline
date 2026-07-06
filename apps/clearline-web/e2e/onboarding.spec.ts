@@ -75,7 +75,7 @@ test.describe('Business onboarding & KYB (US-CW-004, US-CW-005)', () => {
     await page.getByRole('button', { name: 'Continue' }).click();
     await expect(page).toHaveURL(/\/onboarding\/documents/);
 
-    await page.getByLabel('browse', { exact: true }).setInputFiles(SHARP_DOC);
+    await page.getByLabel(/browse/i).setInputFiles(SHARP_DOC);
     await expect(page.getByText('Quality check passed')).toBeVisible();
 
     await page.getByRole('button', { name: 'Continue' }).click();
@@ -200,7 +200,7 @@ test.describe('Business onboarding & KYB (US-CW-004, US-CW-005)', () => {
     // wrong_type, the component swaps to a "Choose a different file" retry button/input instead
     // (see DocumentDropzone) — the label to target changes on every subsequent attempt.
     response = waitForApiResponse(page, '/api/onboarding/documents');
-    await page.getByLabel('browse', { exact: true }).setInputFiles(UNRECOGNIZED_DOC);
+    await page.getByLabel(/browse/i).setInputFiles(UNRECOGNIZED_DOC);
     await response;
     await expect(
       page.getByText(
@@ -209,9 +209,7 @@ test.describe('Business onboarding & KYB (US-CW-004, US-CW-005)', () => {
     ).toBeVisible();
 
     response = waitForApiResponse(page, '/api/onboarding/documents');
-    await page
-      .getByLabel('Choose a different file', { exact: true })
-      .setInputFiles(UNRECOGNIZED_DOC);
+    await page.getByLabel(/choose a different file/i).setInputFiles(UNRECOGNIZED_DOC);
     await response;
     await expect(
       page.getByText(
@@ -220,9 +218,7 @@ test.describe('Business onboarding & KYB (US-CW-004, US-CW-005)', () => {
     ).toBeVisible();
 
     response = waitForApiResponse(page, '/api/onboarding/documents');
-    await page
-      .getByLabel('Choose a different file', { exact: true })
-      .setInputFiles(UNRECOGNIZED_DOC);
+    await page.getByLabel(/choose a different file/i).setInputFiles(UNRECOGNIZED_DOC);
     await response;
 
     await expect(page).toHaveURL(/\/onboarding\/status/);

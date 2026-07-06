@@ -6,6 +6,7 @@ import {
   useCompleteStep,
 } from '@fintech-portfolio/data-access-onboarding';
 import {
+  Alert,
   AuthLayout,
   Button,
   DocumentDropzone,
@@ -71,6 +72,12 @@ export function DocumentUploadStepPage() {
           />
         ))}
       </div>
+
+      {(submitDocument.isError || completeStep.isError) && (
+        <div className="mb-5">
+          <Alert tone="negative" title="Something went wrong. Please try again." />
+        </div>
+      )}
 
       <div className="flex justify-end">
         <Button onClick={handleContinue} disabled={!allAccepted} loading={completeStep.isPending}>

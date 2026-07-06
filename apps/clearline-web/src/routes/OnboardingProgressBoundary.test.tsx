@@ -76,6 +76,23 @@ describe('OnboardingProgressBoundary', () => {
     await waitFor(() => expect(screen.getByText('Status page')).toBeInTheDocument());
   });
 
+  it('shows the AC-06 timeout message once redirected back to the last-completed step', async () => {
+    setAccessToken('access_valid');
+    server.use(
+      http.get('*/api/onboarding/status', () =>
+        HttpResponse.json(statusResponse({ sessionTimedOut: true })),
+      ),
+    );
+    renderAt('/onboarding/review');
+
+    await waitFor(() => expect(screen.getByText('Owners step')).toBeInTheDocument());
+    expect(
+      screen.getByText(
+        "Your verification session timed out. Let's start again from where you left off.",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it('shows a retry option on a network error rather than redirecting', async () => {
     setAccessToken('access_valid');
     server.use(http.get('*/api/onboarding/status', () => HttpResponse.error()));

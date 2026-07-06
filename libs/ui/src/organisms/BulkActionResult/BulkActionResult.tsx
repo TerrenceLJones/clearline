@@ -1,4 +1,4 @@
-import { Icon } from '@fintech-portfolio/icons';
+import { Icon } from '@clearline/icons';
 import { Button } from '../../atoms/Button';
 import { Text } from '../../atoms/Text';
 

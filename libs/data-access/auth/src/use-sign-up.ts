@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import type { SignUpErrorCode, SignUpRequest, SignUpResponse } from '@fintech-portfolio/contracts';
+import type { SignUpErrorCode, SignUpRequest, SignUpResponse } from '@clearline/contracts';
 
 export class SignUpError extends Error {
   readonly code: SignUpErrorCode;

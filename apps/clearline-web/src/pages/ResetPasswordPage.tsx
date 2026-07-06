@@ -1,11 +1,11 @@
 import { useState, type SubmitEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import { Alert, AuthLayout, AuthNotice, Button, PasswordField, Text } from '@fintech-portfolio/ui';
+import { Alert, AuthLayout, AuthNotice, Button, PasswordField, Text } from '@clearline/ui';
 import {
   ResetPasswordError,
   useResetPassword,
   useValidateResetToken,
-} from '@fintech-portfolio/data-access-auth';
+} from '@clearline/data-access-auth';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 const WEAK_PASSWORD_MESSAGE =

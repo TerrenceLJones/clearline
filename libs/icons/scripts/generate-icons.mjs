@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Regenerates src/icon-registry.ts from icons.source.json.
 // icons.source.json (a copy of clearline-icons.json) is the single input —
-// edit it, then re-run `pnpm --filter @fintech-portfolio/icons generate`.
+// edit it, then re-run `pnpm --filter @clearline/icons generate`.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -22,7 +22,7 @@ const nameUnion = names.map((name) => `  | '${name}'`).join('\n');
 
 const ts = `// GENERATED FILE — do not edit by hand.
 // Source: icons.source.json (a copy of clearline-icons.json).
-// Regenerate with: pnpm --filter @fintech-portfolio/icons generate
+// Regenerate with: pnpm --filter @clearline/icons generate
 
 export interface IconDefinition {
   viewBox: string;

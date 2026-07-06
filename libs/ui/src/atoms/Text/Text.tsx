@@ -1,17 +1,10 @@
 import type { ComponentPropsWithoutRef, ElementType } from 'react';
-import { typography } from '@fintech-portfolio/design-tokens';
+import { typography } from '@clearline/design-tokens';
 
 export type TextSize = keyof typeof typography.scale;
 export type TextWeight = 'regular' | 'medium' | 'semibold';
 export type TextTone =
-  | 'default'
-  | 'muted'
-  | 'faint'
-  | 'accent'
-  | 'positive'
-  | 'negative'
-  | 'warning'
-  | 'critical';
+  'default' | 'muted' | 'faint' | 'accent' | 'positive' | 'negative' | 'warning' | 'critical';
 export type TextElement = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'label' | 'div';
 
 export interface TextProps extends Omit<ComponentPropsWithoutRef<'span'>, 'color'> {
@@ -117,7 +110,8 @@ export function Text({
         fontSize: scale.size,
         letterSpacing: scale.letterSpacing,
         lineHeight: LINE_HEIGHT[size],
-        fontVariantNumeric: 'tabularNums' in scale && scale.tabularNums ? 'tabular-nums' : undefined,
+        fontVariantNumeric:
+          'tabularNums' in scale && scale.tabularNums ? 'tabular-nums' : undefined,
       }}
       {...rest}
     >

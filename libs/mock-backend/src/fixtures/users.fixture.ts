@@ -1,7 +1,7 @@
 export interface SeedUser {
   id: string;
   email: string;
-  /** PBKDF2-HMAC-SHA256 hash (see @fintech-portfolio/domain-auth password-hashing) — never plaintext, even in seed data. */
+  /** PBKDF2-HMAC-SHA256 hash (see @clearline/domain-auth password-hashing) — never plaintext, even in seed data. */
   passwordHash: string;
   /** False from account creation (US-CW-029 AC-01) until the sign-up verification link is clicked (AC-03). */
   verified: boolean;

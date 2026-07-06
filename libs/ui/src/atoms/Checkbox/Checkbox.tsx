@@ -1,5 +1,5 @@
 import { Checkbox as RadixCheckbox } from 'radix-ui';
-import { Icon } from '@fintech-portfolio/icons';
+import { Icon } from '@clearline/icons';
 import { useDisabledGuard } from '../../utils/useDisabledGuard';
 
 export interface CheckboxProps {

@@ -3,7 +3,7 @@ import type {
   VerifyEmailErrorCode,
   VerifyEmailRequest,
   VerifyEmailResponse,
-} from '@fintech-portfolio/contracts';
+} from '@clearline/contracts';
 
 export class VerifyEmailError extends Error {
   readonly code: VerifyEmailErrorCode;

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import { AuthLayout, AuthNotice, Text } from '@fintech-portfolio/ui';
-import { setAccessToken, useVerifyEmail } from '@fintech-portfolio/data-access-auth';
+import { AuthLayout, AuthNotice, Text } from '@clearline/ui';
+import { setAccessToken, useVerifyEmail } from '@clearline/data-access-auth';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 export function VerifyEmailPage() {

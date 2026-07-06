@@ -1,4 +1,4 @@
-import { Icon, type IconName } from '@fintech-portfolio/icons';
+import { Icon, type IconName } from '@clearline/icons';
 import { Text } from '../../atoms/Text';
 
 export interface NavItemProps {
@@ -25,9 +25,10 @@ export function NavItem({ icon, label, active = false, badge, onClick }: NavItem
         as="span"
         size="label"
         weight={active ? 'semibold' : 'medium'}
-        className={['flex-1 whitespace-nowrap', active ? 'text-cl-accent-text' : 'text-cl-text-2'].join(
-          ' ',
-        )}
+        className={[
+          'flex-1 whitespace-nowrap',
+          active ? 'text-cl-accent-text' : 'text-cl-text-2',
+        ].join(' ')}
       >
         {label}
       </Text>

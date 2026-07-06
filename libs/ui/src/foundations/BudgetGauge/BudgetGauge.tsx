@@ -1,4 +1,4 @@
-import { Icon, type IconName } from '@fintech-portfolio/icons';
+import { Icon, type IconName } from '@clearline/icons';
 import { formatMoney } from '../../utils/formatMoney';
 import { Text } from '../../atoms/Text';
 

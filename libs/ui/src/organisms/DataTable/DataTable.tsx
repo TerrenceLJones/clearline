@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Icon } from '@fintech-portfolio/icons';
+import { Icon } from '@clearline/icons';
 import { Checkbox } from '../../atoms/Checkbox';
 import { Text } from '../../atoms/Text';
 import { StatusBadge, type StatusKey } from '../../foundations/StatusBadge';
@@ -170,7 +170,13 @@ export function DataTable({
             <Text as="div" size="mono" tone="muted">
               {row.date}
             </Text>
-            <Text as="div" size="mono" weight="semibold" tone="default" className="pr-4.5 text-right">
+            <Text
+              as="div"
+              size="mono"
+              weight="semibold"
+              tone="default"
+              className="pr-4.5 text-right"
+            >
               {formatMoney(row.amount)}
             </Text>
             <div>

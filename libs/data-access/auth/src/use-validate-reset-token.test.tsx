@@ -5,7 +5,7 @@ import { useValidateResetToken } from './use-validate-reset-token';
 import {
   buildValidateResetTokenResponse,
   registerMswServer,
-} from '@fintech-portfolio/mock-backend/test-factories';
+} from '@clearline/mock-backend/test-factories';
 import { createQueryWrapper } from './test/create-query-wrapper';
 
 const server = registerMswServer();

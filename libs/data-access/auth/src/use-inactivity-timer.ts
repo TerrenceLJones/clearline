@@ -3,7 +3,7 @@ import {
   getInactivityPhase,
   getWarningSecondsRemaining,
   type InactivityPhase,
-} from '@fintech-portfolio/domain-auth';
+} from '@clearline/domain-auth';
 
 export interface UseInactivityTimerOptions {
   onExpire: () => void;

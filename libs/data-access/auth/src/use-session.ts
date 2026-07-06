@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import type { SessionResponse } from '@fintech-portfolio/contracts';
+import type { SessionResponse } from '@clearline/contracts';
 import { authenticatedFetch } from './api-client';
 
 async function getSession(): Promise<SessionResponse> {

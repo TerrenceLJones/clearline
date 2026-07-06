@@ -13,7 +13,7 @@ depends_on_epics: ['EPIC-CW-001']
 extends_stories: []
 reuses_from: []
 has_ui: true
-ui_library: '@fintech-portfolio/ui'
+ui_library: '@clearline/ui'
 changes:
   adds:
     - story_id: 'US-CW-006'

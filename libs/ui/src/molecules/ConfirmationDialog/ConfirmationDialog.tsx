@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from 'react';
 import { Dialog } from 'radix-ui';
-import { Icon } from '@fintech-portfolio/icons';
+import { Icon } from '@clearline/icons';
 import { Text } from '../../atoms/Text';
 import { useDisabledGuard } from '../../utils/useDisabledGuard';
 

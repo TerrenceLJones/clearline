@@ -3,12 +3,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { http, HttpResponse } from 'msw';
-import { clearAccessToken, getAccessToken } from '@fintech-portfolio/data-access-auth';
+import { clearAccessToken, getAccessToken } from '@clearline/data-access-auth';
 import {
   buildAuthErrorResponse,
   buildLoginSuccessResponse,
   registerMswServer,
-} from '@fintech-portfolio/mock-backend/test-factories';
+} from '@clearline/mock-backend/test-factories';
 import { LoginPage } from './LoginPage';
 import { withQueryClient } from '../test/with-query-client';
 

@@ -3,13 +3,13 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import { http, HttpResponse } from 'msw';
-import { registerMswServer } from '@fintech-portfolio/mock-backend/test-factories';
+import { registerMswServer } from '@clearline/mock-backend/test-factories';
 import {
   authenticatedFetch,
   clearAccessToken,
   getAccessToken,
   setAccessToken,
-} from '@fintech-portfolio/data-access-auth';
+} from '@clearline/data-access-auth';
 import { SessionActivityBoundary } from './SessionActivityBoundary';
 import { withQueryClient } from '../test/with-query-client';
 

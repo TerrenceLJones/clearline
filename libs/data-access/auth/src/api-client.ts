@@ -1,4 +1,4 @@
-import type { RefreshResponse, SessionErrorCode } from '@fintech-portfolio/contracts';
+import type { RefreshResponse, SessionErrorCode } from '@clearline/contracts';
 import { clearAccessToken, getAccessToken, setAccessToken } from './access-token-store';
 
 export type SessionEndedReason = 'security' | 'expired' | 'password_changed' | 'invalid';

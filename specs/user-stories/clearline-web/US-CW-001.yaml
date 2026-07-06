@@ -156,7 +156,7 @@ technical_notes: |
   channel using approved cryptography" for authenticator secrets) — Vercel enforces this at the platform level;
   no per-request application-layer encryption is added on top, and none should be. At rest: passwords are hashed,
   never encrypted — hashing is one-way by design, so nothing (including the backend itself) can ever recover the
-  plaintext. This is implemented via PBKDF2-HMAC-SHA256 (@fintech-portfolio/domain-auth's password-hashing
+  plaintext. This is implemented via PBKDF2-HMAC-SHA256 (@clearline/domain-auth's password-hashing
   module), OWASP's documented fallback where Argon2id isn't available — Argon2id has no native Web Crypto support
   and would require a WASM dependency inside the browser-mode MSW service worker this mock backend runs in.
   AuthService.login also runs a dummy-hash verification for unregistered emails so response timing can't be used

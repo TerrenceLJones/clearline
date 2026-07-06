@@ -1,4 +1,4 @@
-# fintech-portfolio
+# clearline
 
 A monorepo of standalone fintech frontend projects, each demoable and discussable independently. Each project is scoped around a specific fintech domain — modeling real business rules, failure modes, and data integrity constraints, not just happy-path CRUD.
 
@@ -19,13 +19,13 @@ Double-entry ledger with derived balances, idempotent payment flows, multi-level
 ## Monorepo structure
 
 ```
-fintech-portfolio/
+clearline/
   apps/                  # deployable applications (one per project)
     clearline-web/       # placeholder — frontend framework TBD (TDR-CW-WEB-001)
   libs/                  # shared libraries — domain logic, UI, data-access, utilities
     design-tokens/       # Clearline --cl-* design tokens (Tailwind v4 @theme) + ThemeProvider/useTheme
-    icons/               # @fintech-portfolio/icons — the 45-glyph Clearline icon registry + <Icon>
-    ui/                  # @fintech-portfolio/ui — the Clearline React component library + Storybook
+    icons/               # @clearline/icons — the 45-glyph Clearline icon registry + <Icon>
+    ui/                  # @clearline/ui — the Clearline React component library + Storybook
     mock-backend/        # MSW v2 mock backend convention (services-first, handlers-second)
     contracts/           # documented API contracts (no Pact — see TDR-PLATFORM-001)
   specs/                 # opportunities, TDRs, user stories, implementation plans
@@ -94,10 +94,10 @@ input for each package:
 
 ```bash
 # after editing libs/design-tokens/tokens.source.json
-pnpm --filter @fintech-portfolio/design-tokens generate
+pnpm --filter @clearline/design-tokens generate
 
 # after editing libs/icons/icons.source.json
-pnpm --filter @fintech-portfolio/icons generate
+pnpm --filter @clearline/icons generate
 ```
 
 ---

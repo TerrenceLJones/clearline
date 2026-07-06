@@ -5,7 +5,7 @@ import type {
   SignUpResponse,
   VerifyEmailErrorResponse,
   VerifyEmailResponse,
-} from '@fintech-portfolio/contracts';
+} from '@clearline/contracts';
 import { createSignUpHandlers } from './signup.handlers';
 import { AuthService } from '../services/auth.service';
 import { SEED_USERS } from '../fixtures/users.fixture';

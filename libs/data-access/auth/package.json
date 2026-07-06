@@ -1,5 +1,5 @@
 {
-  "name": "@fintech-portfolio/data-access-auth",
+  "name": "@clearline/data-access-auth",
   "version": "0.1.0",
   "private": true,
   "description": "Auth data-access layer for clearline-web: the in-memory access-token store and the login TanStack Query mutation. No UI, no business rules — those live in libs/ui and libs/domain/auth respectively.",
@@ -15,14 +15,14 @@
     "react-dom": "^19.2.0"
   },
   "dependencies": {
-    "@fintech-portfolio/contracts": "workspace:*",
-    "@fintech-portfolio/domain-auth": "workspace:*",
+    "@clearline/contracts": "workspace:*",
+    "@clearline/domain-auth": "workspace:*",
     "@tanstack/react-query": "^5.101.2"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "@fintech-portfolio/mock-backend": "workspace:*",
+    "@clearline/mock-backend": "workspace:*",
     "msw": "^2.14.6"
   },
   "metadata": {

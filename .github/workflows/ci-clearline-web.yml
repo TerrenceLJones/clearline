@@ -67,7 +67,7 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Install Playwright browsers
-        run: pnpm --filter @fintech-portfolio/ui --filter @fintech-portfolio/clearline-web exec playwright install --with-deps chromium
+        run: pnpm --filter @clearline/ui --filter @clearline/clearline-web exec playwright install --with-deps chromium
 
       - name: Derive base/head for nx affected
         uses: nrwl/nx-set-shas@v4

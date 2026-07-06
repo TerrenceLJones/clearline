@@ -1,6 +1,6 @@
 // GENERATED FILE — do not edit by hand.
 // Source: tokens.source.json (a copy of clearline-tokens.json).
-// Regenerate with: pnpm --filter @fintech-portfolio/design-tokens generate
+// Regenerate with: pnpm --filter @clearline/design-tokens generate
 
 export const semanticTokens = {
   bg: { cssVar: '--cl-bg', role: 'App background', light: '#f5f6f8', dark: '#0b0d11' },

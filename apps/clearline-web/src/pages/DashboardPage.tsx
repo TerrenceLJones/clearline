@@ -1,4 +1,4 @@
-import { useSession } from '@fintech-portfolio/data-access-auth';
+import { useSession } from '@clearline/data-access-auth';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 /**

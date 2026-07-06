@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Regenerates src/theme.css and src/tokens.ts from tokens.source.json.
 // tokens.source.json (a copy of clearline-tokens.json) is the single input —
-// edit it, then re-run `pnpm --filter @fintech-portfolio/design-tokens generate`.
+// edit it, then re-run `pnpm --filter @clearline/design-tokens generate`.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -42,7 +42,7 @@ const fontEntries = Object.entries(tokens.typography.fontFamilies).map(
 const theme = `/*
  * GENERATED FILE — do not edit by hand.
  * Source: tokens.source.json (a copy of clearline-tokens.json).
- * Regenerate with: pnpm --filter @fintech-portfolio/design-tokens generate
+ * Regenerate with: pnpm --filter @clearline/design-tokens generate
  */
 
 :root {
@@ -81,7 +81,7 @@ const primitiveTsEntries = Object.entries(tokens.color.primitives)
 
 const ts = `// GENERATED FILE — do not edit by hand.
 // Source: tokens.source.json (a copy of clearline-tokens.json).
-// Regenerate with: pnpm --filter @fintech-portfolio/design-tokens generate
+// Regenerate with: pnpm --filter @clearline/design-tokens generate
 
 export const semanticTokens = {
 ${semanticTsEntries}

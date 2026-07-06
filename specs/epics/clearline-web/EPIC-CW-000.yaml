@@ -13,7 +13,7 @@ depends_on_epics: []
 extends_stories: []
 reuses_from: []
 has_ui: true
-ui_library: '@fintech-portfolio/ui'
+ui_library: '@clearline/ui'
 changes:
   adds:
     - story_id: 'US-CW-022'
@@ -60,7 +60,7 @@ notes: >
   and one .dc.html spec per component) into a typed, tested React component library living in
   libs/, ahead of and independent from apps/clearline-web itself (still a placeholder pending
   TDR-CW-WEB-001 execution). Unblocks all 15 feature epics (EPIC-CW-001 through EPIC-CW-015),
-  each of which now points its `ui_library` field at `@fintech-portfolio/ui`.
+  each of which now points its `ui_library` field at `@clearline/ui`.
 
   Amends TDR-PLATFORM-001's `shared_design_system_tooling` decision, which deferred a shared
   component-primitives library "until a second app exists to validate real reuse." That

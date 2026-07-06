@@ -38,7 +38,7 @@ removed_date: null
 # User Story
 user_story:
   persona: 'clearline-web engineer integrating money into any feature epic'
-  capability: 'a shared `Money` type in `@fintech-portfolio/contracts`, a `toMajorUnits` conversion in the new `@fintech-portfolio/money` (libs/util/money), and a currency-aware `formatMoney` in `@fintech-portfolio/ui`'
+  capability: 'a shared `Money` type in `@clearline/contracts`, a `toMajorUnits` conversion in the new `@clearline/money` (libs/util/money), and a currency-aware `formatMoney` in `@clearline/ui`'
   business_value: 'minor-unit-to-major-unit conversion and currency display formatting are correct for any ISO 4217 currency and defined exactly once, instead of every feature epic hand-rolling the same math and risking a hardcoded "divide by 100" assumption that silently misconverts 0-decimal currencies (JPY) or 3-decimal currencies (BHD)'
   description: |
     As a clearline-web engineer
@@ -83,16 +83,16 @@ acceptance_criteria:
 # Technical Notes
 technical_notes: |
   Split across three packages by what each thing actually is, not just "money-related":
-  `@fintech-portfolio/contracts` holds only the `Money` interface — the wire *shape* (what an
+  `@clearline/contracts` holds only the `Money` interface — the wire *shape* (what an
   amount looks like in a request/response), kept as a pure type with zero hand-written runtime
   logic so the package stays safely regenerable from a schema, matching contracts' documented
-  scope of "request/response shapes, status codes, error formats" only. `@fintech-portfolio/money`
+  scope of "request/response shapes, status codes, error formats" only. `@clearline/money`
   (`libs/util/money`) holds `toMajorUnits` — the actual conversion *logic* that operationalizes
   that shape, which must produce identical results everywhere it's used (the mock backend's
   ledger, any UI consumer) since there's no Pact-style contract test to catch drift between a
   real backend and this frontend (ADR-006). It derives each currency's minor-unit exponent from
   `Intl.NumberFormat(...).resolvedOptions().maximumFractionDigits` rather than a hand-maintained
-  ISO 4217 table. `@fintech-portfolio/ui`'s `formatMoney` takes neither of these as a runtime
+  ISO 4217 table. `@clearline/ui`'s `formatMoney` takes neither of these as a runtime
   dependency: it only ever receives an already-converted major-unit float plus a currency code,
   and `Intl.NumberFormat`'s `style: 'currency'` handles correct symbol/decimal-place *display* on
   its own — display formatting isn't part of the wire contract (two frontends could format the
@@ -128,7 +128,7 @@ edge_cases: |
   - libs/contracts/src/money.ts (now a pure `Money` interface, no runtime logic)
   - libs/contracts/package.json (removed the `test` script — nothing left to test)
   - libs/ui/src/lib/format-money.ts (currency-aware via Intl.NumberFormat)
-  - tsconfig.base.json (added the `@fintech-portfolio/money` path)
+  - tsconfig.base.json (added the `@clearline/money` path)
 📁 Files removed:
   - libs/contracts/src/money.test.ts, libs/contracts/vitest.config.mts (moved to libs/util/money)
 🧪 Test coverage: 3 tests in libs/util/money (to-major-units.test.ts), 4 tests in libs/ui

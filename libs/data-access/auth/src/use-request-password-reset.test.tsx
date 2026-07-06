@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { useRequestPasswordReset } from './use-request-password-reset';
-import { registerMswServer } from '@fintech-portfolio/mock-backend/test-factories';
+import { registerMswServer } from '@clearline/mock-backend/test-factories';
 import { createQueryWrapper } from './test/create-query-wrapper';
 
 const server = registerMswServer();

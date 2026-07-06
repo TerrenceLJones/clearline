@@ -10,7 +10,7 @@ import {
   hashPassword,
   hashToken,
   type FailedAttempt,
-} from '@fintech-portfolio/domain-auth';
+} from '@clearline/domain-auth';
 import { SEED_USERS, type SeedUser } from '../fixtures/users.fixture';
 
 /** No real user's hash — exists only so an unregistered-email login takes the same PBKDF2 time as a real one. */

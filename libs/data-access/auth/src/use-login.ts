@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import type { AuthErrorCode, LoginRequest, LoginResponse } from '@fintech-portfolio/contracts';
+import type { AuthErrorCode, LoginRequest, LoginResponse } from '@clearline/contracts';
 
 const MAX_RETRIES = 3;
 

@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
-import { registerMswServer } from '@fintech-portfolio/mock-backend/test-factories';
-import { clearAccessToken, setAccessToken } from '@fintech-portfolio/data-access-auth';
+import { registerMswServer } from '@clearline/mock-backend/test-factories';
+import { clearAccessToken, setAccessToken } from '@clearline/data-access-auth';
 import { DashboardPage } from './DashboardPage';
 import { withQueryClient } from '../test/with-query-client';
 

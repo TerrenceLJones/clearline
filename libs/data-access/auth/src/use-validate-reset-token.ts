@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import type { ValidateResetTokenResponse } from '@fintech-portfolio/contracts';
+import type { ValidateResetTokenResponse } from '@clearline/contracts';
 
 async function getValidateResetToken(token: string): Promise<ValidateResetTokenResponse> {
   const response = await fetch(

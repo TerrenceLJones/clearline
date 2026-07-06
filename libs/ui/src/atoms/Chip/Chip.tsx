@@ -1,4 +1,4 @@
-import { Icon, type IconName } from '@fintech-portfolio/icons';
+import { Icon, type IconName } from '@clearline/icons';
 import { Text } from '../Text';
 
 export interface ChipProps {

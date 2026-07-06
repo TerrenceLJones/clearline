@@ -4,8 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import { QueryClient } from '@tanstack/react-query';
 import { http, HttpResponse } from 'msw';
-import { registerMswServer } from '@fintech-portfolio/mock-backend/test-factories';
-import { clearAccessToken, setAccessToken } from '@fintech-portfolio/data-access-auth';
+import { registerMswServer } from '@clearline/mock-backend/test-factories';
+import { clearAccessToken, setAccessToken } from '@clearline/data-access-auth';
 import { RequireAuth } from './RequireAuth';
 import { withQueryClient } from '../test/with-query-client';
 

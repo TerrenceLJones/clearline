@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import { ThemeProvider } from '@fintech-portfolio/design-tokens';
+import { ThemeProvider } from '@clearline/design-tokens';
 import { AppShell, type AppShellProps } from './AppShell';
 import { buildNavItem } from '../../test-factories';
 

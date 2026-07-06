@@ -4,7 +4,7 @@ import type {
   RefreshResponse,
   SessionErrorResponse,
   SessionResponse,
-} from '@fintech-portfolio/contracts';
+} from '@clearline/contracts';
 import { AuthService, type RevocationReason } from '../services/auth.service';
 import { sharedAuthService } from '../services/shared-auth-service';
 import { parseCookie } from './cookies';

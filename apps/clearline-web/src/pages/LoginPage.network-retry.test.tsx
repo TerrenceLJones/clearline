@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { LoginPage } from './LoginPage';
-import { useLogin } from '@fintech-portfolio/data-access-auth';
+import { useLogin } from '@clearline/data-access-auth';
 import { withQueryClient } from '../test/with-query-client';
 import { buildMutationResult } from '../test/build-mutation-result';
 
@@ -12,8 +12,8 @@ import { buildMutationResult } from '../test/build-mutation-result';
 // exhausted-retries UI state can be tested without a ~14s real-backoff wait. Kept in its own
 // file because vi.mock hoists to the top of the whole module — mixing it into LoginPage.test.tsx
 // would silently break that file's real-MSW-backed tests too.
-vi.mock('@fintech-portfolio/data-access-auth', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@fintech-portfolio/data-access-auth')>();
+vi.mock('@clearline/data-access-auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@clearline/data-access-auth')>();
   return { ...actual, useLogin: vi.fn() };
 });
 

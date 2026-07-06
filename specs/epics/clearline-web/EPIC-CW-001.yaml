@@ -44,6 +44,17 @@ changes:
         starting a new one. Moved here from US-CW-002 AC-04 (see above) since this story owns the actual payment
         form and idempotency-key mechanics the AC depends on. Adds a dependency on US-CW-002, since the AC layers
         on top of that story's forced-logout/redirect-to-/login mechanism.
+    - story_id: 'US-CW-002'
+      story_path: '/specs/user-stories/clearline-web/US-CW-002.yaml'
+      title: 'Session & Token Lifecycle'
+      change: >
+        Clarifies AC-07: the criterion specified what "Continue here" does (does not forcibly log
+        out the other device) but was silent on "Cancel". Surfaced during implementation — the
+        login that surfaces the concurrent-session notice has already established a real session
+        server-side by the time the notice appears, so leaving "Cancel" undefined meant it was up
+        to implementation to decide whether that session gets revoked or left dangling. Clarifies
+        that cancelling revokes only the session just created by this login; the other device's
+        session is unaffected either way.
   deprecates: []
   removes: []
 notes: >
@@ -58,3 +69,9 @@ notes: >
   AC-06, where it can be implemented against the real form once that story is picked up. Following the precedent
   EPIC-CW-016 set for amending an already-APPROVED epic to close a gap found during implementation of a sibling
   story, rather than opening a new epic for a one-AC relocation.
+
+  Amended 2026-07-05, during US-CW-002's implementation: AC-07 defined "Continue here" but was silent on
+  "Cancel", leaving a real behavioral gap — the concurrent-session notice's own login has already created a
+  session server-side before the user chooses either option. Clarified AC-07 so the criterion itself states
+  cancelling revokes only that just-created session, rather than leaving it as an undocumented implementation
+  decision.

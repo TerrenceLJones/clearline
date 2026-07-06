@@ -9,7 +9,7 @@ feature_area: 'core'
 title: 'Session & Token Lifecycle'
 
 # Lifecycle status
-status: 'APPROVED'
+status: 'IMPLEMENTED'
 story_points: 13
 dependencies: ['US-CW-001']
 
@@ -28,10 +28,13 @@ history:
   - epic_id: 'EPIC-CW-001'
     action: 'updated'
     date: '2026-07-03'
+  - epic_id: 'EPIC-CW-001'
+    action: 'updated'
+    date: '2026-07-05'
 
 # Status timestamps — set when status transitions occur
 approved_date: '2026-06-30'
-implementation_date: null
+implementation_date: '2026-07-05'
 deprecated_date: null
 removed_date: null
 
@@ -105,6 +108,8 @@ acceptance_criteria:
       When I log in on a new device with the same account
       Then I see a notice: "You're signed in on another device. Continue here?"
       And I may choose to continue, which does not forcibly log out the other device
+      And if I cancel instead, only the session just created by this login is revoked —
+      the other device's session is left untouched either way
     status: 'active'
 
 # Technical Notes
@@ -136,5 +141,25 @@ edge_cases: |
 
 # Implementation Status
 implementation_status: |
-  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
-  specification pass for clearline-web — no application code exists yet.
+  ✅ Implemented: 2026-07-05
+  📁 Files created/modified (grouped by area — see PR #9 for the full list):
+    - libs/domain/auth/src/{access-token-policy,refresh-token-policy,inactivity-policy}.ts — pure
+      threshold/classification logic (5-min access-token TTL, 30-day refresh-token TTL, 14-min
+      warning / 15-min inactivity cutoff)
+    - libs/mock-backend/src/services/auth.service.ts — per-login RefreshTokenFamily model;
+      refresh()/checkSession()/logout() methods
+    - libs/mock-backend/src/handlers/session.handlers.ts — POST /api/auth/refresh,
+      GET /api/auth/session, POST /api/auth/logout
+    - libs/data-access/auth/src/api-client.ts — authenticatedFetch() silent-refresh interceptor
+    - libs/data-access/auth/src/use-{refresh-token,logout,session,inactivity-timer}.ts — hooks
+    - libs/ui/src/molecules/InactivityWarningModal/ — new component
+    - apps/clearline-web/src/routes/SessionActivityBoundary.tsx (new),
+      RequireAuth.tsx and pages/LoginPage.tsx (updated)
+  🧪 Test coverage: full unit/component suite green across all 8 Nx projects, plus 31 Playwright
+  e2e tests (6 new in apps/clearline-web/e2e/session.spec.ts covering AC-01/02/03/06/07). AC-04/
+  AC-05 covered only at the fake-timer component level (use-inactivity-timer.test.ts,
+  SessionActivityBoundary.test.tsx), not e2e — a real 14-minute wait per test run wasn't judged
+  worth the added coverage.
+  📖 Storybook story: Molecules/InactivityWarningModal — 4 stories (Interactive,
+  StaySignedInClosesAndResets, SignOutEndsTheSessionImmediately,
+  DismissingViaEscapeCountsAsActivity), all passing via `nx run ui:test-storybook`.

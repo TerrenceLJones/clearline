@@ -6,7 +6,7 @@ import type {
   VerifyEmailErrorResponse,
   VerifyEmailRequest,
   VerifyEmailResponse,
-} from '@fintech-portfolio/contracts';
+} from '@clearline/contracts';
 import { AuthService } from '../services/auth.service';
 import { sharedAuthService } from '../services/shared-auth-service';
 

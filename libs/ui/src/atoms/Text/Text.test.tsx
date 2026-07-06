@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { typography } from '@fintech-portfolio/design-tokens';
+import { typography } from '@clearline/design-tokens';
 import { Text } from './Text';
 
 describe('Text', () => {

@@ -1,12 +1,12 @@
 import { useCallback, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
-import { InactivityWarningModal } from '@fintech-portfolio/ui';
+import { InactivityWarningModal } from '@clearline/ui';
 import {
   subscribeSessionEnded,
   useInactivityTimer,
   useLogout,
   type SessionEndedReason,
-} from '@fintech-portfolio/data-access-auth';
+} from '@clearline/data-access-auth';
 
 export type SessionEndReason = SessionEndedReason | 'inactivity';
 

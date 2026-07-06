@@ -79,7 +79,7 @@ acceptance_criteria:
 # Technical Notes
 technical_notes: |
   Budget amounts and spend totals must be stored as integer minor units and converted/rendered via the shared
-  `toMajorUnits`/`formatMoney` utilities (`@fintech-portfolio/money`/`@fintech-portfolio/ui`, US-CW-027) to
+  `toMajorUnits`/`formatMoney` utilities (`@clearline/money`/`@clearline/ui`, US-CW-027) to
   support exact percentage and overage calculations such as "104% of budget used — $2,000.00 over" — not a
   hardcoded "two decimal places" assumption, which is wrong for a department ever budgeted in a 0-decimal
   currency (e.g. JPY) or a 3-decimal currency (e.g. BHD). Threshold

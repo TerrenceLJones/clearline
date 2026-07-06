@@ -1,7 +1,7 @@
 // MSW v2 browser worker entry point (dev server / Storybook).
 import { http, HttpResponse } from 'msw';
 import { setupWorker } from 'msw/browser';
-import type { SessionErrorCode } from '@fintech-portfolio/contracts';
+import type { SessionErrorCode } from '@clearline/contracts';
 import { authHandlers } from './handlers/auth.handlers';
 import { passwordResetHandlers } from './handlers/password-reset.handlers';
 import { signUpHandlers } from './handlers/signup.handlers';

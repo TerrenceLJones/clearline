@@ -1,5 +1,5 @@
 {
-  "name": "@fintech-portfolio/mock-backend",
+  "name": "@clearline/mock-backend",
   "version": "0.1.0",
   "private": true,
   "description": "Platform-wide MSW v2 mock backend convention: stateful TypeScript services hold the invariants, MSW handlers are thin HTTP/WebSocket adapters in front of them. See TDR-PLATFORM-001 > technology_decisions.shared_mock_backend_strategy.",
@@ -17,8 +17,8 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@fintech-portfolio/contracts": "workspace:*",
-    "@fintech-portfolio/domain-auth": "workspace:*"
+    "@clearline/contracts": "workspace:*",
+    "@clearline/domain-auth": "workspace:*"
   },
   "devDependencies": {
     "msw": "^2.14.6"

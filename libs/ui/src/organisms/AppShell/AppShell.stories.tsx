@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import { ThemeProvider } from '@fintech-portfolio/design-tokens';
+import { ThemeProvider } from '@clearline/design-tokens';
 import { AppShell } from './AppShell';
 import { MoneyDisplay } from '../../foundations/MoneyDisplay';
 import { BudgetGauge } from '../../foundations/BudgetGauge';

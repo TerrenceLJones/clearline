@@ -1,7 +1,7 @@
 import { afterAll, afterEach, beforeAll } from 'vitest';
 import type { HttpHandler } from 'msw';
 import { setupServer } from 'msw/node';
-import { hashPassword } from '@fintech-portfolio/domain-auth';
+import { hashPassword } from '@clearline/domain-auth';
 import type {
   AuthErrorResponse,
   LoginRequest,
@@ -18,7 +18,7 @@ import type {
   ValidateVerifyEmailTokenResponse,
   VerifyEmailErrorResponse,
   VerifyEmailResponse,
-} from '@fintech-portfolio/contracts';
+} from '@clearline/contracts';
 import { AuthService } from '../services/auth.service';
 import type { SeedUser } from './users.fixture';
 

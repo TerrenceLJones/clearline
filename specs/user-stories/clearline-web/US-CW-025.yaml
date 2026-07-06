@@ -84,7 +84,7 @@ acceptance_criteria:
 # Technical Notes
 technical_notes: |
   DataTable composes Checkbox (Tier 1) and StatusBadge (foundations) rather than reimplementing
-  either. AppShell consumes theme state via `useTheme()` (from @fintech-portfolio/design-tokens)
+  either. AppShell consumes theme state via `useTheme()` (from @clearline/design-tokens)
   rather than instantiating its own `<ThemeProvider>` — the app root mounts ThemeProvider once, so
   theme state is shared app-wide and other theme-dependent chrome (e.g. US-CW-028's NavigationShell)
   can compose alongside AppShell without going through it. A consuming screen still only ever writes

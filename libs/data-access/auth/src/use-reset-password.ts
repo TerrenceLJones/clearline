@@ -3,7 +3,7 @@ import type {
   ResetPasswordErrorCode,
   ResetPasswordRequest,
   ResetPasswordResponse,
-} from '@fintech-portfolio/contracts';
+} from '@clearline/contracts';
 
 export class ResetPasswordError extends Error {
   readonly code: ResetPasswordErrorCode;

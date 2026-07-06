@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Dialog } from 'radix-ui';
-import { Icon, type IconName } from '@fintech-portfolio/icons';
+import { Icon, type IconName } from '@clearline/icons';
 import { Text } from '../../atoms/Text';
 
 export type ModalTone = 'accent' | 'negative' | 'warning';

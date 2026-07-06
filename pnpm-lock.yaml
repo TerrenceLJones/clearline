@@ -125,25 +125,25 @@ importers:
 
   apps/clearline-web:
     dependencies:
-      '@fintech-portfolio/contracts':
+      '@clearline/contracts':
         specifier: workspace:*
         version: link:../../libs/contracts
-      '@fintech-portfolio/data-access-auth':
+      '@clearline/data-access-auth':
         specifier: workspace:*
         version: link:../../libs/data-access/auth
-      '@fintech-portfolio/design-tokens':
+      '@clearline/design-tokens':
         specifier: workspace:*
         version: link:../../libs/design-tokens
-      '@fintech-portfolio/domain-auth':
+      '@clearline/domain-auth':
         specifier: workspace:*
         version: link:../../libs/domain/auth
-      '@fintech-portfolio/icons':
+      '@clearline/icons':
         specifier: workspace:*
         version: link:../../libs/icons
-      '@fintech-portfolio/mock-backend':
+      '@clearline/mock-backend':
         specifier: workspace:*
         version: link:../../libs/mock-backend
-      '@fintech-portfolio/ui':
+      '@clearline/ui':
         specifier: workspace:*
         version: link:../../libs/ui
       '@sentry/cli':
@@ -194,10 +194,10 @@ importers:
 
   libs/data-access/auth:
     dependencies:
-      '@fintech-portfolio/contracts':
+      '@clearline/contracts':
         specifier: workspace:*
         version: link:../../contracts
-      '@fintech-portfolio/domain-auth':
+      '@clearline/domain-auth':
         specifier: workspace:*
         version: link:../../domain/auth
       '@tanstack/react-query':
@@ -210,7 +210,7 @@ importers:
         specifier: ^19.2.0
         version: 19.2.7(react@19.2.7)
     devDependencies:
-      '@fintech-portfolio/mock-backend':
+      '@clearline/mock-backend':
         specifier: workspace:*
         version: link:../../mock-backend
       '@types/react':
@@ -250,10 +250,10 @@ importers:
 
   libs/mock-backend:
     dependencies:
-      '@fintech-portfolio/contracts':
+      '@clearline/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@fintech-portfolio/domain-auth':
+      '@clearline/domain-auth':
         specifier: workspace:*
         version: link:../domain/auth
     devDependencies:
@@ -263,10 +263,10 @@ importers:
 
   libs/ui:
     dependencies:
-      '@fintech-portfolio/design-tokens':
+      '@clearline/design-tokens':
         specifier: workspace:*
         version: link:../design-tokens
-      '@fintech-portfolio/icons':
+      '@clearline/icons':
         specifier: workspace:*
         version: link:../icons
       radix-ui:
@@ -315,7 +315,7 @@ importers:
 
   libs/util/money:
     dependencies:
-      '@fintech-portfolio/contracts':
+      '@clearline/contracts':
         specifier: workspace:*
         version: link:../../contracts
 

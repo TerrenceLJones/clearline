@@ -1,8 +1,8 @@
 {
-  "name": "@fintech-portfolio/ui",
+  "name": "@clearline/ui",
   "version": "0.1.0",
   "private": true,
-  "description": "Clearline design system React component library, styled with Tailwind CSS v4 against @fintech-portfolio/design-tokens' --cl-* tokens, with Radix (radix-ui) backing the interactive/accessible primitives.",
+  "description": "Clearline design system React component library, styled with Tailwind CSS v4 against @clearline/design-tokens' --cl-* tokens, with Radix (radix-ui) backing the interactive/accessible primitives.",
   "main": "src/index.ts",
   "scripts": {
     "lint": "eslint .",
@@ -21,8 +21,8 @@
     "react-router": "^7.18.1"
   },
   "dependencies": {
-    "@fintech-portfolio/design-tokens": "workspace:*",
-    "@fintech-portfolio/icons": "workspace:*",
+    "@clearline/design-tokens": "workspace:*",
+    "@clearline/icons": "workspace:*",
     "radix-ui": "^1.6.1"
   },
   "devDependencies": {

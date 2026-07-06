@@ -7,7 +7,7 @@ import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 import { VerifyEmailPage } from './VerifyEmailPage';
 import { withQueryClient } from '../test/with-query-client';
-import { getAccessToken } from '@fintech-portfolio/data-access-auth';
+import { getAccessToken } from '@clearline/data-access-auth';
 
 const server = setupServer();
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));

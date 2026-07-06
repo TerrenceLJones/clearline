@@ -5,7 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router';
 import { http, HttpResponse } from 'msw';
 import { SignUpPage } from './SignUpPage';
 import { withQueryClient } from '../test/with-query-client';
-import { registerMswServer } from '@fintech-portfolio/mock-backend/test-factories';
+import { registerMswServer } from '@clearline/mock-backend/test-factories';
 
 const server = registerMswServer();
 

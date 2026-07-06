@@ -10,7 +10,7 @@ import {
   buildResetPasswordErrorResponse,
   buildValidateResetTokenResponse,
   registerMswServer,
-} from '@fintech-portfolio/mock-backend/test-factories';
+} from '@clearline/mock-backend/test-factories';
 
 const server = registerMswServer();
 

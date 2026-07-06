@@ -1,4 +1,4 @@
-import { Icon } from '@fintech-portfolio/icons';
+import { Icon } from '@clearline/icons';
 
 export interface PasswordRequirementItem {
   label: string;
@@ -11,7 +11,7 @@ export interface PasswordRequirementsListProps {
 
 /**
  * Presentation-only live checklist for password-complexity requirements (sign-up AC-04) — takes
- * plain `{label, met}` pairs rather than importing `@fintech-portfolio/domain-auth` directly, so
+ * plain `{label, met}` pairs rather than importing `@clearline/domain-auth` directly, so
  * the page computes requirement results with the real policy and this molecule just renders them,
  * the same domain/UI split every other page here already follows.
  */

@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router';
-import { ThemeProvider } from '@fintech-portfolio/design-tokens';
-import { AppShell, type NavigationShellItem } from '@fintech-portfolio/ui';
+import { ThemeProvider } from '@clearline/design-tokens';
+import { AppShell, type NavigationShellItem } from '@clearline/ui';
 import { LoginPage } from './pages/LoginPage';
 import { SignUpPage } from './pages/SignUpPage';
 import { VerifyEmailPage } from './pages/VerifyEmailPage';

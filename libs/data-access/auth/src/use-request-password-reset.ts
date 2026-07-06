@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import type { ForgotPasswordRequest, ForgotPasswordResponse } from '@fintech-portfolio/contracts';
+import type { ForgotPasswordRequest, ForgotPasswordResponse } from '@clearline/contracts';
 
 async function postForgotPassword(request: ForgotPasswordRequest): Promise<ForgotPasswordResponse> {
   let response: Response;

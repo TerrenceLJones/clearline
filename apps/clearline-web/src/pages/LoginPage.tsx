@@ -1,14 +1,6 @@
 import { useEffect, useRef, useState, type SubmitEvent } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
-import {
-  Alert,
-  AuthLayout,
-  Button,
-  Modal,
-  PasswordField,
-  Text,
-  TextField,
-} from '@fintech-portfolio/ui';
+import { Alert, AuthLayout, Button, Modal, PasswordField, Text, TextField } from '@clearline/ui';
 import {
   LoginError,
   setAccessToken,
@@ -16,7 +8,7 @@ import {
   useLogout,
   useSignUp,
   type SessionEndedReason,
-} from '@fintech-portfolio/data-access-auth';
+} from '@clearline/data-access-auth';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 // Only redirect to a same-origin path carried in `next` — anything else (an absolute URL, or a

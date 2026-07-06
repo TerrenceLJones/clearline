@@ -102,7 +102,7 @@ technical_notes: |
   attempt without the person submitting the form learning the email is taken.
 
   Passwords are hashed, never encrypted, using the same PBKDF2-HMAC-SHA256 helper introduced for US-CW-001
-  (@fintech-portfolio/domain-auth's password-hashing module) — no new hashing logic should be written for this
+  (@clearline/domain-auth's password-hashing module) — no new hashing logic should be written for this
   story. See US-CW-001's technical_notes for the full OWASP/NIST rationale (transit confidentiality is TLS/HTTPS;
   at-rest confidentiality is one-way hashing; nothing should ever be able to recover the plaintext).
 

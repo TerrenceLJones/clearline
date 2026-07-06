@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
-import { registerMswServer } from '@fintech-portfolio/mock-backend/test-factories';
+import { registerMswServer } from '@clearline/mock-backend/test-factories';
 import { useLogout } from './use-logout';
 import { clearAccessToken, getAccessToken, setAccessToken } from './access-token-store';
 import { createQueryWrapper } from './test/create-query-wrapper';

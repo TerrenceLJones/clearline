@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Icon, type IconName } from '@fintech-portfolio/icons';
+import { Icon, type IconName } from '@clearline/icons';
 import { Button, type ButtonTone } from '../Button';
 import { Text } from '../Text';
 

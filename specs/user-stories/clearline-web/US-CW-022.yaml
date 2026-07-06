@@ -50,13 +50,13 @@ acceptance_criteria:
   - id: 'AC-01'
     description: |
       Given tokens.source.json (a copy of clearline-tokens.json) as the input
-      When I run `pnpm --filter @fintech-portfolio/design-tokens generate`
+      When I run `pnpm --filter @clearline/design-tokens generate`
       Then libs/design-tokens/src/theme.css is regenerated with `:root`/`[data-theme='dark']` `--cl-*` variables and a `@theme inline` block aliasing each as a Tailwind color token
       And libs/design-tokens/src/tokens.ts is regenerated with a typed `semanticTokens`/`primitiveTokens` export and a `SemanticToken` union
     status: 'active'
   - id: 'AC-02'
     description: |
-      Given a component imports `ThemeProvider`/`useTheme` from @fintech-portfolio/design-tokens
+      Given a component imports `ThemeProvider`/`useTheme` from @clearline/design-tokens
       When `toggleTheme` or `setTheme('dark')` is called
       Then `data-theme` is set on `document.documentElement` and persisted to localStorage
       And every `--cl-*` token resolves to its dark-theme value across the whole tree
@@ -64,7 +64,7 @@ acceptance_criteria:
   - id: 'AC-03'
     description: |
       Given icons.source.json (a copy of clearline-icons.json) as the input
-      When I run `pnpm --filter @fintech-portfolio/icons generate`
+      When I run `pnpm --filter @clearline/icons generate`
       Then libs/icons/src/icon-registry.ts is regenerated with all 45 icon definitions and an `IconName` union
       And `<Icon name="..." />` only accepts a name from that union at compile time
     status: 'active'

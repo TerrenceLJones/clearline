@@ -1,5 +1,5 @@
-import { useTheme } from '@fintech-portfolio/design-tokens';
-import { Icon } from '@fintech-portfolio/icons';
+import { useTheme } from '@clearline/design-tokens';
+import { Icon } from '@clearline/icons';
 import { Outlet } from 'react-router';
 import { Container } from '../../atoms/Container';
 import { SegmentedControl } from '../../atoms/SegmentedControl';

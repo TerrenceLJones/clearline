@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
-import { EmptyState } from '@fintech-portfolio/ui';
-import { getAccessToken, useRefreshToken } from '@fintech-portfolio/data-access-auth';
+import { EmptyState } from '@clearline/ui';
+import { getAccessToken, useRefreshToken } from '@clearline/data-access-auth';
 
 /**
  * Route guard for pages that require an authenticated session — mount as the element of a parent

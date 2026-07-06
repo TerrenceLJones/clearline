@@ -83,7 +83,7 @@ technical_notes: |
   sent to the account owner as a security signal of the change.
 
   Needed change carried over from US-CW-001's password-hashing decision: the new password submitted on AC-03 must
-  be hashed with the same PBKDF2-HMAC-SHA256 helper (@fintech-portfolio/domain-auth's password-hashing module) used
+  be hashed with the same PBKDF2-HMAC-SHA256 helper (@clearline/domain-auth's password-hashing module) used
   by login — never stored or compared in plaintext, and never "encrypted" in a reversible way. Transit confidentiality
   is TLS/HTTPS, not application-layer crypto (see US-CW-001 technical_notes for the full OWASP/NIST rationale).
   Additionally, per the OWASP Forgot Password Cheat Sheet, the reset token itself should be stored hashed

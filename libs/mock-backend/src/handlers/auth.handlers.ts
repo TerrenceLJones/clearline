@@ -1,5 +1,5 @@
 import { http, HttpResponse, type HttpHandler } from 'msw';
-import type { AuthErrorResponse, LoginRequest, LoginResponse } from '@fintech-portfolio/contracts';
+import type { AuthErrorResponse, LoginRequest, LoginResponse } from '@clearline/contracts';
 import { AuthService } from '../services/auth.service';
 import { sharedAuthService } from '../services/shared-auth-service';
 

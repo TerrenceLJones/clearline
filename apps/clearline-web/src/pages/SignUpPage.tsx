@@ -9,9 +9,9 @@ import {
   PasswordRequirementsList,
   Text,
   TextField,
-} from '@fintech-portfolio/ui';
-import { evaluateSignUpPassword, isValidSignUpPassword } from '@fintech-portfolio/domain-auth';
-import { useSignUp } from '@fintech-portfolio/data-access-auth';
+} from '@clearline/ui';
+import { evaluateSignUpPassword, isValidSignUpPassword } from '@clearline/domain-auth';
+import { useSignUp } from '@clearline/data-access-auth';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 const SIGNUP_HEADLINE = 'Set up your business account in minutes.';

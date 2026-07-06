@@ -1,6 +1,6 @@
 // GENERATED FILE — do not edit by hand.
 // Source: icons.source.json (a copy of clearline-icons.json).
-// Regenerate with: pnpm --filter @fintech-portfolio/icons generate
+// Regenerate with: pnpm --filter @clearline/icons generate
 
 export interface IconDefinition {
   viewBox: string;

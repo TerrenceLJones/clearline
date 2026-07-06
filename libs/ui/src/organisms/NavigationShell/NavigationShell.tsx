@@ -1,4 +1,4 @@
-import type { IconName } from '@fintech-portfolio/icons';
+import type { IconName } from '@clearline/icons';
 import { NavItem } from '../../molecules/NavItem';
 
 export interface NavigationShellItem {

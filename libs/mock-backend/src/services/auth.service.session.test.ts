@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { hashPassword } from '@fintech-portfolio/domain-auth';
+import { hashPassword } from '@clearline/domain-auth';
 import { AuthService } from './auth.service';
 import type { SeedUser } from '../fixtures/users.fixture';
 

@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import '@fintech-portfolio/design-tokens/src/theme.css';
+@import '@clearline/design-tokens/src/theme.css';
 
 /* Explicit @source: Tailwind's automatic content detection is anchored to the
    consuming app's Vite root, so without this, classNames inside this library's

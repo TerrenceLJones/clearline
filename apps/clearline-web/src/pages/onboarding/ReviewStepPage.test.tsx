@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { http, HttpResponse } from 'msw';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { registerMswServer } from '@clearline/mock-backend/test-factories';
+import { buildBeneficialOwner, registerMswServer } from '@clearline/mock-backend/test-factories';
 import { setAccessToken, clearAccessToken } from '@clearline/data-access-auth';
 import { ReviewStepPage } from './ReviewStepPage';
 
@@ -25,16 +25,7 @@ function statusResponse() {
       state: 'CA',
       postalCode: '94105',
     },
-    owners: [
-      {
-        id: 'owner_1',
-        firstName: 'Dara',
-        lastName: 'Reyes',
-        fullName: 'Dara Reyes',
-        ownershipPercent: 60,
-        requiresKyc: true,
-      },
-    ],
+    owners: [buildBeneficialOwner()],
     documents: [{ ownerId: 'owner_1', documentType: 'drivers_license' }],
     documentAttemptCount: 0,
     lastActivityAt: 0,

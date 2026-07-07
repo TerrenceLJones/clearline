@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { http, HttpResponse } from 'msw';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { registerMswServer } from '@clearline/mock-backend/test-factories';
+import { buildBeneficialOwner, registerMswServer } from '@clearline/mock-backend/test-factories';
 import { setAccessToken, clearAccessToken } from '@clearline/data-access-auth';
 import * as dataAccessOnboarding from '@clearline/data-access-onboarding';
 import { DocumentUploadStepPage } from './DocumentUploadStepPage';
@@ -29,22 +29,14 @@ function statusResponse(overrides: Record<string, unknown> = {}) {
     lastCompletedStep: 'owners',
     business: null,
     owners: [
-      {
-        id: 'owner_1',
-        firstName: 'Dara',
-        lastName: 'Reyes',
-        fullName: 'Dara Reyes',
-        ownershipPercent: 60,
-        requiresKyc: true,
-      },
-      {
+      buildBeneficialOwner(),
+      buildBeneficialOwner({
         id: 'owner_2',
         firstName: 'Marcus',
         lastName: 'Okafor',
-        fullName: 'Marcus Okafor',
         ownershipPercent: 10,
         requiresKyc: false,
-      },
+      }),
     ],
     documents: [],
     documentAttemptCount: 0,
@@ -140,14 +132,13 @@ describe('DocumentUploadStepPage', () => {
         HttpResponse.json(
           statusResponse({
             owners: [
-              {
+              buildBeneficialOwner({
                 id: 'owner_2',
                 firstName: 'Marcus',
                 lastName: 'Okafor',
-                fullName: 'Marcus Okafor',
                 ownershipPercent: 10,
                 requiresKyc: false,
-              },
+              }),
             ],
           }),
         ),

@@ -2,7 +2,11 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { http, HttpResponse } from 'msw';
-import { registerMswServer } from '@clearline/mock-backend/test-factories';
+import {
+  buildBeneficialOwner,
+  buildBeneficialOwnerInput,
+  registerMswServer,
+} from '@clearline/mock-backend/test-factories';
 import { useAddOwner } from './use-add-owner';
 import { setAccessToken, clearAccessToken } from '@clearline/data-access-auth';
 import { createQueryWrapper } from './test/create-query-wrapper';
@@ -19,26 +23,13 @@ describe('useAddOwner', () => {
     server.use(
       http.post('*/api/onboarding/owners', () =>
         HttpResponse.json({
-          owner: {
-            id: 'owner_1',
-            firstName: 'Dara',
-            lastName: 'Reyes',
-            fullName: 'Dara Reyes',
-            ownershipPercent: 60,
-            requiresKyc: true,
-            ssnItinLast4: '4417',
-          },
+          owner: buildBeneficialOwner({ ssnItinLast4: '4417' }),
         }),
       ),
     );
 
     const { result } = renderHook(() => useAddOwner(), { wrapper });
-    result.current.mutate({
-      firstName: 'Dara',
-      lastName: 'Reyes',
-      ownershipPercent: 60,
-      ssnItin: '123-45-4417',
-    });
+    result.current.mutate(buildBeneficialOwnerInput({ ssnItin: '123-45-4417' }));
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.owner).toMatchObject({ fullName: 'Dara Reyes', requiresKyc: true });
@@ -49,14 +40,7 @@ describe('useAddOwner', () => {
     server.use(
       http.post('*/api/onboarding/owners', () =>
         HttpResponse.json({
-          owner: {
-            id: 'owner_1',
-            firstName: 'Dara',
-            lastName: 'Reyes',
-            fullName: 'Dara Reyes',
-            ownershipPercent: 60,
-            requiresKyc: true,
-          },
+          owner: buildBeneficialOwner(),
         }),
       ),
     );
@@ -68,7 +52,7 @@ describe('useAddOwner', () => {
         <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
       ),
     });
-    result.current.mutate({ firstName: 'Dara', lastName: 'Reyes', ownershipPercent: 60 });
+    result.current.mutate(buildBeneficialOwnerInput());
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(queryClient.getQueryState(ONBOARDING_STATUS_QUERY_KEY)?.isInvalidated).toBe(true);

@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { http, HttpResponse } from 'msw';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { registerMswServer } from '@clearline/mock-backend/test-factories';
+import { buildBeneficialOwner, registerMswServer } from '@clearline/mock-backend/test-factories';
 import { setAccessToken, clearAccessToken } from '@clearline/data-access-auth';
 import { BeneficialOwnersStepPage } from './BeneficialOwnersStepPage';
 
@@ -34,15 +34,7 @@ describe('BeneficialOwnersStepPage', () => {
     server.use(
       http.post('*/api/onboarding/owners', () =>
         HttpResponse.json({
-          owner: {
-            id: 'owner_1',
-            firstName: 'Dara',
-            lastName: 'Reyes',
-            fullName: 'Dara Reyes',
-            ownershipPercent: 60,
-            requiresKyc: true,
-            ssnItinLast4: '4417',
-          },
+          owner: buildBeneficialOwner({ ssnItinLast4: '4417' }),
         }),
       ),
     );
@@ -75,14 +67,7 @@ describe('BeneficialOwnersStepPage', () => {
     server.use(
       http.post('*/api/onboarding/owners', () =>
         HttpResponse.json({
-          owner: {
-            id: 'owner_1',
-            firstName: 'Dara',
-            lastName: 'Reyes',
-            fullName: 'Dara Reyes',
-            ownershipPercent: 60,
-            requiresKyc: true,
-          },
+          owner: buildBeneficialOwner(),
         }),
       ),
       http.post('*/api/onboarding/steps/:step/complete', () => HttpResponse.json({})),

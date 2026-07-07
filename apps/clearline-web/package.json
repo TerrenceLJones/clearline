@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@clearline/contracts": "workspace:*",
+    "@clearline/data-access-approvals": "workspace:*",
     "@clearline/data-access-auth": "workspace:*",
     "@clearline/data-access-onboarding": "workspace:*",
     "@clearline/design-tokens": "workspace:*",
@@ -21,6 +22,7 @@
     "@clearline/domain-onboarding": "workspace:*",
     "@clearline/icons": "workspace:*",
     "@clearline/mock-backend": "workspace:*",
+    "@clearline/money": "workspace:*",
     "@clearline/ui": "workspace:*",
     "@hookform/resolvers": "^3.9.1",
     "@sentry/cli": "^3.6.0",

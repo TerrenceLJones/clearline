@@ -1,0 +1,60 @@
+import { afterEach, describe, expect, it } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { renderHook, waitFor } from '@testing-library/react';
+import type { SessionResponse } from '@clearline/contracts';
+import { registerMswServer } from '@clearline/mock-backend/test-factories';
+import { useAuthorization } from './use-authorization';
+import { clearAccessToken, setAccessToken } from './access-token-store';
+import { createQueryWrapper } from './test/create-query-wrapper';
+
+const server = registerMswServer();
+const wrapper = createQueryWrapper({ queries: { retry: false } });
+
+afterEach(() => clearAccessToken());
+
+function mockSession(overrides: Partial<SessionResponse>) {
+  setAccessToken('access_valid');
+  server.use(
+    http.get('*/api/auth/session', () =>
+      HttpResponse.json({
+        userId: 'user_1',
+        email: 'demo@clearline.dev',
+        displayName: 'Marcus Okafor',
+        role: 'employee',
+        approvalLimit: null,
+        isAdmin: false,
+        ...overrides,
+      }),
+    ),
+  );
+}
+
+describe('useAuthorization', () => {
+  it('maps an Employee session to only expenses/cards permissions', async () => {
+    mockSession({ role: 'employee' });
+    const { result } = renderHook(() => useAuthorization(), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.role).toBe('employee');
+    expect(result.current.can('expenses:view')).toBe(true);
+    expect(result.current.can('approvals:view')).toBe(false);
+  });
+
+  it('maps a Finance Manager session to approval permissions with the limit', async () => {
+    mockSession({ role: 'finance_manager', approvalLimit: 1_000_000 });
+    const { result } = renderHook(() => useAuthorization(), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.can('approvals:act')).toBe(true);
+    expect(result.current.approvalLimit).toBe(1_000_000);
+  });
+
+  it('grants team:view for an Admin Employee without any approval authority', async () => {
+    mockSession({ role: 'employee', isAdmin: true });
+    const { result } = renderHook(() => useAuthorization(), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.can('team:view')).toBe(true);
+    expect(result.current.can('approvals:act')).toBe(false);
+  });
+});

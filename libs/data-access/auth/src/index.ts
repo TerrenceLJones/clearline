@@ -7,6 +7,8 @@ export * from './use-refresh-token';
 export * from './use-request-password-reset';
 export * from './use-reset-password';
 export * from './use-session';
+export * from './use-authorization';
+export * from './use-access-changed';
 export * from './use-sign-up';
 export * from './use-validate-reset-token';
 export * from './use-verify-email';

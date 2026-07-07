@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useTheme } from '@clearline/design-tokens';
 import { Icon } from '../../foundations/Icon';
 import { Outlet } from 'react-router';
@@ -12,6 +13,8 @@ export interface AppShellProps {
   onNavigate?: (id: string) => void;
   title?: string;
   maxWidth?: number;
+  /** Full-width strip rendered flush under the top bar, above the page content — e.g. the access-changed notice (US-CW-006 AC-05). */
+  banner?: ReactNode;
 }
 
 /**
@@ -26,6 +29,7 @@ export function AppShell({
   onNavigate,
   title,
   maxWidth = 1200,
+  banner,
 }: AppShellProps) {
   const { theme, setTheme } = useTheme();
 
@@ -47,6 +51,7 @@ export function AppShell({
           onChange={(next) => setTheme(next === 'Dark' ? 'dark' : 'light')}
         />
       </header>
+      {banner}
       <Container width={maxWidth} className="pt-9 pb-24">
         {title ? (
           <Text as="h1" size="title" className="mb-6">

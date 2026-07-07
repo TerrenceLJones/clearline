@@ -28,6 +28,7 @@ export type IconName =
   | 'refresh'
   | 'spinner'
   | 'clock'
+  | 'bar-chart'
   | 'triangle-alert'
   | 'octagon-alert'
   | 'info'
@@ -102,6 +103,11 @@ export const iconRegistry: Record<IconName, IconDefinition> = {
     viewBox: '0 0 16 16',
     sw: 1.7,
     body: '<circle cx="8" cy="8" r="6"/><path d="M8 5v3.2l2 1.3"/>',
+  },
+  'bar-chart': {
+    viewBox: '0 0 16 16',
+    sw: 1.7,
+    body: '<path d="M2 13h12M4 13V8M7.3 13V5M10.6 13V9M13.9 13V6"/>',
   },
   'triangle-alert': {
     viewBox: '0 0 16 16',

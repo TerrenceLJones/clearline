@@ -1,12 +1,13 @@
 // MSW v2 browser worker entry point (dev server / Storybook).
 import { http, HttpResponse } from 'msw';
 import { setupWorker } from 'msw/browser';
-import type { SessionErrorCode } from '@clearline/contracts';
+import type { Role, SessionErrorCode } from '@clearline/contracts';
 import { authHandlers } from './handlers/auth.handlers';
 import { passwordResetHandlers } from './handlers/password-reset.handlers';
 import { signUpHandlers } from './handlers/signup.handlers';
 import { sessionHandlers } from './handlers/session.handlers';
 import { onboardingHandlers } from './handlers/onboarding.handlers';
+import { approvalsHandlers } from './handlers/approvals.handlers';
 import { sharedAuthService } from './services/shared-auth-service';
 import { sharedOnboardingService } from './services/shared-onboarding-service';
 import { DEMO_ONBOARDED_BUSINESS, DEMO_ONBOARDED_USER_ID } from './fixtures/onboarding.fixture';
@@ -17,6 +18,7 @@ export const worker = setupWorker(
   ...signUpHandlers,
   ...sessionHandlers,
   ...onboardingHandlers,
+  ...approvalsHandlers,
 );
 
 // Seed the demo user as an already-approved, fully-onboarded business so signing in as it lands on
@@ -164,4 +166,19 @@ export function simulateRefreshOutcomeForE2E(
         : 'session_expired';
 
   worker.use(http.post('*/api/auth/refresh', () => HttpResponse.json({ error }, { status: 401 })));
+}
+
+/**
+ * Dev/e2e control for US-CW-006: changes the signed-in demo account's role/limit/admin flag in
+ * place, standing in for an admin reassigning it in another surface. Because checkSession re-reads
+ * the live user record on every request, the app's next session refetch reflects the new role — the
+ * "next request" AC-05 hangs on — hiding now-unauthorized nav and features without a re-login. Also
+ * how the demo tours all three shells (Employee / Finance Manager / Controller) from one account.
+ * Reachable only via the window hook main.tsx wires up behind import.meta.env.DEV, so it never ships.
+ */
+export function simulateRoleChangeForE2E(
+  email: string,
+  patch: { role?: Role; approvalLimit?: number | null; isAdmin?: boolean },
+): void {
+  sharedAuthService.setUserRole(email, patch);
 }

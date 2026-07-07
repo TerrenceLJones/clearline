@@ -1,4 +1,6 @@
 export * from './access-token-policy';
+export * from './approval-authority-policy';
+export * from './authorization-policy';
 export * from './inactivity-policy';
 export * from './lockout-policy';
 export * from './password-hashing';

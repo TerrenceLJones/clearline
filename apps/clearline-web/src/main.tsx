@@ -21,6 +21,7 @@ async function bootstrap() {
       issueExpiredVerificationTokenForE2E,
       expireAccessTokenForE2E,
       simulateRefreshOutcomeForE2E,
+      simulateRoleChangeForE2E,
     } = await import('@clearline/mock-backend/browser');
     await worker.start({ onUnhandledRequest: 'bypass' });
     // With the mock backend in play there's no real ID-verification vendor, so swap the browser
@@ -38,6 +39,7 @@ async function bootstrap() {
       issueExpiredVerificationTokenForE2E,
       expireAccessTokenForE2E,
       simulateRefreshOutcomeForE2E,
+      simulateRoleChangeForE2E,
     };
   }
 

@@ -2,7 +2,7 @@
   "name": "@clearline/domain-auth",
   "version": "0.1.0",
   "private": true,
-  "description": "Pure, framework-agnostic authentication business rules (e.g. account-lockout policy) — no data-access or UI dependencies, per the plan's domain-libs-stay-pure architecture.",
+  "description": "Pure, framework-agnostic authentication & authorization business rules (account-lockout, role→permission mapping, approval authority) — depends only on @clearline/contracts for shared type vocabulary; no data-access or UI dependencies, per the plan's domain-libs-stay-pure architecture.",
   "main": "src/index.ts",
   "scripts": {
     "lint": "eslint .",
@@ -10,7 +10,9 @@
     "test": "vitest run",
     "build": "tsc"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@clearline/contracts": "workspace:*"
+  },
   "devDependencies": {},
   "metadata": {
     "package_type": "shared",

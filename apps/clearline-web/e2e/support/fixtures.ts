@@ -42,6 +42,11 @@ export const test = base.extend<{ mockBackend: MockBackend }>({
             window.__e2eMockBackend!.simulateRefreshOutcomeForE2E(outcome, email),
           { outcome, email },
         ),
+      simulateRoleChangeForE2E: (email, patch) =>
+        page.evaluate(
+          ({ email, patch }) => window.__e2eMockBackend!.simulateRoleChangeForE2E(email, patch),
+          { email, patch },
+        ),
     });
   },
 });

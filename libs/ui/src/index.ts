@@ -63,6 +63,8 @@ export type { AIInsightCardProps, InsightTone } from './molecules/AIInsightCard'
 
 export { EmptyState } from './organisms/EmptyState';
 export type { EmptyStateProps } from './organisms/EmptyState';
+export { AccessDenied } from './organisms/AccessDenied';
+export type { AccessDeniedProps } from './organisms/AccessDenied';
 export { NavigationShell } from './organisms/NavigationShell';
 export type { NavigationShellProps, NavigationShellItem } from './organisms/NavigationShell';
 export { ApprovalActionBar } from './organisms/ApprovalActionBar';
@@ -73,5 +75,7 @@ export { DataTable } from './organisms/DataTable';
 export type { DataTableProps, DataTableRow, Density } from './organisms/DataTable';
 export { AppShell } from './organisms/AppShell';
 export type { AppShellProps } from './organisms/AppShell';
+
+export { formatMoney } from './utils/formatMoney';
 export { AuthLayout } from './organisms/AuthLayout';
 export type { AuthLayoutProps } from './organisms/AuthLayout';

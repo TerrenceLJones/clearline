@@ -5,6 +5,7 @@ import { passwordResetHandlers } from './handlers/password-reset.handlers';
 import { signUpHandlers } from './handlers/signup.handlers';
 import { sessionHandlers } from './handlers/session.handlers';
 import { onboardingHandlers } from './handlers/onboarding.handlers';
+import { approvalsHandlers } from './handlers/approvals.handlers';
 
 export const server = setupServer(
   ...authHandlers,
@@ -12,4 +13,5 @@ export const server = setupServer(
   ...signUpHandlers,
   ...sessionHandlers,
   ...onboardingHandlers,
+  ...approvalsHandlers,
 );

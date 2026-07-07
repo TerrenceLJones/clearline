@@ -8,6 +8,11 @@ export type DocumentTextRecognizer = (file: File) => Promise<string>;
  * tests inject `recognizeText` — same seam, at the app-composition level.
  */
 let overrideRecognizer: DocumentTextRecognizer | null = null;
+/**
+ * Dev-bootstrap-only: called once from main.tsx when the MSW mock backend starts, and by tests that
+ * exercise this seam (which clear it afterward). Not part of the production request path — the hook
+ * injects its own `recognizeText` for unit tests, so nothing else should set this global.
+ */
 export function setDocumentTextRecognizer(recognizer: DocumentTextRecognizer | null): void {
   overrideRecognizer = recognizer;
 }

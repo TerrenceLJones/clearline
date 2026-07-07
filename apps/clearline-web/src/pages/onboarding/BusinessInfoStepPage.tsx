@@ -2,8 +2,8 @@ import { useNavigate } from 'react-router';
 import { Link } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, AuthLayout, Button, Stepper, Text, TextField } from '@fintech-portfolio/ui';
-import { useSubmitBusinessInfo, useCompleteStep } from '@fintech-portfolio/data-access-onboarding';
+import { Alert, AuthLayout, Button, Stepper, Text, TextField } from '@clearline/ui';
+import { useSubmitBusinessInfo, useCompleteStep } from '@clearline/data-access-onboarding';
 import { businessInfoSchema, type BusinessInfoFormValues } from './schemas';
 import { WIZARD_STEP_LABELS } from './wizard-steps';
 

@@ -10,13 +10,13 @@ import type {
   SubmitDocumentOutcome,
   SubmitReviewOutcome,
   UploadedDocument,
-} from '@fintech-portfolio/contracts';
+} from '@clearline/contracts';
 import {
   hasOnboardingSessionTimedOut,
   isDocumentVerificationBlocked,
   isValidEinFormat,
   requiresKyc,
-} from '@fintech-portfolio/domain-onboarding';
+} from '@clearline/domain-onboarding';
 import { REGISTRY_EINS, WATCHLIST_NAMES } from '../fixtures/onboarding.fixture';
 
 const STEP_ORDER: OnboardingStepId[] = ['business', 'owners', 'documents', 'review'];

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
-import { useOnboardingStatus } from '@fintech-portfolio/data-access-onboarding';
-import { EmptyState, Text } from '@fintech-portfolio/ui';
+import { useOnboardingStatus } from '@clearline/data-access-onboarding';
+import { EmptyState, Text } from '@clearline/ui';
 
 /**
  * Terminal onboarding screens share one shape (icon + title + body + single CTA), so they're one

@@ -11,7 +11,7 @@ import type {
   SubmitDocumentRequest,
   SubmitDocumentResponse,
   SubmitReviewResponse,
-} from '@fintech-portfolio/contracts';
+} from '@clearline/contracts';
 import { AuthService } from '../services/auth.service';
 import { sharedAuthService } from '../services/shared-auth-service';
 import { OnboardingService } from '../services/onboarding.service';

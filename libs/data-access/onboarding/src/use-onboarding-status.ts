@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import type { OnboardingStatusResponse } from '@fintech-portfolio/contracts';
-import { authenticatedFetch } from '@fintech-portfolio/data-access-auth';
+import type { OnboardingStatusResponse } from '@clearline/contracts';
+import { authenticatedFetch } from '@clearline/data-access-auth';
 import { ONBOARDING_STATUS_QUERY_KEY } from './onboarding-status-query-key';
 
 async function getOnboardingStatus(): Promise<OnboardingStatusResponse> {

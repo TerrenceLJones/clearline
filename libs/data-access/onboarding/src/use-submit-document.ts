@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { SubmitDocumentResponse } from '@fintech-portfolio/contracts';
-import { evaluateDocumentQuality, type GrayscaleImage } from '@fintech-portfolio/domain-onboarding';
-import { authenticatedFetch } from '@fintech-portfolio/data-access-auth';
+import type { SubmitDocumentResponse } from '@clearline/contracts';
+import { evaluateDocumentQuality, type GrayscaleImage } from '@clearline/domain-onboarding';
+import { authenticatedFetch } from '@clearline/data-access-auth';
 import { extractGrayscaleImage } from './extract-grayscale-image';
 import { ONBOARDING_STATUS_QUERY_KEY } from './onboarding-status-query-key';
 

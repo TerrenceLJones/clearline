@@ -4,7 +4,7 @@ import {
   useOnboardingStatus,
   useSubmitDocument,
   useCompleteStep,
-} from '@fintech-portfolio/data-access-onboarding';
+} from '@clearline/data-access-onboarding';
 import {
   Alert,
   AuthLayout,
@@ -13,7 +13,7 @@ import {
   Stepper,
   Text,
   type DocumentDropzoneStatus,
-} from '@fintech-portfolio/ui';
+} from '@clearline/ui';
 import { WIZARD_STEP_LABELS } from './wizard-steps';
 
 export function DocumentUploadStepPage() {

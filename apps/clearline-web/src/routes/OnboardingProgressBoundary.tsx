@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
-import type { OnboardingOverallStatus } from '@fintech-portfolio/contracts';
-import { useOnboardingStatus } from '@fintech-portfolio/data-access-onboarding';
-import { Alert, EmptyState } from '@fintech-portfolio/ui';
+import type { OnboardingOverallStatus } from '@clearline/contracts';
+import { useOnboardingStatus } from '@clearline/data-access-onboarding';
+import { Alert, EmptyState } from '@clearline/ui';
 import { stepPath } from '../pages/onboarding/wizard-steps';
 
 const TERMINAL_STATUSES: OnboardingOverallStatus[] = [

@@ -4,9 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { http, HttpResponse } from 'msw';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { registerMswServer } from '@fintech-portfolio/mock-backend/test-factories';
-import { setAccessToken, clearAccessToken } from '@fintech-portfolio/data-access-auth';
-import * as dataAccessOnboarding from '@fintech-portfolio/data-access-onboarding';
+import { registerMswServer } from '@clearline/mock-backend/test-factories';
+import { setAccessToken, clearAccessToken } from '@clearline/data-access-auth';
+import * as dataAccessOnboarding from '@clearline/data-access-onboarding';
 import { DocumentUploadStepPage } from './DocumentUploadStepPage';
 
 const server = registerMswServer();

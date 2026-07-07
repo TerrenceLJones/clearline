@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { useOnboardingStatus, useSubmitReview } from '@fintech-portfolio/data-access-onboarding';
-import { Alert, AuthLayout, Button, Checkbox, Stepper, Text } from '@fintech-portfolio/ui';
+import { useOnboardingStatus, useSubmitReview } from '@clearline/data-access-onboarding';
+import { Alert, AuthLayout, Button, Checkbox, Stepper, Text } from '@clearline/ui';
 import { WIZARD_STEP_LABELS } from './wizard-steps';
 
 export function ReviewStepPage() {

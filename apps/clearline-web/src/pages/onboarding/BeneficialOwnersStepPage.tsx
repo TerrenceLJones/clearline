@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { BeneficialOwner } from '@fintech-portfolio/contracts';
-import { Alert, AuthLayout, Avatar, Button, Stepper, Text, TextField } from '@fintech-portfolio/ui';
-import { useAddOwner, useCompleteStep } from '@fintech-portfolio/data-access-onboarding';
+import type { BeneficialOwner } from '@clearline/contracts';
+import { Alert, AuthLayout, Avatar, Button, Stepper, Text, TextField } from '@clearline/ui';
+import { useAddOwner, useCompleteStep } from '@clearline/data-access-onboarding';
 import { ownerSchema, type OwnerFormValues } from './schemas';
 import { WIZARD_STEP_LABELS } from './wizard-steps';
 

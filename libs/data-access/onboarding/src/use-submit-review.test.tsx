@@ -2,9 +2,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { http, HttpResponse } from 'msw';
-import { registerMswServer } from '@fintech-portfolio/mock-backend/test-factories';
+import { registerMswServer } from '@clearline/mock-backend/test-factories';
 import { useSubmitReview } from './use-submit-review';
-import { setAccessToken, clearAccessToken } from '@fintech-portfolio/data-access-auth';
+import { setAccessToken, clearAccessToken } from '@clearline/data-access-auth';
 import { createQueryWrapper } from './test/create-query-wrapper';
 import { ONBOARDING_STATUS_QUERY_KEY } from './onboarding-status-query-key';
 

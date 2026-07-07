@@ -1,4 +1,4 @@
-import type { GrayscaleImage } from '@fintech-portfolio/domain-onboarding';
+import type { GrayscaleImage } from '@clearline/domain-onboarding';
 
 /** Downscales the capture before analysis — keeps the pixel-analysis cost bounded regardless of the original photo's resolution. */
 const ANALYSIS_MAX_DIMENSION = 64;

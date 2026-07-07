@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { isValidEinFormat, requiresKyc } from '@fintech-portfolio/domain-onboarding';
+import { isValidEinFormat, requiresKyc } from '@clearline/domain-onboarding';
 
 export const businessInfoSchema = z.object({
   legalName: z.string().min(1, 'Legal business name is required'),

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
-import { registerMswServer } from '@fintech-portfolio/mock-backend/test-factories';
+import { registerMswServer } from '@clearline/mock-backend/test-factories';
 import { useOnboardingStatus } from './use-onboarding-status';
-import { setAccessToken, clearAccessToken } from '@fintech-portfolio/data-access-auth';
+import { setAccessToken, clearAccessToken } from '@clearline/data-access-auth';
 import { createQueryWrapper } from './test/create-query-wrapper';
 
 const server = registerMswServer();

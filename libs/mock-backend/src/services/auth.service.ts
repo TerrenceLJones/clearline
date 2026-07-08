@@ -102,6 +102,8 @@ export interface SessionCheckResult {
   approvalLimit?: number | null;
   /** Present only when outcome is 'active'. */
   isAdmin?: boolean;
+  /** Present only when outcome is 'active' — the account creator/Owner flag (US-CW-030). */
+  isOwner?: boolean;
   /** Present only when outcome is 'revoked'. */
   reason?: RevocationReason;
 }
@@ -367,6 +369,7 @@ export class AuthService {
       role: user.role,
       approvalLimit: user.approvalLimit,
       isAdmin: user.isAdmin,
+      isOwner: user.isOwner,
     };
   }
 
@@ -378,13 +381,14 @@ export class AuthService {
    */
   setUserRole(
     email: string,
-    patch: { role?: Role; approvalLimit?: number | null; isAdmin?: boolean },
+    patch: { role?: Role; approvalLimit?: number | null; isAdmin?: boolean; isOwner?: boolean },
   ): void {
     const user = this.usersByEmail.get(email.toLowerCase());
     if (!user) return;
     if (patch.role !== undefined) user.role = patch.role;
     if (patch.approvalLimit !== undefined) user.approvalLimit = patch.approvalLimit;
     if (patch.isAdmin !== undefined) user.isAdmin = patch.isAdmin;
+    if (patch.isOwner !== undefined) user.isOwner = patch.isOwner;
   }
 
   /** Revokes the family the presented refresh token belongs to. A no-op (not an error) for a token that doesn't map to any family, matching a real logout endpoint's idempotent 200. */
@@ -569,6 +573,7 @@ export class AuthService {
         role: 'employee',
         approvalLimit: null,
         isAdmin: false,
+        isOwner: false,
       });
     }
 

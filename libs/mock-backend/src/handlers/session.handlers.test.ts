@@ -130,6 +130,7 @@ describe('GET /api/auth/session', () => {
       role: user!.role,
       approvalLimit: user!.approvalLimit,
       isAdmin: user!.isAdmin,
+      isOwner: user!.isOwner,
     });
   });
 

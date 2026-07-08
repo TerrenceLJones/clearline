@@ -49,6 +49,7 @@ export async function buildSeedUser(
     role = 'employee',
     approvalLimit = null,
     isAdmin = false,
+    isOwner = false,
   } = overrides;
 
   return {
@@ -59,6 +60,7 @@ export async function buildSeedUser(
     role,
     approvalLimit,
     isAdmin,
+    isOwner,
     passwordHash: passwordHash ?? (await hashPassword(password ?? DEFAULT_TEST_PASSWORD)),
   };
 }
@@ -140,6 +142,7 @@ export function buildSessionResponse(overrides: Partial<SessionResponse> = {}): 
     role: 'finance_manager',
     approvalLimit: 1_000_000,
     isAdmin: false,
+    isOwner: false,
     ...overrides,
   };
 }

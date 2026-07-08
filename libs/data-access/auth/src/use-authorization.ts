@@ -8,6 +8,8 @@ export interface Authorization {
   isLoading: boolean;
   role: Role | null;
   isAdmin: boolean;
+  /** The account creator/Owner flag (US-CW-030). Orthogonal to the tier; grants no permissions on its own in this epic. */
+  isOwner: boolean;
   /** Minor units; null = unlimited (Controller) or unknown (not yet loaded). */
   approvalLimit: number | null;
   permissions: Permission[];
@@ -30,6 +32,7 @@ export function useAuthorization(): Authorization {
         isLoading: isPending,
         role: null,
         isAdmin: false,
+        isOwner: false,
         approvalLimit: null,
         permissions: [],
         can: () => false,
@@ -41,6 +44,7 @@ export function useAuthorization(): Authorization {
       isLoading: false,
       role: data.role,
       isAdmin: data.isAdmin,
+      isOwner: data.isOwner,
       approvalLimit: data.approvalLimit,
       permissions,
       can: (permission) => hasPermission(permissions, permission),

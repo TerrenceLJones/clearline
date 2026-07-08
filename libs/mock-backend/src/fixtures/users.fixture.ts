@@ -15,6 +15,12 @@ export interface SeedUser {
   approvalLimit: number | null;
   /** Orthogonal to the approval tier — grants team:view only, never approval authority. */
   isAdmin: boolean;
+  /**
+   * The account creator, elevated to Owner when their business clears KYB (US-CW-030). Orthogonal to
+   * both the approval tier and isAdmin; grants no permissions on its own in this epic. A protected
+   * singleton per account — non-removable/non-demotable enforcement arrives with team management (EPIC-CW-018).
+   */
+  isOwner: boolean;
 }
 
 /** The plaintext DEMO_USER_PASSWORD was hashed from, kept only so local dev/tests can log in as the seed user. */
@@ -36,5 +42,6 @@ export const SEED_USERS: SeedUser[] = [
     role: 'finance_manager',
     approvalLimit: 1_000_000,
     isAdmin: false,
+    isOwner: false,
   },
 ];

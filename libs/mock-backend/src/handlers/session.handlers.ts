@@ -81,6 +81,7 @@ export function createSessionHandlers(authService: AuthService = sharedAuthServi
           role: result.role!,
           approvalLimit: result.approvalLimit!,
           isAdmin: result.isAdmin!,
+          isOwner: result.isOwner!,
         };
         return HttpResponse.json(body, { status: 200 });
       }

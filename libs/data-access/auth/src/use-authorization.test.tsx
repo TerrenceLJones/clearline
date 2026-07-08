@@ -23,6 +23,7 @@ function mockSession(overrides: Partial<SessionResponse>) {
         role: 'employee',
         approvalLimit: null,
         isAdmin: false,
+        isOwner: false,
         ...overrides,
       }),
     ),
@@ -56,5 +57,20 @@ describe('useAuthorization', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.can('team:view')).toBe(true);
     expect(result.current.can('approvals:act')).toBe(false);
+  });
+
+  it('surfaces isOwner from the session and grants no permissions on its own (US-CW-030)', async () => {
+    mockSession({ role: 'controller', isOwner: true });
+    const { result } = renderHook(() => useAuthorization(), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.isOwner).toBe(true);
+    // isOwner is orthogonal to permissions in this epic — a Controller Owner still has no team:view.
+    expect(result.current.can('team:view')).toBe(false);
+  });
+
+  it('defaults isOwner to false while no session is loaded', () => {
+    const { result } = renderHook(() => useAuthorization(), { wrapper });
+    expect(result.current.isOwner).toBe(false);
   });
 });

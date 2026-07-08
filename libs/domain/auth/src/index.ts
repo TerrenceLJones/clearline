@@ -3,6 +3,7 @@ export * from './approval-authority-policy';
 export * from './authorization-policy';
 export * from './inactivity-policy';
 export * from './lockout-policy';
+export * from './owner-provisioning-policy';
 export * from './password-hashing';
 export * from './password-policy';
 export * from './refresh-token-policy';

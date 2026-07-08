@@ -12,19 +12,29 @@ import type {
   SubmitDocumentResponse,
   SubmitReviewResponse,
 } from '@clearline/contracts';
+import { ownerProvisioning } from '@clearline/domain-auth';
 import { AuthService } from '../services/auth.service';
 import { sharedAuthService } from '../services/shared-auth-service';
 import { OnboardingService } from '../services/onboarding.service';
 import { sharedOnboardingService } from '../services/shared-onboarding-service';
 
-/** Resolves the requesting userId from the Bearer access token, or null if it isn't a currently-active session. */
-function resolveUserId(request: Request, authService: AuthService): string | null {
+/** Resolves both the userId and email of an active session — the email is needed to elevate the account creator on KYB approval (setUserRole is keyed by email). Null if not an active session. */
+function resolveActiveSession(
+  request: Request,
+  authService: AuthService,
+): { userId: string; email: string } | null {
   const authHeader = request.headers.get('authorization');
   const accessToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
   if (!accessToken) return null;
 
   const result = authService.checkSession(accessToken);
-  return result.outcome === 'active' ? result.userId! : null;
+  if (result.outcome !== 'active') return null;
+  return { userId: result.userId!, email: result.email! };
+}
+
+/** Resolves just the requesting userId from the Bearer access token, or null if it isn't a currently-active session. */
+function resolveUserId(request: Request, authService: AuthService): string | null {
+  return resolveActiveSession(request, authService)?.userId ?? null;
 }
 
 const UNAUTHENTICATED: OnboardingErrorResponse = { error: 'unauthenticated' };
@@ -87,10 +97,18 @@ export function createOnboardingHandlers(
     }),
 
     http.post('*/api/onboarding/review/submit', ({ request }) => {
-      const userId = resolveUserId(request, authService);
-      if (!userId) return HttpResponse.json(UNAUTHENTICATED, { status: 401 });
+      const session = resolveActiveSession(request, authService);
+      if (!session) return HttpResponse.json(UNAUTHENTICATED, { status: 401 });
 
-      const result = onboardingService.submitReview(userId);
+      const result = onboardingService.submitReview(session.userId);
+
+      // KYB approval is where the account creator becomes the Owner (US-CW-030 AC-01/AC-02): onboarding
+      // is a business-level concern, RBAC a per-person one, and they meet exactly here. Only the
+      // approved outcome elevates — an under_review (compliance-hold) submission does not. setUserRole
+      // is keyed by email, so the elevation reads through on the creator's very next session check.
+      if (result.outcome === 'approved') {
+        authService.setUserRole(session.email, ownerProvisioning());
+      }
 
       const body: SubmitReviewResponse = { outcome: result.outcome };
       return HttpResponse.json(body, { status: 200 });

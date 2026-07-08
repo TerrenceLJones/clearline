@@ -25,6 +25,7 @@ function renderAccessChanged(getRole: () => Role) {
         role: getRole(),
         approvalLimit: getRole() === 'finance_manager' ? 1_000_000 : null,
         isAdmin: false,
+        isOwner: false,
       }),
     ),
   );
@@ -81,6 +82,7 @@ describe('useAccessChanged', () => {
           role: 'finance_manager',
           approvalLimit: 1_000_000,
           isAdmin: false,
+          isOwner: false,
         });
       }),
     );

@@ -24,6 +24,7 @@ function mockRole(role: Role) {
         role,
         approvalLimit: role === 'finance_manager' ? 1_000_000 : null,
         isAdmin: false,
+        isOwner: false,
       }),
     ),
   );

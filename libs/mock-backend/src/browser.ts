@@ -178,7 +178,7 @@ export function simulateRefreshOutcomeForE2E(
  */
 export function simulateRoleChangeForE2E(
   email: string,
-  patch: { role?: Role; approvalLimit?: number | null; isAdmin?: boolean },
+  patch: { role?: Role; approvalLimit?: number | null; isAdmin?: boolean; isOwner?: boolean },
 ): void {
   sharedAuthService.setUserRole(email, patch);
 }

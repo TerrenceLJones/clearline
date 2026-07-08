@@ -29,6 +29,12 @@ export interface SessionResponse {
   approvalLimit: number | null;
   /** Orthogonal to the approval tier — grants team:view only, never approval authority. */
   isAdmin: boolean;
+  /**
+   * The account creator, elevated to Owner when their business clears KYB (US-CW-030). Orthogonal to
+   * both the approval tier and isAdmin, and — in this epic — grants no permissions on its own; the
+   * team-management authority of ownership is layered on in EPIC-CW-018.
+   */
+  isOwner: boolean;
 }
 
 export type LogoutResponse = Record<string, never>;

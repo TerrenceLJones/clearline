@@ -36,6 +36,7 @@ declare global {
           role?: 'employee' | 'finance_manager' | 'controller';
           approvalLimit?: number | null;
           isAdmin?: boolean;
+          isOwner?: boolean;
         },
       ) => void;
     };

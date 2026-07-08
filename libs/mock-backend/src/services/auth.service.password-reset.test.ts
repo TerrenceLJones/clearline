@@ -21,6 +21,7 @@ beforeAll(async () => {
     role: 'finance_manager',
     approvalLimit: 1_000_000,
     isAdmin: false,
+    isOwner: false,
   };
 });
 

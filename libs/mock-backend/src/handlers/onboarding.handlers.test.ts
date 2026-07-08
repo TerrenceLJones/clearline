@@ -166,18 +166,28 @@ describe('onboarding handlers', () => {
 });
 
 describe('review submission — owner provisioning at KYB approval (US-CW-030)', () => {
-  const APPROVED_USER = seedUser!; // demo user, submits a clean business -> approved
+  const APPROVED_USER = seedUser!; // completes full KYB -> approved -> elevated
   const PENDING_USER: SeedUser = {
     ...seedUser!,
     id: 'user_pending',
     email: 'pending@clearline.dev',
+  };
+  const INCOMPLETE_USER: SeedUser = {
+    ...seedUser!,
+    id: 'user_incomplete',
+    email: 'incomplete@clearline.dev',
+  };
+  const RESUBMIT_USER: SeedUser = {
+    ...seedUser!,
+    id: 'user_resubmit',
+    email: 'resubmit@clearline.dev',
   };
 
   let server: ReturnType<typeof setupServer>;
   let authService: AuthService;
 
   beforeAll(() => {
-    authService = new AuthService([APPROVED_USER, PENDING_USER]);
+    authService = new AuthService([APPROVED_USER, PENDING_USER, INCOMPLETE_USER, RESUBMIT_USER]);
     const onboardingService = new OnboardingService();
     server = setupServer(...createOnboardingHandlers(onboardingService, authService));
     server.listen({ onUnhandledRequest: 'error' });
@@ -206,6 +216,39 @@ describe('review submission — owner provisioning at KYB approval (US-CW-030)',
     });
   }
 
+  async function addOwner(origin: string, token: string): Promise<string> {
+    const res = await fetch(`${origin}/api/onboarding/owners`, {
+      method: 'POST',
+      headers: { ...authHeaders(token), 'content-type': 'application/json' },
+      body: JSON.stringify({
+        firstName: 'Dara',
+        lastName: 'Reyes',
+        ownershipPercent: 60,
+        ssnItin: '123-45-4417',
+      }),
+    });
+    return (await res.json()).owner.id;
+  }
+
+  async function submitDocument(origin: string, token: string, ownerId: string) {
+    return fetch(`${origin}/api/onboarding/documents`, {
+      method: 'POST',
+      headers: { ...authHeaders(token), 'content-type': 'application/json' },
+      body: JSON.stringify({
+        ownerId,
+        ocrText: 'CALIFORNIA DRIVER LICENSE DL I1234562',
+        mimeType: 'image/jpeg',
+      }),
+    });
+  }
+
+  /** Walk the full wizard (business -> owner -> verified document) so the record is KYB-complete. */
+  async function completeKyb(origin: string, token: string, legalName: string, ein: string) {
+    await submitBusiness(origin, token, legalName, ein);
+    const ownerId = await addOwner(origin, token);
+    await submitDocument(origin, token, ownerId);
+  }
+
   function submitReview(origin: string, token: string) {
     return fetch(`${origin}/api/onboarding/review/submit`, {
       method: 'POST',
@@ -213,20 +256,16 @@ describe('review submission — owner provisioning at KYB approval (US-CW-030)',
     });
   }
 
-  it('elevates the creator to Controller + Owner when the review is approved (AC-01/AC-02)', async () => {
+  it('elevates the creator to Controller + Owner when a complete KYB is approved (AC-01/AC-02)', async () => {
     const origin = uniqueOrigin();
     const token = await tokenFor(APPROVED_USER.email);
-    await submitBusiness(origin, token, 'Northwind Labs, Inc.', '12-3456789');
+    await completeKyb(origin, token, 'Northwind Labs, Inc.', '12-3456789');
 
     const response = await submitReview(origin, token);
     expect((await response.json()).outcome).toBe('approved');
 
     const session = authService.checkSession(token);
-    expect(session).toMatchObject({
-      role: 'controller',
-      approvalLimit: null,
-      isOwner: true,
-    });
+    expect(session).toMatchObject({ role: 'controller', approvalLimit: null, isOwner: true });
   });
 
   it('does not elevate when the review is routed to under_review (AC-01)', async () => {
@@ -240,5 +279,35 @@ describe('review submission — owner provisioning at KYB approval (US-CW-030)',
 
     const session = authService.checkSession(token);
     expect(session).toMatchObject({ role: 'finance_manager', isOwner: false });
+  });
+
+  it('does not elevate a bare submit that skips the KYB wizard, even though it approves', async () => {
+    const origin = uniqueOrigin();
+    const token = await tokenFor(INCOMPLETE_USER.email);
+    // No business/owner/document submitted — a direct review submit still approves (app access),
+    // but must not confer Controller + Owner on an unfinished application.
+    const response = await submitReview(origin, token);
+    expect((await response.json()).outcome).toBe('approved');
+
+    const session = authService.checkSession(token);
+    expect(session).toMatchObject({ role: 'finance_manager', isOwner: false });
+  });
+
+  it('does not re-elevate on a re-submission after the owner has been changed', async () => {
+    const origin = uniqueOrigin();
+    const token = await tokenFor(RESUBMIT_USER.email);
+    await completeKyb(origin, token, 'Resubmit Co', '11-2223334');
+    await submitReview(origin, token); // first approval elevates to Controller + Owner
+
+    // A later administrative change moves them off Owner; a re-submit must not re-assert it.
+    authService.setUserRole(RESUBMIT_USER.email, {
+      role: 'employee',
+      approvalLimit: 0,
+      isOwner: false,
+    });
+    await submitReview(origin, token);
+
+    const session = authService.checkSession(token);
+    expect(session).toMatchObject({ role: 'employee', isOwner: false });
   });
 });

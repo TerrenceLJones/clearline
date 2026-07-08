@@ -308,6 +308,73 @@ describe('OnboardingService.submitReview', () => {
 
     expect(service.getSentNotifications()).toEqual([]);
   });
+
+  it('reports finalizedNow only on the transition into a terminal status, not on re-submission', async () => {
+    const service = newService();
+    await service.submitBusinessInfo('user_1', business(), NOW);
+
+    expect(service.submitReview('user_1', NOW).finalizedNow).toBe(true);
+    expect(service.submitReview('user_1', NOW).finalizedNow).toBe(false);
+  });
+
+  it('is idempotent once approved: a re-submission does not emit a second approval notification', async () => {
+    const service = newService();
+    await service.submitBusinessInfo('user_1', business(), NOW);
+    service.submitReview('user_1', NOW);
+    service.submitReview('user_1', NOW);
+
+    expect(service.getSentNotifications()).toHaveLength(1);
+  });
+
+  it('returns the existing terminal outcome on re-submission without re-screening', async () => {
+    const service = newService();
+    await service.submitBusinessInfo(
+      'user_1',
+      business({ legalName: 'Vostok Trading LLC', ein: OTHER_KNOWN_EIN }),
+      NOW,
+    );
+    service.submitReview('user_1', NOW);
+    const resubmit = service.submitReview('user_1', NOW);
+
+    expect(resubmit).toEqual({ outcome: 'under_review', finalizedNow: false });
+  });
+});
+
+describe('OnboardingService.isKybComplete', () => {
+  async function completeKyb(service: OnboardingService) {
+    await service.submitBusinessInfo('user_1', business(), NOW);
+    await service.addOwner(
+      'user_1',
+      { firstName: 'Dara', lastName: 'Reyes', ownershipPercent: 60 },
+      NOW,
+    );
+    service.submitDocument(
+      'user_1',
+      {
+        ownerId: 'owner_1',
+        ocrText: 'CALIFORNIA DRIVER LICENSE DL I1234562',
+        mimeType: 'image/jpeg',
+      },
+      NOW,
+    );
+  }
+
+  it('is true once business info, an owner, and a verified document are all captured', async () => {
+    const service = newService();
+    await completeKyb(service);
+    expect(service.isKybComplete('user_1')).toBe(true);
+  });
+
+  it('is false when only business info has been submitted', async () => {
+    const service = newService();
+    await service.submitBusinessInfo('user_1', business(), NOW);
+    expect(service.isKybComplete('user_1')).toBe(false);
+  });
+
+  it('is false for an unknown user with no onboarding record', () => {
+    const service = newService();
+    expect(service.isKybComplete('nobody')).toBe(false);
+  });
 });
 
 describe('OnboardingService inactivity resume', () => {

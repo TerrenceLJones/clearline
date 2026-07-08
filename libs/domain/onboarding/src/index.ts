@@ -1,4 +1,5 @@
 export * from './ein-format-policy';
+export * from './kyb-completion-policy';
 export * from './ownership-threshold-policy';
 export * from './onboarding-inactivity-policy';
 export * from './document-retry-policy';

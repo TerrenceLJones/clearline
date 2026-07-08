@@ -103,10 +103,17 @@ export function createOnboardingHandlers(
       const result = onboardingService.submitReview(session.userId);
 
       // KYB approval is where the account creator becomes the Owner (US-CW-030 AC-01/AC-02): onboarding
-      // is a business-level concern, RBAC a per-person one, and they meet exactly here. Only the
-      // approved outcome elevates — an under_review (compliance-hold) submission does not. setUserRole
-      // is keyed by email, so the elevation reads through on the creator's very next session check.
-      if (result.outcome === 'approved') {
+      // is a business-level concern, RBAC a per-person one, and they meet exactly here. Elevation is
+      // guarded on three counts: the outcome is approved (not an under_review compliance hold); this
+      // call is the transition into that status, not a re-submission (finalizedNow), so an owner is
+      // never re-provisioned over a later change; and the KYB record is genuinely complete, so a bare
+      // submit that skips the wizard can't confer full financial authority. setUserRole is keyed by
+      // email, so the elevation reads through on the creator's very next session check.
+      if (
+        result.outcome === 'approved' &&
+        result.finalizedNow &&
+        onboardingService.isKybComplete(session.userId)
+      ) {
         authService.setUserRole(session.email, ownerProvisioning());
       }
 

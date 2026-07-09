@@ -29,6 +29,16 @@ declare global {
         outcome: 'success' | 'reused' | 'expired' | 'password_changed',
         email: string,
       ) => void;
+      /** Changes the signed-in account's role/limit/admin flag in place, standing in for an admin reassignment — the next session refetch reflects it without a re-login (US-CW-006 AC-05). */
+      simulateRoleChangeForE2E: (
+        email: string,
+        patch: {
+          role?: 'employee' | 'finance_manager' | 'controller';
+          approvalLimit?: number | null;
+          isAdmin?: boolean;
+          isOwner?: boolean;
+        },
+      ) => void;
     };
   }
 }

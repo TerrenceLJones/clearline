@@ -11,6 +11,7 @@ import {
   hashToken,
   type FailedAttempt,
 } from '@clearline/domain-auth';
+import type { Role } from '@clearline/contracts';
 import { SEED_USERS, type SeedUser } from '../fixtures/users.fixture';
 
 /** No real user's hash — exists only so an unregistered-email login takes the same PBKDF2 time as a real one. */
@@ -93,6 +94,16 @@ export interface SessionCheckResult {
   userId?: string;
   /** Present only when outcome is 'active'. */
   email?: string;
+  /** Present only when outcome is 'active'. */
+  displayName?: string;
+  /** Present only when outcome is 'active' — the user's live role, re-read every check so a mid-session change surfaces on the next request (US-CW-006 AC-05). */
+  role?: Role;
+  /** Present only when outcome is 'active'. Minor units; null = unlimited. */
+  approvalLimit?: number | null;
+  /** Present only when outcome is 'active'. */
+  isAdmin?: boolean;
+  /** Present only when outcome is 'active' — the account creator/Owner flag (US-CW-030). */
+  isOwner?: boolean;
   /** Present only when outcome is 'revoked'. */
   reason?: RevocationReason;
 }
@@ -349,8 +360,35 @@ export class AuthService {
       return { outcome: 'expired' };
     }
 
-    const user = this.usersByEmail.get(family.email);
-    return { outcome: 'active', userId: user!.id, email: family.email };
+    const user = this.usersByEmail.get(family.email)!;
+    return {
+      outcome: 'active',
+      userId: user.id,
+      email: family.email,
+      displayName: user.displayName,
+      role: user.role,
+      approvalLimit: user.approvalLimit,
+      isAdmin: user.isAdmin,
+      isOwner: user.isOwner,
+    };
+  }
+
+  /**
+   * Applies a role/limit/admin change to a user in place — the mid-session change an admin makes
+   * (US-CW-006 AC-05). Keyed by email. Because checkSession re-reads the live user record on every
+   * request, the very next session check reflects this without the user re-logging in. A no-op for
+   * an unknown email.
+   */
+  setUserRole(
+    email: string,
+    patch: { role?: Role; approvalLimit?: number | null; isAdmin?: boolean; isOwner?: boolean },
+  ): void {
+    const user = this.usersByEmail.get(email.toLowerCase());
+    if (!user) return;
+    if (patch.role !== undefined) user.role = patch.role;
+    if (patch.approvalLimit !== undefined) user.approvalLimit = patch.approvalLimit;
+    if (patch.isAdmin !== undefined) user.isAdmin = patch.isAdmin;
+    if (patch.isOwner !== undefined) user.isOwner = patch.isOwner;
   }
 
   /** Revokes the family the presented refresh token belongs to. A no-op (not an error) for a token that doesn't map to any family, matching a real logout endpoint's idempotent 200. */
@@ -524,11 +562,18 @@ export class AuthService {
     if (existingUser) {
       existingUser.passwordHash = passwordHash;
     } else {
+      // A freshly signed-up account defaults to the lowest tier — Employee, no approval authority,
+      // not an admin. Role/limit changes are an administrative action modeled by setUserRole.
       this.usersByEmail.set(key, {
         id: `user_${crypto.randomUUID()}`,
         email: key,
         passwordHash,
         verified: false,
+        displayName: key.split('@')[0] ?? key,
+        role: 'employee',
+        approvalLimit: null,
+        isAdmin: false,
+        isOwner: false,
       });
     }
 

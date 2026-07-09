@@ -74,6 +74,11 @@ export class PersistedAuthService extends AuthService {
     await super.logout(...args);
     this.persist();
   }
+
+  override setUserRole(...args: Parameters<AuthService['setUserRole']>) {
+    super.setUserRole(...args);
+    this.persist();
+  }
 }
 
 /**

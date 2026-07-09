@@ -45,12 +45,22 @@ export async function buildSeedUser(
     id = 'user_1',
     email = 'demo@clearline.dev',
     verified = true,
+    displayName = 'Demo User',
+    role = 'employee',
+    approvalLimit = null,
+    isAdmin = false,
+    isOwner = false,
   } = overrides;
 
   return {
     id,
     email,
     verified,
+    displayName,
+    role,
+    approvalLimit,
+    isAdmin,
+    isOwner,
     passwordHash: passwordHash ?? (await hashPassword(password ?? DEFAULT_TEST_PASSWORD)),
   };
 }
@@ -125,7 +135,16 @@ export function buildLogoutResponse(): LogoutResponse {
 }
 
 export function buildSessionResponse(overrides: Partial<SessionResponse> = {}): SessionResponse {
-  return { userId: 'user_1', email: 'demo@clearline.dev', ...overrides };
+  return {
+    userId: 'user_1',
+    email: 'demo@clearline.dev',
+    displayName: 'Demo User',
+    role: 'finance_manager',
+    approvalLimit: 1_000_000,
+    isAdmin: false,
+    isOwner: false,
+    ...overrides,
+  };
 }
 
 export function buildSessionErrorResponse(

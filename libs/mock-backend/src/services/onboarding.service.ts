@@ -14,6 +14,7 @@ import type {
 import {
   hasOnboardingSessionTimedOut,
   isDocumentVerificationBlocked,
+  isKybComplete,
   isValidEinFormat,
   requiresKyc,
 } from '@clearline/domain-onboarding';
@@ -56,6 +57,13 @@ export interface SubmitDocumentResult {
 
 export interface SubmitReviewResult {
   outcome: SubmitReviewOutcome;
+  /**
+   * True only on the call that transitions the application into a terminal status (approved /
+   * under_review). A re-submission of an already-finalized record reports false, so downstream
+   * side-effects that must fire once — the approval notification and the owner elevation
+   * (US-CW-030) — are not re-applied on every subsequent submit.
+   */
+  finalizedNow: boolean;
 }
 
 /** Mirrors AuthService's NotificationEvent — models the "email + in-app notification" a real backend would send (US-CW-004 AC-08), without an actual delivery mechanism. */
@@ -232,6 +240,13 @@ export class OnboardingService {
     const record = this.getOrCreateRecord(userId, now);
     record.lastActivityAt = now;
 
+    // Idempotent once terminal: a re-submission of an already-approved/under_review application
+    // returns its existing outcome without re-screening or re-notifying, and reports finalizedNow
+    // false so one-time side effects (approval notification, owner elevation) aren't re-applied.
+    if (record.status === 'approved' || record.status === 'under_review') {
+      return { outcome: record.status, finalizedNow: false };
+    }
+
     const namesToScreen = [
       record.business?.legalName,
       ...record.owners.map((owner) => owner.fullName),
@@ -254,7 +269,23 @@ export class OnboardingService {
       });
     }
 
-    return { outcome: matchesWatchlist ? 'under_review' : 'approved' };
+    return { outcome: matchesWatchlist ? 'under_review' : 'approved', finalizedNow: true };
+  }
+
+  /**
+   * Whether the user's application reflects a genuinely completed KYB (business info, a beneficial
+   * owner, and a verified document). The owner elevation (US-CW-030) gates on this so a bare
+   * review submission that skips the wizard can't confer Controller + Owner. Reads the record
+   * without creating one — an unknown user is trivially incomplete.
+   */
+  isKybComplete(userId: string): boolean {
+    const record = this.recordsByUserId.get(userId);
+    if (!record) return false;
+    return isKybComplete({
+      hasBusiness: record.business !== null,
+      ownerCount: record.owners.length,
+      documentCount: record.documents.length,
+    });
   }
 
   /**

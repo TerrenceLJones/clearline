@@ -17,6 +17,11 @@ beforeAll(async () => {
     email: 'demo@clearline.dev',
     passwordHash: await hashPassword(PLAINTEXT_PASSWORD),
     verified: true,
+    displayName: 'Demo User',
+    role: 'finance_manager',
+    approvalLimit: 1_000_000,
+    isAdmin: false,
+    isOwner: false,
   };
 });
 

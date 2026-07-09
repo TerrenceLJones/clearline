@@ -116,6 +116,13 @@ test.describe('Business onboarding & KYB (US-CW-004, US-CW-005)', () => {
 
     await page.getByRole('button', { name: 'Go to dashboard' }).click();
     await expect(page).toHaveURL(`${new URL(page.url()).origin}/`);
+
+    // The approved creator is provisioned as the Owner (US-CW-030): Controller-tier nav an
+    // Employee would never see — Budget Management and Audit Log — is now present, confirming the
+    // elevation end-to-end rather than just that onboarding finished.
+    const nav = page.getByRole('navigation', { name: 'Main' });
+    await expect(nav.getByText('Budget Management')).toBeVisible();
+    await expect(nav.getByText('Audit Log')).toBeVisible();
   });
 
   test('routes a not-yet-onboarded user who lands on the dashboard into the wizard (AC-09)', async ({

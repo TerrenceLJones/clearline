@@ -123,7 +123,15 @@ describe('GET /api/auth/session', () => {
     const response = await getSession(uniqueOrigin(), accessToken);
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ userId: user!.id, email: user!.email });
+    expect(await response.json()).toEqual({
+      userId: user!.id,
+      email: user!.email,
+      displayName: user!.displayName,
+      role: user!.role,
+      approvalLimit: user!.approvalLimit,
+      isAdmin: user!.isAdmin,
+      isOwner: user!.isOwner,
+    });
   });
 
   it('returns 401 invalid_token with no Authorization header', async () => {

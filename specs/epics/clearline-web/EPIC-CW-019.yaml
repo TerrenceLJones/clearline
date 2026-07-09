@@ -1,0 +1,65 @@
+epic_id: 'EPIC-CW-019'
+title: 'Account Owner Provisioning'
+app: 'clearline-web'
+feature_area: 'core'
+status: 'DRAFT'
+approved_date: null
+created_date: '2026-07-07'
+source_reference: >
+  Split out from the design §18 "Organization & Team Management" work (see EPIC-CW-018) as the foundational,
+  implement-first slice. Answers the RBAC/KYB interaction question that EPIC-CW-002 (onboarding) and
+  EPIC-CW-003 (RBAC) left open — what role an account creator gets and when — without any of the invite /
+  team-management surface, which is deferred to EPIC-CW-018.
+package_location: 'apps/clearline-web/'
+deployment_unit: 'apps/clearline-web/'
+tdr_reference: 'TDR-CW-WEB-001'
+depends_on_epics: ['EPIC-CW-002', 'EPIC-CW-003', 'EPIC-CW-016']
+extends_stories: ['US-CW-004', 'US-CW-006', 'US-CW-029']
+reuses_from:
+  - 'OnboardingService approval path + setUserRole seam from EPIC-CW-002 (US-CW-004) for elevate-at-approval'
+  - 'RBAC session/permission model (SessionResponse, useAuthorization, isAdmin flag precedent) from EPIC-CW-003 (US-CW-006)'
+has_ui: false
+ui_library: '@clearline/ui'
+changes:
+  adds:
+    - story_id: 'US-CW-030'
+      story_path: '/specs/user-stories/clearline-web/US-CW-030.yaml'
+      title: 'Account Owner Provisioning at KYB Approval'
+  updates:
+    - story_id: 'US-CW-004'
+      story_path: '/specs/user-stories/clearline-web/US-CW-004.yaml'
+      title: 'Business Onboarding Flow'
+      reason: >
+        The approval outcome (AC-08) additionally elevates the account creator to Controller + Owner
+        (US-CW-030 AC-01/AC-02). Onboarding becomes the seam where the creator's role is assigned — once, at
+        approval — instead of leaving them as the sign-up default 'employee'. Applied at implementation time;
+        no change to the onboarding wizard steps themselves.
+    - story_id: 'US-CW-006'
+      story_path: '/specs/user-stories/clearline-web/US-CW-006.yaml'
+      title: 'Role-Based Navigation & Approval Authority'
+      reason: >
+        Introduces the orthogonal `isOwner` session flag alongside the existing `isAdmin` flag (neither is a
+        role in the Role union) and surfaces it through useAuthorization(). In this epic isOwner grants no new
+        permissions and renders no UI — the team:view / team-management consequences of ownership are deferred
+        to EPIC-CW-018, which has the surface to gate. Adding the flag here keeps the session contract and the
+        provisioning correct without shipping a nav item to a page that does not exist yet.
+  deprecates: []
+  removes: []
+notes: >
+  The "implement now" foundation. A single story, US-CW-030: at KYB approval the account creator is provisioned
+  as the Owner — Controller approval tier (unlimited limit) plus an orthogonal isOwner flag — atomically with
+  approval. This directly answers "what role should account owners have, and how does RBAC meet KYB": KYB is a
+  business-level concern, RBAC is a per-person concern, and they meet exactly once, at approval.
+
+  Fixes a live gap: today sign-up hardcodes role 'employee' and the onboarding flow never touches the role, so
+  a real business owner who signs up and completes KYB is stranded as a plain employee (only expenses:view +
+  cards:view). The seeded demo user hides this by being pre-seeded as finance_manager.
+
+  Deliberately excludes everything that depends on non-creator members — the invite flow, the team roster and
+  actions, the distinct Organization entity, team:view via isOwner, the RequireOnboarded invited-member
+  bypass, and the non-owner duplicate-EIN branch — all of which live in EPIC-CW-018 (US-CW-031). RequireOnboarded
+  is intentionally NOT changed here: with no invited members, every user is a creator who still onboards as
+  today. Ownership transfer is out of scope across both epics.
+
+  Status is DRAFT: authored as specs-only for review. The changes.updates entries are declared but NOT yet
+  applied to the already-IMPLEMENTED US-CW-004 / US-CW-006 records — that is an implementation-time step.

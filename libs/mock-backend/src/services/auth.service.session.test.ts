@@ -17,6 +17,11 @@ beforeAll(async () => {
     email: 'demo@clearline.dev',
     passwordHash: await hashPassword(PLAINTEXT_PASSWORD),
     verified: true,
+    displayName: 'Demo User',
+    role: 'finance_manager',
+    approvalLimit: 1_000_000,
+    isAdmin: false,
+    isOwner: false,
   };
 });
 
@@ -167,6 +172,32 @@ describe('AuthService.checkSession (AC-01, AC-06)', () => {
 
     const result = service.checkSession(accessToken!, NOW + 3 * MINUTE);
     expect(result).toMatchObject({ outcome: 'revoked', reason: 'reuse_detected' });
+  });
+});
+
+describe('AuthService.setUserRole — isOwner flag (US-CW-030 AC-02)', () => {
+  it('defaults isOwner to false for a seed user that was never elevated', async () => {
+    const service = newService();
+    const { accessToken } = await login(service, NOW);
+    const result = service.checkSession(accessToken!, NOW + MINUTE);
+    expect(result.isOwner).toBe(false);
+  });
+
+  it('reflects an isOwner elevation on the next session check', async () => {
+    const service = newService();
+    const { accessToken } = await login(service, NOW);
+    service.setUserRole(USER.email, { role: 'controller', approvalLimit: null, isOwner: true });
+    const result = service.checkSession(accessToken!, NOW + MINUTE);
+    expect(result).toMatchObject({ role: 'controller', approvalLimit: null, isOwner: true });
+  });
+
+  it('leaves isOwner unchanged when a patch omits it', async () => {
+    const service = newService();
+    const { accessToken } = await login(service, NOW);
+    service.setUserRole(USER.email, { isOwner: true });
+    service.setUserRole(USER.email, { approvalLimit: 500_000 });
+    const result = service.checkSession(accessToken!, NOW + MINUTE);
+    expect(result.isOwner).toBe(true);
   });
 });
 

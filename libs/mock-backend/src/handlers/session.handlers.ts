@@ -74,7 +74,15 @@ export function createSessionHandlers(authService: AuthService = sharedAuthServi
       const result = authService.checkSession(accessToken);
 
       if (result.outcome === 'active') {
-        const body: SessionResponse = { userId: result.userId!, email: result.email! };
+        const body: SessionResponse = {
+          userId: result.userId!,
+          email: result.email!,
+          displayName: result.displayName!,
+          role: result.role!,
+          approvalLimit: result.approvalLimit!,
+          isAdmin: result.isAdmin!,
+          isOwner: result.isOwner!,
+        };
         return HttpResponse.json(body, { status: 200 });
       }
 

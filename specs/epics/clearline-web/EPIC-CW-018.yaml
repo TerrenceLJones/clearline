@@ -1,0 +1,87 @@
+epic_id: 'EPIC-CW-018'
+title: 'Organization & Team Management'
+app: 'clearline-web'
+feature_area: 'core'
+status: 'DRAFT'
+approved_date: null
+created_date: '2026-07-07'
+source_reference: >
+  specs/designs/Clearline Design System - Consolidated.dc.html §18 "Organization & Team Management"
+  (labeled "Gherkin EPIC-CW-017 — Organization Provisioning & Team Management, US-CW-030 · US-CW-031"),
+  plus the non-owner duplicate-business branch drawn under §1 / Batch 03. This body of work existed only as
+  design mockups with no formal backlog record; this epic formalizes the TEAM-MANAGEMENT half. NOTE ON
+  NUMBERING: the design's "EPIC-CW-017" label is superseded — EPIC-CW-016.yaml intentionally retired the
+  number 017 (a draft folded back into EPIC-CW-016), so this work is assigned EPIC-CW-018 (which also matches
+  design §18). The owner-provisioning half was split out into EPIC-CW-019 as the "implement first" foundation;
+  this epic is the deferred invite/team-management work and depends on it.
+package_location: 'apps/clearline-web/'
+deployment_unit: 'apps/clearline-web/'
+tdr_reference: 'TDR-CW-WEB-001'
+depends_on_epics: ['EPIC-CW-019', 'EPIC-CW-002', 'EPIC-CW-003', 'EPIC-CW-016']
+extends_stories: ['US-CW-004', 'US-CW-006', 'US-CW-030']
+reuses_from:
+  - '@clearline/domain-auth password-hashing module (PBKDF2-HMAC-SHA256), for invitee self-set passwords'
+  - 'Single-use, hashed-at-rest token machinery from US-CW-029 (email verification) and US-CW-003 (password reset)'
+  - 'Enumeration-safe confirmation + async email dispatch pattern from US-CW-029 / US-CW-003'
+  - 'RBAC permission model (permissionsForRole, RequirePermission guard, AccessDenied, useAuthorization, nav gating) from EPIC-CW-003 (US-CW-006 / US-CW-028)'
+  - 'isOwner flag + owner provisioning from EPIC-CW-019 (US-CW-030)'
+  - 'RequireOnboarded guard + onboarding status resolver from EPIC-CW-002 (US-CW-004) for invited-member admission'
+  - 'ConfirmationDialog organism (design §11) for role-change and removal; AuditTrail (US-CW-021) for team-change audit events'
+has_ui: true
+ui_library: '@clearline/ui'
+changes:
+  adds:
+    - story_id: 'US-CW-031'
+      story_path: '/specs/user-stories/clearline-web/US-CW-031.yaml'
+      title: 'Team Member Invitations & Management'
+  updates:
+    - story_id: 'US-CW-004'
+      story_path: '/specs/user-stories/clearline-web/US-CW-004.yaml'
+      title: 'Business Onboarding Flow'
+      reason: >
+        Two additions, applied at this epic's implementation time. (1) RequireOnboarded must admit invited
+        members — who have no per-user onboarding record — to the app instead of redirecting them into the KYB
+        wizard, by inheriting their Organization's approved status (US-CW-031 AC-10). (2) A new acceptance
+        criterion for the NON-owner duplicate-EIN branch: AC-07 today only covers the creator re-onboarding
+        ("Sign in instead"); the design also specifies a different person hitting an already-claimed EIN being
+        told "your business already has an account — ask your admin to invite you," with no sign-in CTA and no
+        credentials (US-CW-031 AC-11). That branch is currently design-only with no matching AC on US-CW-004.
+    - story_id: 'US-CW-006'
+      story_path: '/specs/user-stories/clearline-web/US-CW-006.yaml'
+      title: 'Role-Based Navigation & Approval Authority'
+      reason: >
+        Extends the `team:view` permission — today granted only by isAdmin — to also be granted by isOwner
+        (introduced in EPIC-CW-019), so team-management nav and endpoints authorize on isOwner OR isAdmin. This
+        is deferred to here rather than done in EPIC-CW-019 because there is no team surface to gate until this
+        epic ships; granting team:view earlier would render a nav item pointing at a nonexistent page. The
+        mid-session role-change handling (AC-05) and "Your access changed" banner are reused as-is by
+        US-CW-031's role-change flow.
+  deprecates: []
+  removes: []
+notes: >
+  The deferred invite / team-management half of design §18 ("One Owner, invite-only membership"). Contains a
+  single story, US-CW-031: the invite and team-management lifecycle — invite by email + approval-tier role with
+  optional Admin, single-use 7-day enumeration-safe link, self-set-password acceptance (no temporary
+  passwords), pending / resend / revoke, role change, member removal, non-admin 403 enforcement, and audit.
+  This epic also introduces the distinct Organization entity (members belong to it, invites target it), and
+  it owns the two behaviors that only make sense once non-creator members exist: invited members bypassing KYB
+  onboarding (US-CW-031 AC-10, via the RequireOnboarded change) and the non-owner duplicate-EIN "ask your admin
+  to invite you" branch (US-CW-031 AC-11).
+
+  Sequencing: the owner-provisioning foundation is EPIC-CW-019 (US-CW-030 — isOwner flag + creator elevated to
+  Controller + Owner at KYB approval), which is implemented first and answers the RBAC/KYB interaction on its
+  own. This epic is picked up later and builds the team surface on top of that foundation; hence depends_on
+  EPIC-CW-019.
+
+  Credential model (design-confirmed, project-owner-approved 2026-07-07): invited users SET THEIR OWN password
+  via the invite link — there is no temporary-password mechanism anywhere in the product. Matches the §18.3
+  "Set a password to join" mockup and the enumeration-safe, single-use-token conventions already shipped for
+  sign-up (US-CW-029) and password reset (US-CW-003).
+
+  Ownership transfer / Owner offboarding is deliberately OUT OF SCOPE here as in EPIC-CW-019: the Owner remains
+  non-removable and non-demotable (US-CW-031 AC-06/AC-07 enforce the US-CW-030 AC-03 invariant), and the org
+  always has exactly one Owner. A future epic must introduce ownership transfer before an Owner can ever leave.
+
+  Status is DRAFT: authored as specs-only for review. The changes.updates entries above are declared but NOT yet
+  applied to the already-APPROVED/IMPLEMENTED US-CW-004 / US-CW-006 records — editing those is an
+  implementation-time step for whoever picks this epic up.

@@ -8,10 +8,14 @@ import { formatMoney } from '@clearline/ui';
  * keep the submit blocked without a network call.
  */
 export function parseAmountToMinorUnits(input: string): number | null {
+  // Strip formatting the user may have typed: dollar sign, thousands commas, whitespace.
   const cleaned = input.replace(/[$,\s]/g, '');
+  // Reject empty input or anything that isn't plain digits with an optional single decimal point.
   if (cleaned === '' || !/^\d*\.?\d*$/.test(cleaned)) return null;
   const dollars = Number(cleaned);
+  // Guard against NaN and non-positive amounts (e.g. a bare "." or "0").
   if (!Number.isFinite(dollars) || dollars <= 0) return null;
+  // Convert dollars to cents, rounding to avoid floating-point drift (e.g. 19.99 * 100).
   return Math.round(dollars * 100);
 }
 

@@ -105,8 +105,9 @@ async function chooseRecipientAndAmount(name: RegExp, amount: string) {
 describe('NewPaymentPage — derived balance', () => {
   it('shows the available balance as a derived, read-only value (US-CW-008)', async () => {
     renderPage();
-    expect(await screen.findByText(/DERIVED · READ-ONLY/i)).toBeInTheDocument();
-    // No input affordance on the balance — there is no editable "available balance" field.
+    // The "Pay from" balance carries a DERIVED chip flagging it as a ledger projection…
+    expect(await screen.findByText('DERIVED')).toBeInTheDocument();
+    // …and no input affordance on the balance — there is no editable "available balance" field.
     expect(screen.queryByLabelText(/available balance/i)).not.toBeInTheDocument();
   });
 });

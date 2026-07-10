@@ -94,4 +94,22 @@ export class ApprovalsService {
     this.items.set(itemId, escalated);
     return { outcome: 'ok', item: { ...escalated } };
   }
+
+  /**
+   * Hands an expense to a different approver — the sanctioned way past a self-approval block
+   * (US-CW-006 AC-08). Deliberately does NOT run canApprove: self-approval is only forbidden for the
+   * *approve* action, and reassigning your own expense is precisely the escape hatch. Like reject, the
+   * item leaves this approver's pending queue (the demo doesn't model who it routes to next). Still
+   * gated on approvals:act so a role without approval authority can't reroute the queue.
+   */
+  reassign(itemId: string, actor: ApprovalActor): ApprovalActionOutcome {
+    if (!hasPermission(actor.permissions, 'approvals:act')) {
+      return { outcome: 'forbidden', reason: 'forbidden_role' };
+    }
+    const item = this.items.get(itemId);
+    if (!item) return { outcome: 'not_found' };
+
+    this.items.delete(itemId);
+    return { outcome: 'ok', item: { ...item } };
+  }
 }

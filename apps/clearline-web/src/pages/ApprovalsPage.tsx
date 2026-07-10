@@ -8,6 +8,7 @@ import {
   useApprovalQueue,
   useApproveExpense,
   useEscalateApproval,
+  useReassignApproval,
   useRejectApproval,
 } from '@clearline/data-access-approvals';
 /** Queue table columns: Employee · category | Date | Amount | Action. */
@@ -52,6 +53,7 @@ export function ApprovalsPage() {
   const approve = useApproveExpense();
   const reject = useRejectApproval();
   const escalate = useEscalateApproval();
+  const reassign = useReassignApproval();
 
   if (queue.error instanceof ApprovalsForbiddenError) {
     return <AccessDenied requestLine="403 Forbidden · GET /api/approvals" />;
@@ -109,6 +111,16 @@ export function ApprovalsPage() {
             });
             const isSelf = item.submitterId === approverId;
             const overLimit = !decision.allowed && decision.reason === 'approval_limit_exceeded';
+            const selfBlocked = !decision.allowed && decision.reason === 'self_approval_blocked';
+            // Both blocked states share the compact §3.1 treatment: warn-highlighted row, an inline
+            // triangle note, and a single collapsed action (Escalate for over-limit, Reassign for
+            // self) — no Approve/Reject. The full reason stays screen-reader-only (AC-06/AC-07).
+            const blocked = overLimit || selfBlocked;
+            const noteSuffix = overLimit
+              ? ' · over your limit'
+              : selfBlocked
+                ? ` · ${reasonText('self_approval_blocked', approvalLimit)}`
+                : '';
 
             return (
               <div
@@ -117,7 +129,7 @@ export function ApprovalsPage() {
                 className={[
                   'grid items-start gap-4 px-4 py-3.25 text-[13px]',
                   i < items.length - 1 ? 'border-cl-border border-b' : '',
-                  overLimit ? 'bg-cl-warn-weak' : '',
+                  blocked ? 'bg-cl-warn-weak' : '',
                 ].join(' ')}
                 style={{ gridTemplateColumns: COLS }}
               >
@@ -133,14 +145,15 @@ export function ApprovalsPage() {
                   <Text
                     as="p"
                     size="label"
-                    tone={overLimit ? 'warning' : 'muted'}
-                    className="mb-0 flex items-center gap-1"
+                    tone={blocked ? 'warning' : 'muted'}
+                    className="mt-1 mb-0 flex items-center gap-1"
+                    // Self-blocked shows its full reason inline, so it doubles as the Reassign
+                    // button's description (over-limit keeps the sr-only reason node instead).
+                    id={selfBlocked ? `reason-${item.id}` : undefined}
                   >
-                    {overLimit ? (
-                      <Icon name="triangle-alert" size={11} className="shrink-0" />
-                    ) : null}
+                    {blocked ? <Icon name="triangle-alert" size={11} className="shrink-0" /> : null}
                     {item.category}
-                    {overLimit ? ' · over your limit' : ''}
+                    {noteSuffix}
                     {item.status === 'pending_l2' ? ' · escalated to a Controller' : ''}
                   </Text>
                 </div>
@@ -157,31 +170,16 @@ export function ApprovalsPage() {
                   {formatMoneyAmount(item.amount)}
                 </Text>
                 <div className="flex items-center justify-end gap-2">
+                  {/* Over-limit keeps its full limit sentence as a screen-reader node (the visible
+                      note only says "· over your limit"); self-blocked shows its full reason inline
+                      (see the note above), so no sr-only duplicate is needed there. */}
                   {overLimit ? (
-                    // Over-limit collapses to a single Escalate action (design §3.1); the limit
-                    // message stays available to screen readers via the linked reason node so
-                    // AC-06 holds without a reason block cluttering the compact row.
+                    <span id={`reason-${item.id}`} className="sr-only">
+                      {reasonText(decision.reason, approvalLimit)}
+                    </span>
+                  ) : null}
+                  {decision.allowed ? (
                     <>
-                      <span id={`reason-${item.id}`} className="sr-only">
-                        {reasonText(decision.reason, approvalLimit)}
-                      </span>
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        icon="arrow-up"
-                        aria-describedby={`reason-${item.id}`}
-                        onClick={() => escalate.mutate(item.id)}
-                      >
-                        Escalate to Controller
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      {!decision.allowed ? (
-                        <span id={`reason-${item.id}`} className="sr-only">
-                          {reasonText(decision.reason, approvalLimit)}
-                        </span>
-                      ) : null}
                       <Button variant="danger" size="sm" onClick={() => reject.mutate(item.id)}>
                         Reject
                       </Button>
@@ -189,13 +187,46 @@ export function ApprovalsPage() {
                         variant="primary"
                         tone="positive"
                         size="sm"
-                        disabled={!decision.allowed}
-                        aria-describedby={decision.allowed ? undefined : `reason-${item.id}`}
                         onClick={() => approve.mutate(item.id)}
                       >
                         Approve
                       </Button>
                     </>
+                  ) : overLimit ? (
+                    // Over your limit → the one-click escalation to a Controller (AC-06).
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      icon="arrow-up"
+                      aria-describedby={`reason-${item.id}`}
+                      onClick={() => escalate.mutate(item.id)}
+                    >
+                      Escalate to Controller
+                    </Button>
+                  ) : selfBlocked ? (
+                    // Your own expense → hand it to another approver, the sanctioned path past the
+                    // self-approval block (AC-08).
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      aria-describedby={`reason-${item.id}`}
+                      onClick={() => reassign.mutate(item.id)}
+                    >
+                      Reassign approver
+                    </Button>
+                  ) : (
+                    // Any other block (e.g. forbidden_role — not reachable from this queue) keeps a
+                    // disabled Approve with its stated reason rather than a doomed action.
+                    <Button
+                      variant="primary"
+                      tone="positive"
+                      size="sm"
+                      disabled
+                      aria-describedby={`reason-${item.id}`}
+                      onClick={() => approve.mutate(item.id)}
+                    >
+                      Approve
+                    </Button>
                   )}
                 </div>
               </div>

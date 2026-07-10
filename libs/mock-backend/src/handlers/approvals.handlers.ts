@@ -108,6 +108,22 @@ export function createApprovalsHandlers(
       const body: ApprovalActionResponse = { item: result.item };
       return HttpResponse.json(body, { status: 200 });
     }),
+
+    http.post('*/api/approvals/:id/reassign', ({ request, params }) => {
+      const actor = resolveActor(request, authService);
+      if (!actor) return unauthorized();
+
+      const result = approvalsService.reassign(String(params.id), actor);
+      if (result.outcome === 'not_found') {
+        return HttpResponse.json({ error: 'not_found' }, { status: 404 });
+      }
+      if (result.outcome === 'forbidden') {
+        const body: ApprovalErrorResponse = { error: result.reason };
+        return HttpResponse.json(body, { status: 403 });
+      }
+      const body: ApprovalActionResponse = { item: result.item };
+      return HttpResponse.json(body, { status: 200 });
+    }),
   ];
 }
 

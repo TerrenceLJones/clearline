@@ -28,6 +28,9 @@ history:
   - epic_id: 'EPIC-CW-003'
     action: 'implemented'
     date: '2026-07-08'
+  - epic_id: 'EPIC-CW-020'
+    action: 'updated'
+    date: '2026-07-10'
 
 # Status timestamps — set when status transitions occur
 approved_date: '2026-06-30'
@@ -100,6 +103,16 @@ acceptance_criteria:
       And I see "You can't approve your own expense. It needs another approver."
       And the server independently enforces this rule even if the client check is bypassed
     status: 'active'
+  - id: 'AC-08'
+    description: |
+      Given I am a Finance Manager
+      And I submitted an expense myself (so I cannot approve it, per AC-07)
+      When I view that expense in the approval queue
+      Then a one-click "Reassign approver" action is offered on that row
+      And activating it hands the expense to a different approver and removes it from my queue
+      And the server permits the reassignment (it is gated on approval authority, not on the
+        self-approval rule) so my own submission can still be routed onward
+    status: 'active'
 
 # Technical Notes
 technical_notes: |
@@ -122,9 +135,24 @@ edge_cases: |
   - Finance Manager attempting to approve an expense they personally submitted (conflict of interest)
   - Server-side enforcement of self-approval restriction even if the client-side disabled state is bypassed (e.g. direct API call)
   - Role with no approval limit configured attempting any approval action (inferred)
+  - Self-submitted expense reassigned onward by its own submitter — permitted, because reassign is gated on approval authority, not the self-approval rule (AC-08)
 
 # Implementation Status
 implementation_status: |
+  ✅ AC-08 (Reassign approver) added & implemented: 2026-07-10 (EPIC-CW-020)
+    - libs/mock-backend: ApprovalsService.reassign (mirrors reject — gated on approvals:act, item
+      leaves the pending queue, deliberately skips the self-approval check) + POST
+      /api/approvals/:id/reassign handler.
+    - libs/data-access/approvals: use-reassign-approval.ts hook (posts /reassign, invalidates the
+      queue) + barrel export.
+    - apps/clearline-web/src/pages/ApprovalsPage.tsx: the approval queue is now the design's table
+      (Employee · category | Date | Amount | Action). Blocked rows share the compact §3.1 treatment —
+      warn-highlighted row + inline triangle note + a single collapsed action: Escalate to Controller
+      for over-limit (AC-06), Reassign approver for self-submitted (AC-08). The full reason string
+      stays as screen-reader text linked via aria-describedby so AC-06/AC-07's "And I see …" holds.
+    - Tests: approvals.service.test.ts (reassign ok/self/forbidden), use-reassign-approval.test.tsx,
+      and ApprovalsPage.test.tsx (self row offers Reassign, click hits /reassign).
+
   ✅ Implemented: 2026-07-08 (EPIC-CW-003)
   📁 Files created/modified (grouped by area):
     - libs/contracts/src/rbac.ts, session.ts — Permission vocabulary, role→permission/approval-limit

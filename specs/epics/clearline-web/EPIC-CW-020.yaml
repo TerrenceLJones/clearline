@@ -1,0 +1,47 @@
+epic_id: 'EPIC-CW-020'
+title: 'Reassign Approver for Blocked Approvals'
+app: 'clearline-web'
+feature_area: 'core'
+status: 'IMPLEMENTED'
+approved_date: '2026-07-10'
+created_date: '2026-07-10'
+source_reference: >
+  Design §6.2 "Approval queue & actions" — the self-approval card offers a "Reassign to another
+  approver" action alongside the disabled Approve. That action was present in the mockups from the
+  start but never captured as an acceptance criterion or backed by an endpoint; US-CW-006 only ever
+  specified disable + message (AC-07). This epic closes that gap.
+package_location: 'apps/clearline-web/'
+deployment_unit: 'apps/clearline-web/'
+tdr_reference: 'TDR-CW-WEB-001'
+depends_on_epics: ['EPIC-CW-003']
+extends_stories: ['US-CW-006']
+reuses_from:
+  - 'ApprovalsService + approvals handlers/hooks (approve/reject/escalate) from EPIC-CW-003 (US-CW-006) — reassign mirrors reject'
+  - 'ApprovalActionResponse / ApprovalErrorResponse contracts from EPIC-CW-003'
+has_ui: true
+ui_library: '@clearline/ui'
+changes:
+  adds: []
+  updates:
+    - story_id: 'US-CW-006'
+      story_path: '/specs/user-stories/clearline-web/US-CW-006.yaml'
+      title: 'Role-Based Navigation & Approval Authority'
+      reason: >
+        Adds AC-08: a self-submitted expense (already blocked from approval by AC-07) offers a
+        one-click "Reassign approver" action that hands the expense to a different approver and
+        removes it from the acting approver's queue. Reassign is server-gated on approvals:act but
+        deliberately does NOT run the self-approval check — self-approval is only forbidden for the
+        *approve* action, and reassigning your own expense is precisely the sanctioned escape hatch.
+        Also aligns the queue's blocked-row presentation with the compact design §3.1 treatment
+        (warn-highlighted row + inline triangle note + a single collapsed action), applied to both
+        the over-limit (Escalate, AC-06) and self-submitted (Reassign, AC-08) cases; the full reason
+        text remains available to screen readers so AC-06/AC-07 hold.
+  deprecates: []
+  removes: []
+notes: >
+  Small, self-contained follow-on to EPIC-CW-003's approval work. New POST /api/approvals/:id/reassign
+  endpoint + ApprovalsService.reassign (mirrors reject: gated on approvals:act, item leaves the pending
+  queue — the demo does not model who it routes to next) + useReassignApproval data-access hook.
+  ApprovalsPage wires the "Reassign approver" button onto self-submitted rows. No contract types
+  changed — reassign reuses ApprovalActionResponse / ApprovalErrorResponse. The changes.updates entry
+  for US-CW-006 is applied (AC-08 added), matching this epic's IMPLEMENTED status.

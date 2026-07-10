@@ -114,3 +114,33 @@ describe('ApprovalsService.escalate', () => {
     });
   });
 });
+
+describe('ApprovalsService.reassign', () => {
+  it('removes a reassigned item from the queue', () => {
+    const service = new ApprovalsService();
+    expect(service.reassign('exp_4201', actor()).outcome).toBe('ok');
+    const queue = service.getQueue(actor());
+    if (queue.outcome === 'ok') {
+      expect(queue.items.map((i) => i.id)).not.toContain('exp_4201');
+    }
+  });
+
+  it('lets an approver reassign their own submission (self-approval is not a reassign block)', () => {
+    // exp_4460 is submitted by user_1 (the acting approver) — approve is blocked, but reassign is
+    // the sanctioned escape hatch and must succeed (AC-08).
+    const service = new ApprovalsService();
+    const result = service.reassign('exp_4460', actor());
+    expect(result.outcome).toBe('ok');
+    const queue = service.getQueue(actor());
+    if (queue.outcome === 'ok') {
+      expect(queue.items.map((i) => i.id)).not.toContain('exp_4460');
+    }
+  });
+
+  it('blocks reassignment from a role without approval authority', () => {
+    expect(new ApprovalsService().reassign('exp_4201', employee)).toEqual({
+      outcome: 'forbidden',
+      reason: 'forbidden_role',
+    });
+  });
+});

@@ -85,15 +85,40 @@ describe('ApprovalsPage', () => {
     expect(screen.getByRole('button', { name: 'Escalate to Controller' })).toBeInTheDocument();
   });
 
-  it('blocks self-approval with the separation-of-duties message (AC-07)', async () => {
+  it('blocks self-approval with the separation-of-duties message and offers Reassign (AC-07/AC-08)', async () => {
     mockFinanceManager();
     renderPage();
 
     await waitFor(() =>
       expect(
-        screen.getByText("You can't approve your own expense. It needs another approver."),
+        // The reason now renders inline on the row (prefixed by the category), so match a substring.
+        screen.getByText(/You can't approve your own expense\. It needs another approver\./),
       ).toBeInTheDocument(),
     );
+    // The self-submitted row collapses to a single Reassign action — no Approve button on that row.
+    const selfRow = screen.getByText('Marcus Okafor').closest('[data-approval-row]') as HTMLElement;
+    expect(within(selfRow).getByRole('button', { name: 'Reassign approver' })).toBeInTheDocument();
+    expect(within(selfRow).queryByRole('button', { name: 'Approve' })).not.toBeInTheDocument();
+  });
+
+  it('reassigns a self-submitted expense to another approver when Reassign is clicked (AC-08)', async () => {
+    mockFinanceManager();
+    let reassignedId: string | undefined;
+    server.use(
+      http.post('*/api/approvals/:id/reassign', ({ params }) => {
+        reassignedId = String(params.id);
+        return HttpResponse.json({ item: { ...QUEUE[2], status: 'pending_l1' } });
+      }),
+    );
+    const user = userEvent.setup();
+    renderPage();
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Reassign approver' })).toBeInTheDocument(),
+    );
+    await user.click(screen.getByRole('button', { name: 'Reassign approver' }));
+
+    await waitFor(() => expect(reassignedId).toBe('exp_4460'));
   });
 
   it('leaves an in-limit, other-submitter expense approvable', async () => {

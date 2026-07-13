@@ -42,9 +42,24 @@ export default tseslint.config(
     },
   },
   {
-    files: ['**/*.{jsx,tsx}'],
+    // Classic hook rules apply wherever hooks live — including custom hooks in plain `.ts`
+    // files (e.g. use-*.ts), which the component-only glob below would otherwise miss.
+    // The stricter react-compiler rules (refs/purity) stay scoped to component files, so
+    // this doesn't newly fail existing `.ts` hooks on rules the team hasn't adopted there.
+    files: ['**/*.{js,jsx,ts,tsx}'],
     plugins: {
       'react-hooks': reactHooks,
+    },
+    rules: {
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+    },
+  },
+  {
+    // Component files additionally get the full recommended-latest set (refs, purity, …)
+    // and react-refresh, whose only-export-components rule would misfire on `.ts` modules.
+    files: ['**/*.{jsx,tsx}'],
+    plugins: {
       'react-refresh': reactRefresh,
     },
     rules: {

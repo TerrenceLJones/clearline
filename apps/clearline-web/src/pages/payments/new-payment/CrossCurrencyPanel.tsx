@@ -1,10 +1,10 @@
-import { toMajorUnits } from '@clearline/money';
-import { Alert, Text, formatMoney } from '@clearline/ui';
-import { formatUsd } from './format';
+import { Alert, Checkbox, Text, formatMoneyValue } from '@clearline/ui';
 import type { NewPaymentForm } from './use-new-payment-form';
 
 interface CrossCurrencyPanelProps {
   selectedRecipient: NewPaymentForm['selectedRecipient'];
+  /** Source account currency for the "You send" figure. */
+  sourceCurrency: NewPaymentForm['sourceCurrency'];
   amountMinor: NewPaymentForm['amountMinor'];
   fx: NewPaymentForm['fx'];
   fxAcknowledged: NewPaymentForm['fxAcknowledged'];
@@ -14,6 +14,7 @@ interface CrossCurrencyPanelProps {
 /** Non-blocking cross-currency banner + converted amount, confirmed before send (US-CW-008 AC-06). */
 export function CrossCurrencyPanel({
   selectedRecipient,
+  sourceCurrency,
   amountMinor,
   fx,
   fxAcknowledged,
@@ -32,7 +33,10 @@ export function CrossCurrencyPanel({
               You send
             </Text>
             <Text as="span" size="mono">
-              {amountMinor !== null ? formatUsd(amountMinor) : '—'} USD
+              {amountMinor !== null
+                ? formatMoneyValue({ amountMinorUnits: amountMinor, currency: sourceCurrency })
+                : '—'}{' '}
+              {sourceCurrency}
             </Text>
           </div>
           <div className="flex justify-between py-1">
@@ -40,7 +44,7 @@ export function CrossCurrencyPanel({
               Exchange rate
             </Text>
             <Text as="span" size="mono">
-              1 USD = {fx.data.rate.rate} {fx.data.rate.toCurrency}
+              1 {sourceCurrency} = {fx.data.rate.rate} {fx.data.rate.toCurrency}
             </Text>
           </div>
           <div className="flex justify-between py-1">
@@ -48,15 +52,14 @@ export function CrossCurrencyPanel({
               Recipient gets
             </Text>
             <Text as="span" size="mono" weight="semibold">
-              {formatMoney(toMajorUnits(fx.data.convertedAmount), fx.data.convertedAmount.currency)}{' '}
-              {fx.data.convertedAmount.currency}
+              {formatMoneyValue(fx.data.convertedAmount)} {fx.data.convertedAmount.currency}
             </Text>
           </div>
           <label className="mt-2 flex items-center gap-2">
-            <input
-              type="checkbox"
+            <Checkbox
+              aria-label="Confirm converted amount"
               checked={fxAcknowledged}
-              onChange={(e) => onFxAcknowledgedChange(e.target.checked)}
+              onCheckedChange={onFxAcknowledgedChange}
             />
             <Text as="span" size="label">
               Confirm converted amount

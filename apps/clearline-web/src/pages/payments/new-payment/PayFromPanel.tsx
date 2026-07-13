@@ -1,5 +1,4 @@
-import { Icon, Text } from '@clearline/ui';
-import { formatUsd } from './format';
+import { Icon, Text, formatMoneyValue } from '@clearline/ui';
 import type { NewPaymentForm } from './use-new-payment-form';
 
 /** The read-only "Pay from" row — a derived ledger projection with no input affordance (US-CW-008). */
@@ -32,7 +31,7 @@ export function PayFromPanel({ source }: { source: NewPaymentForm['source'] }) {
           </span>
           {source ? (
             <Text as="div" size="mono" weight="semibold" className="tabular-nums">
-              {formatUsd(source.availableBalance.amountMinorUnits)}
+              {formatMoneyValue(source.availableBalance)}
             </Text>
           ) : (
             <div className="cl-skeleton ml-auto h-[16px] w-[70px] rounded" aria-hidden="true" />

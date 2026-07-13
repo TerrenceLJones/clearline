@@ -1,9 +1,12 @@
-import { Icon, Text, TextField } from '@clearline/ui';
+import { Select, Text, TextField } from '@clearline/ui';
+import { paymentMethodOptions } from './payment-methods';
 import type { NewPaymentForm } from './use-new-payment-form';
 
 interface AmountMethodFieldsProps {
   amountInput: NewPaymentForm['amountInput'];
   method: NewPaymentForm['method'];
+  /** Source account currency — drives the currency-aware method fees. */
+  sourceCurrency: string;
   activeError: NewPaymentForm['activeError'];
   onAmountChange: NewPaymentForm['changeAmount'];
   onMethodChange: NewPaymentForm['setMethod'];
@@ -13,6 +16,7 @@ interface AmountMethodFieldsProps {
 export function AmountMethodFields({
   amountInput,
   method,
+  sourceCurrency,
   activeError,
   onAmountChange,
   onMethodChange,
@@ -34,20 +38,12 @@ export function AmountMethodFields({
         <Text as="div" size="label" tone="muted" className="mb-1.5">
           Method
         </Text>
-        <div className="relative">
-          <select
-            aria-label="Method"
-            value={method}
-            onChange={(e) => onMethodChange(e.target.value as 'ach' | 'wire')}
-            className="border-cl-border-2 bg-cl-surface text-cl-text focus:border-cl-accent focus:ring-cl-accent-weak w-full cursor-pointer appearance-none rounded-lg border py-[11px] pr-9 pl-3.5 text-[13px] outline-none focus:ring-3"
-          >
-            <option value="ach">ACH</option>
-            <option value="wire">Wire</option>
-          </select>
-          <span className="text-cl-text-3 pointer-events-none absolute inset-y-0 right-3 flex items-center">
-            <Icon name="chevron-down" size={12} />
-          </span>
-        </div>
+        <Select
+          aria-label="Method"
+          value={method}
+          onValueChange={(value) => onMethodChange(value as NewPaymentForm['method'])}
+          options={paymentMethodOptions(sourceCurrency)}
+        />
       </div>
     </div>
   );

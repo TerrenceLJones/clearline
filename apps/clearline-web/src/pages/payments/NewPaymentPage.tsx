@@ -1,6 +1,5 @@
-import { AccessDenied, ConfirmationDialog, Text } from '@clearline/ui';
+import { AccessDenied, ConfirmationDialog, Text, formatMoneyValue } from '@clearline/ui';
 import { usePageTitle } from '../../hooks/usePageTitle';
-import { formatUsd } from './new-payment/format';
 import { AmountMethodFields } from './new-payment/AmountMethodFields';
 import { CrossCurrencyPanel } from './new-payment/CrossCurrencyPanel';
 import { MemoField } from './new-payment/MemoField';
@@ -55,6 +54,7 @@ export function NewPaymentPage() {
             <AmountMethodFields
               amountInput={form.amountInput}
               method={form.method}
+              sourceCurrency={form.sourceCurrency}
               activeError={form.activeError}
               onAmountChange={form.changeAmount}
               onMethodChange={form.setMethod}
@@ -65,6 +65,7 @@ export function NewPaymentPage() {
             {form.isCrossCurrency ? (
               <CrossCurrencyPanel
                 selectedRecipient={form.selectedRecipient}
+                sourceCurrency={form.sourceCurrency}
                 amountMinor={form.amountMinor}
                 fx={form.fx}
                 fxAcknowledged={form.fxAcknowledged}
@@ -83,6 +84,7 @@ export function NewPaymentPage() {
           {/* ── Right: the derived Review summary ─────────────────────────────── */}
           <ReviewSummary
             method={form.method}
+            currency={form.sourceCurrency}
             amountMinor={form.amountMinor}
             projectedBalanceMinor={form.projectedBalanceMinor}
             isPending={form.isPending}
@@ -96,9 +98,14 @@ export function NewPaymentPage() {
       <ConfirmationDialog
         open={form.confirmOpen}
         onOpenChange={form.setConfirmOpen}
-        title={`Send ${form.amountMinor !== null ? formatUsd(form.amountMinor) : ''} to ${
-          form.selectedRecipient?.name ?? 'this recipient'
-        }?`}
+        title={`Send ${
+          form.amountMinor !== null
+            ? formatMoneyValue({
+                amountMinorUnits: form.amountMinor,
+                currency: form.sourceCurrency,
+              })
+            : ''
+        } to ${form.selectedRecipient?.name ?? 'this recipient'}?`}
         body="This transfers funds immediately and can't be undone. Recovering it would require a reversing entry."
         confirmLabel="Send payment"
         onConfirm={form.onConfirm}

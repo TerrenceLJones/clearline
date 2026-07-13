@@ -1,26 +1,22 @@
 import type { Money, PaymentErrorCode } from '@clearline/contracts';
-import { toMajorUnits } from '@clearline/money';
-import { formatMoney } from '@clearline/ui';
+import { toMinorUnits } from '@clearline/money';
+import { formatMoneyValue } from '@clearline/ui';
 
 /**
- * Parses a user-typed dollar amount into USD minor units (cents), tolerating `$`, commas and
+ * Parses a user-typed amount into the given currency's minor units, tolerating `$`, commas and
  * surrounding whitespace. Returns null for anything that isn't a positive number, so the form can
- * keep the submit blocked without a network call.
+ * keep the submit blocked without a network call. Conversion is currency-aware via `toMinorUnits`
+ * (JPY has 0 minor-unit decimals, BHD 3), not a hardcoded ×100; `currency` defaults to USD.
  */
-export function parseAmountToMinorUnits(input: string): number | null {
+export function parseAmountToMinorUnits(input: string, currency: string = 'USD'): number | null {
   // Strip formatting the user may have typed: dollar sign, thousands commas, whitespace.
   const cleaned = input.replace(/[$,\s]/g, '');
   // Reject empty input or anything that isn't plain digits with an optional single decimal point.
   if (cleaned === '' || !/^\d*\.?\d*$/.test(cleaned)) return null;
-  const dollars = Number(cleaned);
+  const amount = Number(cleaned);
   // Guard against NaN and non-positive amounts (e.g. a bare "." or "0").
-  if (!Number.isFinite(dollars) || dollars <= 0) return null;
-  // Convert dollars to cents, rounding to avoid floating-point drift (e.g. 19.99 * 100).
-  return Math.round(dollars * 100);
-}
-
-function formatMoneyAmount(money: Money): string {
-  return formatMoney(toMajorUnits(money), money.currency);
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+  return toMinorUnits(amount, currency);
 }
 
 /**
@@ -35,11 +31,11 @@ export function messageForPaymentError(
   switch (reason) {
     case 'insufficient_balance':
       return `You don't have enough available balance for this transfer.${
-        detail.availableBalance ? ` Available: ${formatMoneyAmount(detail.availableBalance)}.` : ''
+        detail.availableBalance ? ` Available: ${formatMoneyValue(detail.availableBalance)}.` : ''
       }`;
     case 'daily_limit_exceeded':
       return `This exceeds your daily transfer limit${
-        detail.dailyLimit ? ` of ${formatMoneyAmount(detail.dailyLimit)}` : ''
+        detail.dailyLimit ? ` of ${formatMoneyValue(detail.dailyLimit)}` : ''
       }. Request a higher limit or enter a smaller amount.`;
     case 'recipient_not_found':
       return "We couldn't find that recipient account. Check the details and try again.";

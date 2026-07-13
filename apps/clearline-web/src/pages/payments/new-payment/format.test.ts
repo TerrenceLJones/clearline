@@ -1,16 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { arrivalEstimate, formatUsd, initialsFor } from './format';
-
-describe('formatUsd', () => {
-  it('formats minor units (cents) as a USD string', () => {
-    expect(formatUsd(500_000)).toBe('$5,000.00');
-    expect(formatUsd(300_050)).toBe('$3,000.50');
-  });
-
-  it('formats zero', () => {
-    expect(formatUsd(0)).toBe('$0.00');
-  });
-});
+import { arrivalEstimate, initialsFor } from './format';
 
 describe('arrivalEstimate', () => {
   it('quotes a couple of business days for ACH and same day for a wire', () => {

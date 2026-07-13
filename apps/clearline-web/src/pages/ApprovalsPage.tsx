@@ -1,7 +1,6 @@
-import type { ApprovalErrorCode, ApprovalQueueItem, Money } from '@clearline/contracts';
+import type { ApprovalErrorCode, ApprovalQueueItem } from '@clearline/contracts';
 import { canApprove } from '@clearline/domain-auth';
-import { toMajorUnits } from '@clearline/money';
-import { AccessDenied, Button, EmptyState, Icon, Text, formatMoney } from '@clearline/ui';
+import { AccessDenied, Button, EmptyState, Icon, Text, formatMoneyValue } from '@clearline/ui';
 import { useAuthorization, useSession } from '@clearline/data-access-auth';
 import {
   ApprovalsForbiddenError,
@@ -13,11 +12,6 @@ import {
 } from '@clearline/data-access-approvals';
 /** Queue table columns: Employee · category | Date | Amount | Action. */
 const COLS = '1.7fr 0.8fr 0.9fr 1.6fr';
-
-/** Adapts a minor-units Money to the shared major-units formatter, so currency/locale rules stay in one place. */
-function formatMoneyAmount(money: Money): string {
-  return formatMoney(toMajorUnits(money), money.currency);
-}
 
 /** "2026-06-28" → "Jun 28" to match the queue table's date column, without pulling in a date lib. */
 function formatSubmittedDate(iso: string): string {
@@ -31,7 +25,7 @@ function reasonText(reason: ApprovalErrorCode, approvalLimit: number | null): st
     case 'self_approval_blocked':
       return "You can't approve your own expense. It needs another approver.";
     case 'approval_limit_exceeded':
-      return `This exceeds your approval limit of ${formatMoneyAmount({
+      return `This exceeds your approval limit of ${formatMoneyValue({
         amountMinorUnits: approvalLimit ?? 0,
         currency: 'USD',
       })}. Route it to a Controller for approval.`;
@@ -74,7 +68,7 @@ export function ApprovalsPage() {
             <Text as="span" size="mono" weight="semibold" tone="default">
               {approvalLimit === null
                 ? 'Unlimited'
-                : formatMoneyAmount({ amountMinorUnits: approvalLimit, currency: 'USD' })}
+                : formatMoneyValue({ amountMinorUnits: approvalLimit, currency: 'USD' })}
             </Text>
           </Text>
         </div>
@@ -167,7 +161,7 @@ export function ApprovalsPage() {
                   tone="default"
                   className="pt-0.5 text-right"
                 >
-                  {formatMoneyAmount(item.amount)}
+                  {formatMoneyValue(item.amount)}
                 </Text>
                 <div className="flex items-center justify-end gap-2">
                   {/* Over-limit keeps its full limit sentence as a screen-reader node (the visible

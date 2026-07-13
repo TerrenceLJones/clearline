@@ -6,5 +6,10 @@
     "types": ["vite/client", "@testing-library/jest-dom"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "references": [{ "path": "../icons" }, { "path": "../design-tokens" }]
+  "references": [
+    { "path": "../icons" },
+    { "path": "../design-tokens" },
+    { "path": "../contracts" },
+    { "path": "../util/money" }
+  ]
 }

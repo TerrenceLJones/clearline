@@ -54,7 +54,8 @@ export function useNewPaymentForm() {
   const source = context.data?.source;
   const recipients = context.data?.recipients ?? [];
   const selectedRecipient = recipients.find((r) => r.id === recipientId);
-  const amountMinor = parseAmountToMinorUnits(amountInput);
+  const sourceCurrency = source?.currency ?? 'USD';
+  const amountMinor = parseAmountToMinorUnits(amountInput, sourceCurrency);
   const isCrossCurrency = !!selectedRecipient && selectedRecipient.currency !== 'USD';
 
   const fx = useExchangeRate('USD', selectedRecipient?.currency ?? 'USD', amountMinor ?? 0, {
@@ -218,6 +219,7 @@ export function useNewPaymentForm() {
     forbidden: context.error instanceof PaymentsForbiddenError,
     // Data
     source,
+    sourceCurrency,
     recipients,
     selectedRecipient,
     amountMinor,

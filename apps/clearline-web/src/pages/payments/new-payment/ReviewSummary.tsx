@@ -1,9 +1,11 @@
-import { Button, Text } from '@clearline/ui';
-import { arrivalEstimate, formatUsd } from './format';
+import { Button, Text, formatMoneyValue } from '@clearline/ui';
+import { arrivalEstimate } from './format';
 import type { NewPaymentForm } from './use-new-payment-form';
 
 interface ReviewSummaryProps {
   method: NewPaymentForm['method'];
+  /** Source account currency — every figure here is a source-side amount. */
+  currency: NewPaymentForm['sourceCurrency'];
   amountMinor: NewPaymentForm['amountMinor'];
   projectedBalanceMinor: NewPaymentForm['projectedBalanceMinor'];
   isPending: NewPaymentForm['isPending'];
@@ -15,6 +17,7 @@ interface ReviewSummaryProps {
 /** The derived Review summary — fees, arrival, total debit and the projected post-payment balance. */
 export function ReviewSummary({
   method,
+  currency,
   amountMinor,
   projectedBalanceMinor,
   isPending,
@@ -22,6 +25,8 @@ export function ReviewSummary({
   idempotencyKey,
   onReview,
 }: ReviewSummaryProps) {
+  const fmt = (minorUnits: number): string =>
+    formatMoneyValue({ amountMinorUnits: minorUnits, currency });
   return (
     <div className="border-cl-border bg-cl-surface flex flex-[0.9] flex-col border-t p-6 md:border-t-0 md:border-l">
       <Text as="div" size="label" weight="semibold" tone="muted" className="mb-4">
@@ -33,7 +38,7 @@ export function ReviewSummary({
           Amount
         </Text>
         <Text as="span" size="body" weight="medium" className="font-mono tabular-nums">
-          {amountMinor !== null ? formatUsd(amountMinor) : '—'}
+          {amountMinor !== null ? fmt(amountMinor) : '—'}
         </Text>
       </div>
       <div className="flex justify-between py-1.5">
@@ -41,7 +46,7 @@ export function ReviewSummary({
           {method === 'ach' ? 'ACH' : 'Wire'} fee
         </Text>
         <Text as="span" size="body" weight="medium" className="font-mono tabular-nums">
-          {formatUsd(0)}
+          {fmt(0)}
         </Text>
       </div>
       <div className="flex justify-between py-1.5">
@@ -60,13 +65,13 @@ export function ReviewSummary({
           Total debit
         </Text>
         <Text as="span" size="body" weight="semibold" className="font-mono tabular-nums">
-          {amountMinor !== null ? formatUsd(amountMinor) : '—'}
+          {amountMinor !== null ? fmt(amountMinor) : '—'}
         </Text>
       </div>
       <Text as="div" size="label" tone="faint" className="mb-5 leading-relaxed">
         Balance after this payment:{' '}
         <span className="font-mono">
-          {projectedBalanceMinor !== null ? formatUsd(projectedBalanceMinor) : '—'}
+          {projectedBalanceMinor !== null ? fmt(projectedBalanceMinor) : '—'}
         </span>{' '}
         (derived).
       </Text>

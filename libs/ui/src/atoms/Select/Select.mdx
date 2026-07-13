@@ -1,0 +1,40 @@
+import { Meta, Stories } from '@storybook/addon-docs/blocks';
+import * as SelectStories from './Select.stories';
+
+<Meta of={SelectStories} />
+
+# Select
+
+A single-select dropdown built on Radix `Select` — listbox semantics, keyboard navigation,
+typeahead, focus management and ARIA wiring come from the primitive rather than being hand-rolled.
+Unlike a native `<select>`, each option renders a rich row (label + description + trailing meta),
+disabled options stay visible with their reason, and the chosen row carries a check. The closed
+trigger echoes only the selected option's `label`.
+
+## User story
+
+**US-CW-023 — Component library — atoms & foundations**
+
+As a clearline-web engineer, I want a typed, accessible Select available as a React component, so
+that I never hand-roll a `<select>` (or a bespoke popover) and risk missing the keyboard, focus, or
+ARIA behavior the design system already solved — e.g. the New Payment "Method" listbox.
+
+## Options
+
+Each `SelectOption` describes one row:
+
+- `value` / `label` — the emitted value and the primary text (the only part echoed into the trigger).
+- `description` — a secondary line beneath the label (e.g. "Standard rail · arrives in 1–2 business days").
+- `meta` — trailing content on the label row, e.g. a currency-formatted fee. Keep it currency-aware
+  by formatting with `formatMoneyValue` rather than assuming a symbol/decimals.
+- `disabled` + `disabledMeta` — a non-selectable row kept visible with its reason, so the option
+  set reads complete rather than hiding capability.
+- `separatorBefore` — draws a divider above the row (e.g. to fence off disabled options).
+
+## Acceptance criteria
+
+- **AC-08 — Select.** Given a `Select` with an option marked `disabled`, when opened, then that
+  option renders with `aria-disabled="true"` and cannot be chosen; and choosing an enabled option
+  calls `onValueChange` with its `value` and updates the trigger to that option's `label`.
+
+<Stories />

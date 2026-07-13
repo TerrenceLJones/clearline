@@ -56,11 +56,14 @@ export function useNewPaymentForm() {
   const selectedRecipient = recipients.find((r) => r.id === recipientId);
   const sourceCurrency = source?.currency ?? 'USD';
   const amountMinor = parseAmountToMinorUnits(amountInput, sourceCurrency);
-  const isCrossCurrency = !!selectedRecipient && selectedRecipient.currency !== 'USD';
+  const isCrossCurrency = !!selectedRecipient && selectedRecipient.currency !== sourceCurrency;
 
-  const fx = useExchangeRate('USD', selectedRecipient?.currency ?? 'USD', amountMinor ?? 0, {
-    enabled: isCrossCurrency && (amountMinor ?? 0) > 0,
-  });
+  const fx = useExchangeRate(
+    sourceCurrency,
+    selectedRecipient?.currency ?? sourceCurrency,
+    amountMinor ?? 0,
+    { enabled: isCrossCurrency && (amountMinor ?? 0) > 0 },
+  );
 
   // Persist the draft (incl. the idempotency key) on every change, so a mid-submission session
   // timeout and redirect can rehydrate it on return (AC-06).
@@ -136,7 +139,9 @@ export function useNewPaymentForm() {
     if (isCrossCurrency && !fxAcknowledged) {
       return {
         field: 'amount',
-        message: 'Review and confirm the converted amount before sending.',
+        message: fx.isError
+          ? "We couldn't fetch the exchange rate. Retry to see the converted amount before sending."
+          : 'Review and confirm the converted amount before sending.',
       };
     }
     return null;
@@ -150,7 +155,7 @@ export function useNewPaymentForm() {
 
   function buildRequest(): CreatePaymentRequest {
     return {
-      amount: { amountMinorUnits: amountMinor ?? 0, currency: 'USD' },
+      amount: { amountMinorUnits: amountMinor ?? 0, currency: sourceCurrency },
       method,
       ...(memo ? { memo } : {}),
       ...(manualMode

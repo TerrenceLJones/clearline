@@ -194,6 +194,38 @@ describe('NewPaymentPage — cross-currency (US-CW-008 AC-06)', () => {
     await user.click(screen.getByRole('button', { name: /review & send/i }));
     expect(await screen.findByText(/to Globex GmbH\?/)).toBeInTheDocument();
   });
+
+  it('surfaces a retryable error when the FX quote fails, rather than a silent dead-end', async () => {
+    renderPage();
+    const user = userEvent.setup();
+    // The rate endpoint fails — without an error state this would leave the payment un-sendable.
+    server.use(http.get('*/api/payments/fx', () => new HttpResponse(null, { status: 500 })));
+
+    await user.click(await screen.findByRole('button', { name: /Globex GmbH/i }));
+    await user.type(screen.getByLabelText('Amount'), '5000');
+
+    // An actionable error with a Retry — not a missing checkbox and a contradictory prompt.
+    expect(await screen.findByText(/couldn't fetch the exchange rate/i)).toBeInTheDocument();
+    const retry = screen.getByRole('button', { name: /^retry$/i });
+    expect(screen.queryByLabelText(/confirm converted amount/i)).not.toBeInTheDocument();
+
+    // Send stays blocked with a message that points at the retry, not at a nonexistent amount.
+    await user.click(screen.getByRole('button', { name: /review & send/i }));
+    expect(await screen.findByText(/retry to see the converted amount/i)).toBeInTheDocument();
+    expect(screen.queryByText(/to Globex GmbH\?/)).not.toBeInTheDocument();
+
+    // Recovery: the endpoint returns, retry fetches the quote, and the converted amount appears.
+    server.use(
+      http.get('*/api/payments/fx', () =>
+        HttpResponse.json({
+          rate: { fromCurrency: 'USD', toCurrency: 'EUR', rate: 0.918 },
+          convertedAmount: { amountMinorUnits: 459_000, currency: 'EUR' },
+        }),
+      ),
+    );
+    await user.click(retry);
+    expect(await screen.findByText(/€4,590\.00/)).toBeInTheDocument();
+  });
 });
 
 describe('NewPaymentPage — session-expiry preservation (US-CW-007 AC-06)', () => {

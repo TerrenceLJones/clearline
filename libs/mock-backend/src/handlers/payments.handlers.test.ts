@@ -120,6 +120,16 @@ describe('POST /api/payments', () => {
     expect(response.status).toBe(422);
     expect(await response.json()).toEqual({ error: 'recipient_closed' });
   });
+
+  it('rejects a non-positive amount the client would never submit (server boundary)', async () => {
+    const token = await login();
+    const response = await pay(
+      { ...acme, amount: { amountMinorUnits: 0, currency: 'USD' } },
+      token,
+    );
+    expect(response.status).toBe(422);
+    expect(await response.json()).toEqual({ error: 'invalid_amount' });
+  });
 });
 
 describe('GET /api/payments/:id', () => {
@@ -135,6 +145,17 @@ describe('GET /api/payments/:id', () => {
       headers: { authorization: `Bearer ${token}` },
     });
     expect(missing.status).toBe(404);
+  });
+
+  it('returns 401 without a token and 403 for a role lacking payments:create', async () => {
+    expect((await fetch(`${ORIGIN}/api/payments/pi_settled`)).status).toBe(401);
+    const token = await login();
+    authService.setUserRole(user!.email, { role: 'employee', approvalLimit: null });
+    const response = await fetch(`${ORIGIN}/api/payments/pi_settled`, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({ error: 'forbidden' });
   });
 });
 
@@ -162,5 +183,15 @@ describe('GET /api/payments/fx', () => {
       headers: { authorization: `Bearer ${token}` },
     });
     expect(unsupported.status).toBe(404);
+  });
+
+  it('returns 401 without a token and 403 for a role lacking payments:create', async () => {
+    const url = `${ORIGIN}/api/payments/fx?from=USD&to=EUR&amount=500000`;
+    expect((await fetch(url)).status).toBe(401);
+    const token = await login();
+    authService.setUserRole(user!.email, { role: 'employee', approvalLimit: null });
+    const response = await fetch(url, { headers: { authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({ error: 'forbidden' });
   });
 });

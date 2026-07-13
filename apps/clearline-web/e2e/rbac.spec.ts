@@ -64,6 +64,21 @@ test('an Employee navigating directly to /approvals hits the access-denied page 
   await expect(page.getByText('403 Forbidden · GET /api/approvals')).toBeVisible();
 });
 
+test('an Employee cannot see or reach Payments (EPIC-CW-004)', async ({ page, mockBackend }) => {
+  await mockBackend.simulateRoleChangeForE2E(DEMO_EMAIL, { role: 'employee', approvalLimit: null });
+  await signIn(page);
+
+  // The Payments nav item is capability-gated on payments:create, which an Employee lacks.
+  const nav = page.getByRole('navigation', { name: 'Main' });
+  await expect(nav.getByText('Payments')).toHaveCount(0);
+
+  // The route is guarded independently of the nav — a direct navigation hits the access-denied
+  // surface, not a UI-only gate, and the server would reject GET /api/payments/context with a 403.
+  await navigateSpa(page, '/payments/new');
+  await expect(page.getByText("You don't have access to this")).toBeVisible();
+  await expect(page.getByText('403 Forbidden · GET /api/payments/context')).toBeVisible();
+});
+
 test('a mid-session downgrade shows the access-changed banner and hides manager nav (AC-05)', async ({
   page,
   mockBackend,

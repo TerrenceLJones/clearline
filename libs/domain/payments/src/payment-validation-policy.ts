@@ -1,5 +1,15 @@
 import type { PaymentErrorCode, RecipientAccountStatus } from '@clearline/contracts';
 
+/**
+ * True when the amount is a well-formed transfer figure: a positive integer number of minor units.
+ * Rejects zero, negatives, fractional minor units, `NaN`, and `Infinity` — a malformed amount the
+ * client's `parseAmountToMinorUnits` already blocks, re-checked here so the server boundary can't be
+ * bypassed into a $0/negative transfer.
+ */
+export function isValidAmount(amountMinorUnits: number): boolean {
+  return Number.isInteger(amountMinorUnits) && amountMinorUnits > 0;
+}
+
 /** True when the amount (minor units) is at or below the available balance. */
 export function hasSufficientBalance(
   availableBalanceMinorUnits: number,
@@ -38,18 +48,27 @@ export type PaymentValidationResult =
       ok: false;
       reason: Extract<
         PaymentErrorCode,
-        'insufficient_balance' | 'daily_limit_exceeded' | 'recipient_closed' | 'self_transfer'
+        | 'invalid_amount'
+        | 'insufficient_balance'
+        | 'daily_limit_exceeded'
+        | 'recipient_closed'
+        | 'self_transfer'
       >;
     };
 
 /**
  * The single gate every payment passes through, run client-side to pre-block and server-side to
  * independently reject — the same canApprove pattern (US-CW-006). Checks run in priority order so the
- * caller surfaces the most fundamental reason first: paying the wrong account at all (self-transfer,
- * closed recipient) outranks whether the payer can afford it (balance, then daily limit). The client
- * is never the security boundary — the server re-runs this on submit regardless of what the UI showed.
+ * caller surfaces the most fundamental reason first: a malformed amount (not a payment at all) outranks
+ * paying the wrong account (self-transfer, closed recipient), which outranks whether the payer can
+ * afford it (balance, then daily limit). The client is never the security boundary — the server re-runs
+ * this on submit regardless of what the UI showed.
  */
 export function validatePayment(input: PaymentValidationInput): PaymentValidationResult {
+  // A malformed amount isn't a payment at all — checked before who's being paid or affordability.
+  if (!isValidAmount(input.amountMinorUnits)) {
+    return { ok: false, reason: 'invalid_amount' };
+  }
   if (input.isSelfTransfer) {
     return { ok: false, reason: 'self_transfer' };
   }

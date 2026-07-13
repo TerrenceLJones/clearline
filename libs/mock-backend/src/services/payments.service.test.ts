@@ -184,6 +184,34 @@ describe('PaymentsService.reverse — append-only reversal (US-CW-009 AC-02)', (
     expect(service.reverse('pi_missing')).toEqual({ outcome: 'not_found' });
   });
 
+  it('returns the debited funds to the available balance when a payment is reversed', () => {
+    const service = new PaymentsService();
+    const before = service.getContext().source.availableBalance.amountMinorUnits;
+
+    const created = service.createPayment(request({ amount: usd(500_000) }), 'key-1', authorized);
+    if (created.outcome !== 'ok') throw new Error('setup failed');
+    expect(service.getContext().source.availableBalance.amountMinorUnits).toBe(before - 500_000);
+
+    service.reverse(created.intent.id);
+    // The reversal returns exactly what was debited — no more, no less.
+    expect(service.getContext().source.availableBalance.amountMinorUnits).toBe(before);
+  });
+
+  it('does not credit the balance or fabricate an original entry for an intent with no posted debit', () => {
+    const service = new PaymentsService();
+    // pi_unrecognized is seeded without an originalEntryId, so it has no debit entry in the ledger.
+    const before = service.getContext().source.availableBalance.amountMinorUnits;
+
+    const result = service.reverse('pi_unrecognized');
+    expect(result.outcome).toBe('ok');
+    if (result.outcome !== 'ok') return;
+    // No funds were ever debited, so none are conjured back...
+    expect(service.getContext().source.availableBalance.amountMinorUnits).toBe(before);
+    // ...and we never invent a ledger id that isn't in the ledger.
+    expect(result.intent.originalEntryId).toBeUndefined();
+    expect(service.getLedger().some((e) => e.id === 'pi_unrecognized:debit')).toBe(false);
+  });
+
   it('reverses a pre-seeded settled payment against its seeded original ledger entry', () => {
     const service = new PaymentsService();
     // The seeded settled intent already has its immutable original debit entry in the ledger.

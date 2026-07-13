@@ -107,6 +107,7 @@ export interface PaymentIntentResponse {
  * independently re-checks even though the client pre-blocks them (the client is never the boundary).
  */
 export type PaymentErrorCode =
+  | 'invalid_amount'
   | 'insufficient_balance'
   | 'daily_limit_exceeded'
   | 'recipient_not_found'

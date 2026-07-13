@@ -57,6 +57,7 @@ export function createPaymentsHandlers(
     http.get('*/api/payments/fx', ({ request }) => {
       const actor = resolveActor(request, authService);
       if (!actor) return unauthorized();
+      if (!hasPermission(actor.permissions, 'payments:create')) return forbidden();
 
       const url = new URL(request.url);
       const from = url.searchParams.get('from') ?? '';
@@ -110,6 +111,7 @@ export function createPaymentsHandlers(
     http.get('*/api/payments/:id', ({ request, params }) => {
       const actor = resolveActor(request, authService);
       if (!actor) return unauthorized();
+      if (!hasPermission(actor.permissions, 'payments:create')) return forbidden();
 
       const intent = paymentsService.getIntent(String(params.id));
       if (!intent) return HttpResponse.json({ error: 'not_found' }, { status: 404 });

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   exceedsDailyLimit,
   hasSufficientBalance,
+  isValidAmount,
   validatePayment,
   type PaymentValidationInput,
 } from './payment-validation-policy';
@@ -17,6 +18,21 @@ function input(overrides: Partial<PaymentValidationInput> = {}): PaymentValidati
     ...overrides,
   };
 }
+
+describe('isValidAmount', () => {
+  it('accepts a positive integer number of minor units', () => {
+    expect(isValidAmount(1)).toBe(true);
+    expect(isValidAmount(500_000)).toBe(true);
+  });
+
+  it('rejects zero, negative, fractional, NaN, and Infinity amounts', () => {
+    expect(isValidAmount(0)).toBe(false);
+    expect(isValidAmount(-100)).toBe(false);
+    expect(isValidAmount(100.5)).toBe(false);
+    expect(isValidAmount(Number.NaN)).toBe(false);
+    expect(isValidAmount(Number.POSITIVE_INFINITY)).toBe(false);
+  });
+});
 
 describe('hasSufficientBalance', () => {
   it('is true when the amount is at or below the available balance', () => {
@@ -43,6 +59,29 @@ describe('exceedsDailyLimit', () => {
 describe('validatePayment', () => {
   it('allows a payment within balance and limit to an active, non-self recipient', () => {
     expect(validatePayment(input())).toEqual({ ok: true });
+  });
+
+  it('blocks a zero amount before any other check', () => {
+    expect(validatePayment(input({ amountMinorUnits: 0 }))).toEqual({
+      ok: false,
+      reason: 'invalid_amount',
+    });
+  });
+
+  it('blocks a negative amount even when it would otherwise fit the balance', () => {
+    // -100 <= balance and spent + (-100) <= limit, so the affordability checks would pass it through.
+    expect(validatePayment(input({ amountMinorUnits: -100 }))).toEqual({
+      ok: false,
+      reason: 'invalid_amount',
+    });
+  });
+
+  it('blocks an invalid amount before self-transfer and closed-recipient checks', () => {
+    expect(
+      validatePayment(
+        input({ amountMinorUnits: 0, isSelfTransfer: true, recipientStatus: 'closed' }),
+      ),
+    ).toEqual({ ok: false, reason: 'invalid_amount' });
   });
 
   it('blocks a self-transfer before any other check', () => {

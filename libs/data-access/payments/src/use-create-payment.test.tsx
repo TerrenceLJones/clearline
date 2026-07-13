@@ -1,5 +1,7 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { ReactNode } from 'react';
 import { delay, http, HttpResponse } from 'msw';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { registerMswServer } from '@clearline/mock-backend/test-factories';
 import { clearAccessToken, setAccessToken } from '@clearline/data-access-auth';
@@ -10,6 +12,7 @@ import {
   type CreatePaymentVariables,
 } from './use-create-payment';
 import { createQueryWrapper } from './test/create-query-wrapper';
+import { PAYMENTS_CONTEXT_QUERY_KEY } from './payments-query-key';
 
 const server = registerMswServer();
 const wrapper = createQueryWrapper({});
@@ -128,10 +131,12 @@ describe('useCreatePayment', () => {
     expect(new Set(keys)).toEqual(new Set([variables.idempotencyKey]));
   });
 
-  it('throws PaymentTimeoutError when the request exceeds the timeout (US-CW-007 AC-03)', async () => {
+  it('throws PaymentTimeoutError when the request exceeds the timeout and never resubmits (US-CW-007 AC-03)', async () => {
     setAccessToken('access_valid');
+    let calls = 0;
     server.use(
       http.post('*/api/payments', async () => {
+        calls += 1;
         await delay(500);
         return HttpResponse.json({ intent: pendingIntent });
       }),
@@ -145,5 +150,27 @@ describe('useCreatePayment', () => {
 
     await waitFor(() => expect(result.current.isError).toBe(true), { timeout: 3000 });
     expect(result.current.error).toBeInstanceOf(PaymentTimeoutError);
+    // The safety property: a slow network must hand off to polling, never turn into a duplicate
+    // payment — so the request is issued exactly once and the timeout is never retried.
+    expect(calls).toBe(1);
+  });
+
+  it('invalidates the payment context on success so the derived balance refetches after the debit', async () => {
+    setAccessToken('access_valid');
+    server.use(http.post('*/api/payments', () => HttpResponse.json({ intent: pendingIntent })));
+
+    // A shared client we can inspect, seeded with a stale context entry the debit should invalidate.
+    const queryClient = new QueryClient({ defaultOptions: {} });
+    queryClient.setQueryData(PAYMENTS_CONTEXT_QUERY_KEY, { source: {}, recipients: [] });
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+    const sharedWrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+
+    const { result } = renderHook(() => useCreatePayment(), { wrapper: sharedWrapper });
+    result.current.mutate(variables);
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: PAYMENTS_CONTEXT_QUERY_KEY });
   });
 });

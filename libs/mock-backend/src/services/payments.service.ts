@@ -206,6 +206,11 @@ export class PaymentsService {
     // Duplicate webhook delivery: already reversed → return the existing state, post no second entry.
     if (intent.status === 'reversed') return { outcome: 'ok', intent: { ...intent } };
 
+    // A reversal offsets the intent's real posted debit — it never fabricates a ledger id. An intent
+    // that never posted a debit (e.g. one still settling on the network) has no funds to return, so we
+    // record the reversal for audit but leave the balance untouched rather than crediting from nothing.
+    const originalDebit = this.ledger.find((e) => e.intentId === intentId && e.kind === 'debit');
+
     const createdDate = now();
     const reversingEntry: LedgerEntry = {
       id: this.nextId('jrn'),
@@ -223,18 +228,20 @@ export class PaymentsService {
       timestamp: createdDate,
     });
 
-    // The funds return to the account; the original debit entry is left byte-for-byte intact.
-    this.source.availableBalance = {
-      ...this.source.availableBalance,
-      amountMinorUnits:
-        this.source.availableBalance.amountMinorUnits + intent.amount.amountMinorUnits,
-    };
+    // The funds that were actually debited return to the account; the original debit is left intact.
+    if (originalDebit) {
+      this.source.availableBalance = {
+        ...this.source.availableBalance,
+        amountMinorUnits:
+          this.source.availableBalance.amountMinorUnits + originalDebit.amount.amountMinorUnits,
+      };
+    }
 
     const reversed: PaymentIntent = {
       ...intent,
       status: 'reversed',
       reversedDate: createdDate,
-      originalEntryId: intent.originalEntryId ?? `${intentId}:debit`,
+      ...(originalDebit ? { originalEntryId: originalDebit.id } : {}),
       reversingEntryId: reversingEntry.id,
     };
     this.intents.set(intentId, reversed);

@@ -1,3 +1,4 @@
+import { currencySymbol } from '@clearline/money';
 import { Select, Text, TextField } from '@clearline/ui';
 import { paymentMethodOptions } from './payment-methods';
 import type { NewPaymentForm } from './use-new-payment-form';
@@ -27,7 +28,7 @@ export function AmountMethodFields({
         <TextField
           label="Amount"
           inputMode="decimal"
-          prefix="$"
+          prefix={currencySymbol(sourceCurrency)}
           value={amountInput}
           onChange={(e) => onAmountChange(e.target.value)}
           state={activeError?.field === 'amount' ? 'error' : undefined}

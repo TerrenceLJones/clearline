@@ -44,6 +44,36 @@ test('submits a vendor payment (pessimistic pending), then reflects a reversal (
   await expect(page.getByText(/The funds were returned to your account/)).toBeVisible();
 });
 
+test('sends a cross-currency payment only after the converted amount is acknowledged (US-CW-008 AC-06)', async ({
+  page,
+}) => {
+  await signIn(page);
+  await page.getByRole('navigation', { name: 'Main' }).getByText('Payments').click();
+
+  // Globex is a EUR recipient — choosing it surfaces the cross-currency banner and a live quote
+  // (5,000 USD × 0.918 = €4,590.00 at the seeded rate).
+  await page.getByRole('button', { name: /Globex GmbH/ }).click();
+  await page.getByLabel('Amount').fill('5000');
+  await expect(page.getByText(/This recipient uses EUR/)).toBeVisible();
+  await expect(page.getByText(/€4,590\.00/)).toBeVisible();
+
+  // Send is blocked until the converted amount is confirmed — no dialog opens.
+  await page.getByRole('button', { name: /Review & send/ }).click();
+  await expect(
+    page.getByText('Review and confirm the converted amount before sending.'),
+  ).toBeVisible();
+  await expect(page.getByText(/to Globex GmbH\?/)).toHaveCount(0);
+
+  // Acknowledge, then the pessimistic confirm dialog opens and the payment submits to a pending state.
+  await page.getByRole('checkbox', { name: 'Confirm converted amount' }).click();
+  await page.getByRole('button', { name: /Review & send/ }).click();
+  await expect(page.getByText(/to Globex GmbH\?/)).toBeVisible();
+  await page.getByRole('button', { name: 'Send payment' }).click();
+
+  await expect(page).toHaveURL(/\/payments\/pi_/);
+  await expect(page.getByText('Pending')).toBeVisible();
+});
+
 test('blocks a self-transfer before any network call (US-CW-008 AC-05)', async ({ page }) => {
   await signIn(page);
   await page.getByRole('navigation', { name: 'Main' }).getByText('Payments').click();

@@ -29,6 +29,8 @@ export function messageForPaymentError(
   detail: { availableBalance?: Money; dailyLimit?: Money } = {},
 ): string {
   switch (reason) {
+    case 'invalid_amount':
+      return 'Enter an amount greater than $0.';
     case 'insufficient_balance':
       return `You don't have enough available balance for this transfer.${
         detail.availableBalance ? ` Available: ${formatMoneyValue(detail.availableBalance)}.` : ''

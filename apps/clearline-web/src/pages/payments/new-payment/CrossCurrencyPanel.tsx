@@ -26,6 +26,22 @@ export function CrossCurrencyPanel({
         tone="info"
         title={`This recipient uses ${selectedRecipient?.currency}. Review the converted amount before sending.`}
       />
+      {fx.isError ? (
+        <div className="mt-3">
+          <Alert
+            tone="negative"
+            title="We couldn't fetch the exchange rate."
+            message="You'll need the converted amount before you can send. Try again."
+            action="Retry"
+            onAction={() => void fx.refetch()}
+          />
+        </div>
+      ) : null}
+      {fx.isLoading && !fx.isError ? (
+        <Text as="p" size="label" tone="muted" className="mt-3">
+          Fetching the latest rate…
+        </Text>
+      ) : null}
       {fx.data ? (
         <div className="border-cl-border bg-cl-surface mt-3 rounded-lg border p-3">
           <div className="flex justify-between py-1">

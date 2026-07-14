@@ -2,7 +2,7 @@ import { useEffect, useId, useState } from 'react';
 import { Icon } from '../../foundations/Icon';
 import { Text } from '../../atoms/Text';
 import { useDisabledGuard } from '../../utils/useDisabledGuard';
-import { ModalShell } from '../ModalShell';
+import { Modal } from '../Modal';
 
 export interface ConfirmationDialogProps {
   open: boolean;
@@ -47,23 +47,23 @@ export function ConfirmationDialog({
   const guard = useDisabledGuard<HTMLButtonElement>(!armed, onConfirm);
 
   return (
-    <ModalShell open={open} onOpenChange={onOpenChange}>
+    <Modal open={open} onOpenChange={onOpenChange}>
       <div className="mb-3 flex items-center gap-2.75">
         <div className="bg-cl-warn-weak flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg">
           <Icon name="triangle-alert" size={17} className="text-cl-warn" />
         </div>
-        <ModalShell.Title asChild>
+        <Modal.Title asChild>
           <Text as="h2" size="heading" tone="default">
             {title}
           </Text>
-        </ModalShell.Title>
+        </Modal.Title>
       </div>
       {body ? (
-        <ModalShell.Description asChild>
+        <Modal.Description asChild>
           <Text as="p" size="label" weight="regular" tone="muted" className="mb-3.5">
             {body}
           </Text>
-        </ModalShell.Description>
+        </Modal.Description>
       ) : null}
       <Text
         as="div"
@@ -75,14 +75,14 @@ export function ConfirmationDialog({
         IRREVERSIBLE &middot; NO UNDO
       </Text>
       <div className="flex gap-2.5">
-        <ModalShell.Close asChild>
+        <Modal.Close asChild>
           <button
             type="button"
             className="border-cl-border-2 bg-cl-surface text-cl-text-2 flex-1 rounded-lg border px-4 py-2.5 text-[13px] font-medium"
           >
             Cancel <span className="text-cl-text-3 font-mono text-[10px]">Esc</span>
           </button>
-        </ModalShell.Close>
+        </Modal.Close>
         <button
           type="button"
           aria-disabled={guard['aria-disabled']}
@@ -98,6 +98,6 @@ export function ConfirmationDialog({
           Waiting a few seconds before this irreversible action can be confirmed.
         </span>
       )}
-    </ModalShell>
+    </Modal>
   );
 }

@@ -1,4 +1,4 @@
-import { Button, Icon, ModalShell, OtpInput, Text, formatMoneyValue } from '@clearline/ui';
+import { Button, Icon, Modal, OtpInput, Text, formatMoneyValue } from '@clearline/ui';
 import { STEP_UP_THRESHOLD_MINOR_UNITS } from '@clearline/domain-payments';
 import { messageForStepUpError } from './step-up-messages';
 import type { StepUpChallengeController } from './use-step-up-challenge';
@@ -43,17 +43,17 @@ export function StepUpChallengeEntry({ controller }: { controller: StepUpChallen
       <div className="bg-cl-accent-weak mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl">
         <Icon name="shield" size={20} className="text-cl-accent-text" />
       </div>
-      <ModalShell.Title asChild>
+      <Modal.Title asChild>
         <Text as="h2" size="heading" tone="default" className="mb-1">
           Verify it&apos;s you
         </Text>
-      </ModalShell.Title>
-      <ModalShell.Description asChild>
+      </Modal.Title>
+      <Modal.Description asChild>
         <Text as="p" size="label" tone="muted" className="mb-4 leading-relaxed">
           Enter the {otpLength}-digit code sent to {destinationMasked}. Required for transfers over{' '}
           {thresholdLabel}.
         </Text>
-      </ModalShell.Description>
+      </Modal.Description>
 
       {errorKind ? (
         <div

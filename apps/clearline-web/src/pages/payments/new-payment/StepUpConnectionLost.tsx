@@ -1,4 +1,4 @@
-import { Button, Icon, ModalShell, Text } from '@clearline/ui';
+import { Button, Icon, Modal, Text } from '@clearline/ui';
 import { messageForStepUpError } from './step-up-messages';
 
 interface StepUpConnectionLostProps {
@@ -17,25 +17,25 @@ export function StepUpConnectionLost({ isVerifying, onRetry }: StepUpConnectionL
       <div className="bg-cl-warn-weak mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl">
         <Icon name="triangle-alert" size={21} className="text-cl-warn" />
       </div>
-      <ModalShell.Title asChild>
+      <Modal.Title asChild>
         <Text as="h2" size="heading" tone="default" className="mb-1.5">
           Connection lost
         </Text>
-      </ModalShell.Title>
-      <ModalShell.Description asChild>
+      </Modal.Title>
+      <Modal.Description asChild>
         <Text as="p" size="label" tone="muted" className="mb-4 leading-relaxed">
           {messageForStepUpError('network')}
         </Text>
-      </ModalShell.Description>
+      </Modal.Description>
       <div className="flex gap-2.25">
-        <ModalShell.Close asChild>
+        <Modal.Close asChild>
           <button
             type="button"
             className="border-cl-border-2 bg-cl-surface text-cl-text-2 flex-1 rounded-lg border px-4 py-2.5 text-[13px] font-medium"
           >
             Cancel
           </button>
-        </ModalShell.Close>
+        </Modal.Close>
         <Button className="flex-[1.5]" fullWidth loading={isVerifying} onClick={onRetry}>
           Try again
         </Button>

@@ -1,4 +1,4 @@
-import { ModalShell } from '@clearline/ui';
+import { Modal } from '@clearline/ui';
 import { StepUpChallengeEntry } from './StepUpChallengeEntry';
 import { StepUpConnectionLost } from './StepUpConnectionLost';
 import type { StepUpChallengeController } from './use-step-up-challenge';
@@ -12,7 +12,7 @@ interface StepUpChallengeModalProps {
 
 /**
  * The step-up (3DS-style) challenge overlay for a high-value payment (US-CW-010). Built on the shared
- * `ModalShell` (focus-trap, Escape-to-close and ARIA), it picks between two faces: the OTP entry (with
+ * `Modal` (focus-trap, Escape-to-close and ARIA), it picks between two faces: the OTP entry (with
  * its wrong-code, expired, and resend states) and — when the request never reached the server — a
  * distinct "connection lost" recovery that is deliberately not an authentication-failure message
  * (AC-04 vs AC-07). Closing it without a successful verify is treated as abandonment by the caller.
@@ -23,7 +23,7 @@ export function StepUpChallengeModal({
   controller,
 }: StepUpChallengeModalProps) {
   return (
-    <ModalShell open={open} onOpenChange={onOpenChange} maxWidth={340} className="text-center">
+    <Modal open={open} onOpenChange={onOpenChange} maxWidth={340} className="text-center">
       {controller.errorKind === 'network' ? (
         <StepUpConnectionLost
           isVerifying={controller.isVerifying}
@@ -32,6 +32,6 @@ export function StepUpChallengeModal({
       ) : (
         <StepUpChallengeEntry controller={controller} />
       )}
-    </ModalShell>
+    </Modal>
   );
 }

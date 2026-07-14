@@ -2,6 +2,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import type { ActionsSection, DemoBeaconPageConfig, EntityRow } from '@clearline/demo-beacon';
 import { SEED_INTENTS } from '@clearline/mock-backend/fixtures';
 import { money, loadControls } from '../../dev/beacon/shared';
+import { resetSection } from '../../dev/beacon/global.beacon';
 
 const intentRows: EntityRow[] = SEED_INTENTS.map((i) => ({
   recipient: i.recipientName,
@@ -56,6 +57,7 @@ export function buildPaymentStatusBeacon(
         rowLink: (row) => `/payments/${row._id}`,
       },
       scenarios,
+      resetSection,
     ],
   };
 }

@@ -7,6 +7,7 @@ import {
   STEP_UP_THRESHOLD_MINOR_UNITS,
 } from '@clearline/mock-backend/fixtures';
 import { money } from '../../dev/beacon/shared';
+import { resetSection } from '../../dev/beacon/global.beacon';
 
 const stepUpThreshold = money({ amountMinorUnits: STEP_UP_THRESHOLD_MINOR_UNITS, currency: 'USD' });
 
@@ -133,5 +134,6 @@ export const newPaymentBeacon: DemoBeaconPageConfig = {
       title: 'Amount blocks',
       body: `Daily limit is **${money(SEED_SOURCE_ACCOUNT.dailyLimit)}** (spent $0 so far) — enter more than that to trip the daily-limit block, or more than the available balance to trip insufficient funds (US-CW-008 AC-01/AC-02).`,
     },
+    resetSection,
   ],
 };

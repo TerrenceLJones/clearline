@@ -1,5 +1,6 @@
 import type { DemoBeaconPageConfig, EntityRow } from '@clearline/demo-beacon';
 import { REGISTRY_EINS, DEMO_ONBOARDED_BUSINESS } from '@clearline/mock-backend/fixtures';
+import { resetSection } from '../../dev/beacon/global.beacon';
 
 const einRows: EntityRow[] = [...REGISTRY_EINS].map((ein) => ({ ein }));
 
@@ -20,6 +21,7 @@ export const businessInfoBeacon: DemoBeaconPageConfig = {
       title: 'Edge cases',
       body: `Any EIN outside that set fails verification. Legal name **Vostok Trading** or **Northgate Holdings** routes to manual review. EIN \`${DEMO_ONBOARDED_BUSINESS.ein}\` is already claimed by the demo business → duplicate detection.`,
     },
+    resetSection,
   ],
 };
 
@@ -42,6 +44,7 @@ export const beneficialOwnersBeacon: DemoBeaconPageConfig = {
         },
       ],
     },
+    resetSection,
   ],
 };
 
@@ -80,6 +83,7 @@ export const documentUploadBeacon: DemoBeaconPageConfig = {
         },
       ],
     },
+    resetSection,
   ],
 };
 
@@ -104,6 +108,7 @@ export const reviewStepBeacon: DemoBeaconPageConfig = {
         },
       ],
     },
+    resetSection,
   ],
 };
 
@@ -116,5 +121,6 @@ export const onboardingStatusBeacon: DemoBeaconPageConfig = {
       title: 'What you’re seeing',
       body: 'The neutral holding page shown while a submitted business is under review. Approved accounts are redirected to the dashboard; blocked ones stay here.',
     },
+    resetSection,
   ],
 };

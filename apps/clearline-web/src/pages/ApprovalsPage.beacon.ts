@@ -1,6 +1,7 @@
 import type { DemoBeaconPageConfig, EntityRow } from '@clearline/demo-beacon';
 import { SEED_APPROVALS } from '@clearline/mock-backend/fixtures';
 import { money } from '../dev/beacon/shared';
+import { resetSection } from '../dev/beacon/global.beacon';
 
 const DEMO_SUBMITTER_ID = 'user_1';
 
@@ -54,5 +55,6 @@ export const approvalsBeacon: DemoBeaconPageConfig = {
         },
       ],
     },
+    resetSection,
   ],
 };

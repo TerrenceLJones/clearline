@@ -1,0 +1,30 @@
+import { Meta, Stories } from '@storybook/addon-docs/blocks';
+import * as ModalShellStories from './ModalShell.stories';
+
+<Meta of={ModalShellStories} />
+
+# ModalShell
+
+The low-level modal chrome: a focus-trapped, Escape-closable overlay + centered surface built on
+Radix `Dialog`, with a free `children` slot. Use it when a modal needs bespoke content — a custom
+body, multiple faces, or a non-standard footer — that the opinionated `Modal` / `ConfirmationDialog`
+can't express. Compose the accessible title, description, and any close-triggering element via
+`ModalShell.Title`, `ModalShell.Description`, and `ModalShell.Close`.
+
+This keeps Radix encapsulated inside the design system: app-level composites (e.g. the step-up
+challenge overlay) build custom modals **through `@clearline/ui`** and never import `radix-ui`
+directly.
+
+## When to use
+
+- **`ModalShell`** — you need full control of the modal's contents (this component).
+- **`Modal`** — a standard icon + title + body + confirm/cancel overlay.
+- **`ConfirmationDialog`** — an irreversible action guarded by a countdown before confirm.
+
+## Accessibility
+
+- Focus is trapped within the surface; Escape and an overlay click call `onOpenChange(false)`.
+- Include a `<ModalShell.Title>` so the dialog has an accessible name; add `<ModalShell.Description>`
+  for supporting copy. Both are wired to the dialog's ARIA automatically.
+
+<Stories />

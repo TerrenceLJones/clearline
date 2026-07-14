@@ -52,9 +52,8 @@ export { ConfirmationDialog } from './molecules/ConfirmationDialog';
 export type { ConfirmationDialogProps } from './molecules/ConfirmationDialog';
 export { OtpInput } from './molecules/OtpInput';
 export type { OtpInputProps, OtpInputState } from './molecules/OtpInput';
-// The Radix Dialog primitive, re-exported so app-level composites can build bespoke focus-trapped
-// overlays (e.g. the step-up challenge) without taking a direct dependency on radix-ui.
-export { Dialog } from 'radix-ui';
+export { ModalShell } from './molecules/ModalShell';
+export type { ModalShellProps } from './molecules/ModalShell';
 export { InactivityWarningModal } from './molecules/InactivityWarningModal';
 export type { InactivityWarningModalProps } from './molecules/InactivityWarningModal';
 export { DocumentDropzone } from './molecules/DocumentDropzone';

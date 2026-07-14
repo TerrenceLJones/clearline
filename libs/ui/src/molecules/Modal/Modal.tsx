@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
-import { Dialog } from 'radix-ui';
 import { Icon } from '../../foundations/Icon';
 import type { IconName } from '@clearline/icons';
 import { Text } from '../../atoms/Text';
+import { ModalShell } from '../ModalShell';
 
 export type ModalTone = 'accent' | 'negative' | 'warning';
 
@@ -39,48 +39,43 @@ export function Modal({
   const t = TONE_CLASSES[tone];
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/45" />
-        <Dialog.Content className="bg-cl-surface fixed top-1/2 left-1/2 w-[calc(100%-48px)] max-w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-2xl p-6 shadow-2xl">
-          <div className="mb-3 flex items-center gap-2.75">
-            <div
-              className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg ${t.weakBg}`}
-            >
-              <Icon name={icon} size={17} className={t.fg} />
-            </div>
-            <Dialog.Title asChild>
-              <Text as="h2" size="heading" tone="default">
-                {title}
-              </Text>
-            </Dialog.Title>
-          </div>
-          {body ? (
-            <Dialog.Description asChild>
-              <Text as="p" size="label" weight="regular" tone="muted" className="mb-4">
-                {body}
-              </Text>
-            </Dialog.Description>
-          ) : null}
-          <div className="flex gap-2.5">
-            <Dialog.Close asChild>
-              <button
-                type="button"
-                className="border-cl-border-2 bg-cl-surface text-cl-text-2 flex-1 rounded-lg border px-4 py-2.5 text-[13px] font-medium"
-              >
-                {cancelLabel}
-              </button>
-            </Dialog.Close>
-            <button
-              type="button"
-              onClick={onConfirm}
-              className={`flex-[1.4] rounded-lg px-4 py-2.5 text-[13px] font-semibold text-white ${t.solidBg}`}
-            >
-              {confirmLabel}
-            </button>
-          </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+    <ModalShell open={open} onOpenChange={onOpenChange}>
+      <div className="mb-3 flex items-center gap-2.75">
+        <div
+          className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg ${t.weakBg}`}
+        >
+          <Icon name={icon} size={17} className={t.fg} />
+        </div>
+        <ModalShell.Title asChild>
+          <Text as="h2" size="heading" tone="default">
+            {title}
+          </Text>
+        </ModalShell.Title>
+      </div>
+      {body ? (
+        <ModalShell.Description asChild>
+          <Text as="p" size="label" weight="regular" tone="muted" className="mb-4">
+            {body}
+          </Text>
+        </ModalShell.Description>
+      ) : null}
+      <div className="flex gap-2.5">
+        <ModalShell.Close asChild>
+          <button
+            type="button"
+            className="border-cl-border-2 bg-cl-surface text-cl-text-2 flex-1 rounded-lg border px-4 py-2.5 text-[13px] font-medium"
+          >
+            {cancelLabel}
+          </button>
+        </ModalShell.Close>
+        <button
+          type="button"
+          onClick={onConfirm}
+          className={`flex-[1.4] rounded-lg px-4 py-2.5 text-[13px] font-semibold text-white ${t.solidBg}`}
+        >
+          {confirmLabel}
+        </button>
+      </div>
+    </ModalShell>
   );
 }

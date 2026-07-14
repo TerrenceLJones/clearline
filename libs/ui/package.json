@@ -21,8 +21,10 @@
     "react-router": "^7.18.1"
   },
   "dependencies": {
+    "@clearline/contracts": "workspace:*",
     "@clearline/design-tokens": "workspace:*",
     "@clearline/icons": "workspace:*",
+    "@clearline/money": "workspace:*",
     "radix-ui": "^1.6.1"
   },
   "devDependencies": {

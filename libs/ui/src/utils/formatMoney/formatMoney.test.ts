@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { formatMoney } from './formatMoney';
+import { formatMoney, formatMoneyValue } from './formatMoney';
+
+// Intl separates a currency code from the amount with a non-breaking space whose exact codepoint
+// varies by ICU version (U+00A0 vs U+202F); normalize whitespace so the assertion is stable.
+const normalize = (value: string) => value.replace(/\s/g, ' ');
 
 describe('formatMoney', () => {
   it('formats a USD amount by default', () => {
@@ -15,6 +19,16 @@ describe('formatMoney', () => {
   });
 
   it('formats a 3-decimal currency with 3 decimal places', () => {
-    expect(formatMoney(182.05, 'BHD')).toBe('BHD 182.050');
+    expect(normalize(formatMoney(182.05, 'BHD'))).toBe('BHD 182.050');
+  });
+});
+
+describe('formatMoneyValue', () => {
+  it('converts minor units to a localized string, per currency', () => {
+    expect(formatMoneyValue({ amountMinorUnits: 500050, currency: 'USD' })).toBe('$5,000.50');
+    expect(formatMoneyValue({ amountMinorUnits: 182050, currency: 'JPY' })).toBe('¥182,050');
+    expect(normalize(formatMoneyValue({ amountMinorUnits: 182050, currency: 'BHD' }))).toBe(
+      'BHD 182.050',
+    );
   });
 });

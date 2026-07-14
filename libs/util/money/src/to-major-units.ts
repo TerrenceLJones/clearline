@@ -1,11 +1,5 @@
 import type { Money } from '@clearline/contracts';
-
-function minorUnitExponent(currency: string): number {
-  return (
-    new Intl.NumberFormat('en-US', { style: 'currency', currency }).resolvedOptions()
-      .maximumFractionDigits ?? 2
-  );
-}
+import { minorUnitExponent } from './minor-unit-exponent';
 
 /**
  * Converts an integer minor-units amount to a major-unit float (e.g. cents -> dollars),

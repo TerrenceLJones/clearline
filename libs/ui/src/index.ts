@@ -22,6 +22,8 @@ export { Alert } from './atoms/Alert';
 export type { AlertProps, AlertTone } from './atoms/Alert';
 export { SegmentedControl } from './atoms/SegmentedControl';
 export type { SegmentedControlProps } from './atoms/SegmentedControl';
+export { Select } from './atoms/Select';
+export type { SelectProps, SelectOption } from './atoms/Select';
 export { Avatar } from './atoms/Avatar';
 export type { AvatarProps, AvatarTone } from './atoms/Avatar';
 export { Chip } from './atoms/Chip';
@@ -74,6 +76,6 @@ export type { DataTableProps, DataTableRow, Density } from './organisms/DataTabl
 export { AppShell } from './organisms/AppShell';
 export type { AppShellProps } from './organisms/AppShell';
 
-export { formatMoney } from './utils/formatMoney';
+export { formatMoney, formatMoneyValue } from './utils/formatMoney';
 export { AuthLayout } from './organisms/AuthLayout';
 export type { AuthLayoutProps } from './organisms/AuthLayout';

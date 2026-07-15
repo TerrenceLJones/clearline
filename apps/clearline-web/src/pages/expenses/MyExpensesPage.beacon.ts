@@ -36,9 +36,8 @@ export const myExpensesBeacon: DemoBeaconPageConfig = {
         {
           id: 'new',
           title: 'Submit a new expense',
-          navigateTo: '/expenses/new',
           steps: [
-            { text: 'Click **“+ New expense”** to open the submission form.' },
+            { text: 'Open the submission form.', navigateTo: '/expenses/new' },
             { text: 'Follow the New Expense guide for the happy path and the policy scenarios.' },
           ],
         },

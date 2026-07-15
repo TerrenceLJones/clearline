@@ -211,3 +211,22 @@ pnpm --filter @clearline/icons generate
 ## AI usage
 
 AI tools (Claude, GitHub Copilot) are used throughout this repo — from initial research and architecture planning through design, scaffolding, and code generation. This is a deliberate workflow choice: AI accelerates the work without replacing the engineering judgment behind it. Domain invariants, architectural decisions, state machine design, and review of all AI-generated output are human-owned.
+
+---
+
+## License & reuse
+
+**Copyright © 2026 Terrence L. Jones. All rights reserved.**
+
+This repository is **source-available, not open source.** No license — open source or
+otherwise — is granted for any part of it. This is intentional, not an oversight: the source
+is published so it can be **read, evaluated, and discussed**, nothing more.
+
+Being able to view, clone, or fork this code on GitHub does **not** grant you permission to
+use it. Under default copyright law, all rights are reserved by the author, and without an
+explicit license you have no right to use, copy, modify, merge, publish, distribute,
+sublicense, create derivative works from, or otherwise reuse this code or its contents — in
+whole or in part, for commercial or non-commercial purposes.
+
+**Any such use is prohibited without the prior express written consent of the author.** If you
+would like to use any part of this project, contact the author to request permission.

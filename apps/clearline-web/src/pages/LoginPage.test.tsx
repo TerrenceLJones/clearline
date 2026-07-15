@@ -385,8 +385,17 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: 'Continue here' }));
     await waitFor(() => expect(screen.getByText('Dashboard stub')).toBeInTheDocument());
 
+    // Baseline the counter immediately before the unmount under test. `registerMswServer` only
+    // resets handlers between tests — it doesn't cancel in-flight react-query mutations — so a
+    // logout fired on unmount by the *previous* AC-07 test ("revokes … if abandoned") can resolve
+    // against this test's handler during the async steps above and inflate the count. Zeroing here
+    // scopes the assertion to what *this* unmount does, which is the behavior under test.
+    logoutCallCount = 0;
     unmount();
 
+    // Give any revoke the unmount might dispatch a real tick to reach the handler before asserting
+    // none did — a bare synchronous assert would pass even if a logout were in flight.
+    await new Promise((resolve) => setTimeout(resolve, 0));
     expect(logoutCallCount).toBe(0);
   });
 });

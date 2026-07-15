@@ -1,4 +1,4 @@
-import { useState, type SubmitEvent } from 'react';
+import { useMemo, useState, type SubmitEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import {
   Alert,
@@ -14,7 +14,7 @@ import { evaluateSignUpPassword, isValidSignUpPassword } from '@clearline/domain
 import { useSignUp } from '@clearline/data-access-auth';
 import { useDemoBeacon } from '@clearline/demo-beacon';
 import { usePageTitle } from '../hooks/usePageTitle';
-import { signUpBeacon } from './SignUpPage.beacon';
+import { buildSignUpBeacon } from './SignUpPage.beacon';
 
 const SIGNUP_HEADLINE = 'Set up your business account in minutes.';
 const SIGNUP_SUBCOPY =
@@ -22,12 +22,29 @@ const SIGNUP_SUBCOPY =
 
 export function SignUpPage() {
   usePageTitle('Sign up');
-  useDemoBeacon(signUpBeacon);
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const signUp = useSignUp();
+
+  // Once the viewer is on the "check your email" wall, bind the Beacon's verify action to the email
+  // and password they just submitted, so it mints the link for *their* account rather than the
+  // placeholder. Before submission there's no account yet, so fall back to the static guide.
+  //
+  // Gate the credentials on `submitted` before threading them into the deps: pre-submit they're
+  // unused, so holding them at '' keeps the memo stable across keystrokes (no re-registration
+  // churn); post-submit the form is unmounted, so they never change again.
+  const targetEmail = submitted ? email : '';
+  const targetPassword = submitted ? password : '';
+  const beacon = useMemo(
+    () =>
+      targetEmail
+        ? buildSignUpBeacon({ email: targetEmail, password: targetPassword })
+        : buildSignUpBeacon(),
+    [targetEmail, targetPassword],
+  );
+  useDemoBeacon(beacon);
 
   const requirements = evaluateSignUpPassword(password);
   const isPasswordValid = isValidSignUpPassword(password);

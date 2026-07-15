@@ -6,6 +6,7 @@ import {
   loadControls,
   verifyEmailSection,
 } from '../dev/beacon/shared';
+import { resetSection } from '../dev/beacon/global.beacon';
 
 /** Sign-in guide: the seeded credentials and the auth-outage scenario. */
 export const loginBeacon: DemoBeaconPageConfig = {
@@ -75,5 +76,6 @@ export const loginBeacon: DemoBeaconPageConfig = {
         },
       ],
     },
+    resetSection,
   ],
 };

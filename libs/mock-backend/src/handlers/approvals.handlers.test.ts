@@ -51,10 +51,11 @@ function escalate(id: string, token: string) {
   });
 }
 
-function reject(id: string, token: string) {
+function reject(id: string, token: string, reason = 'Out of policy') {
   return fetch(`${ORIGIN}/api/approvals/${id}/reject`, {
     method: 'POST',
-    headers: { authorization: `Bearer ${token}` },
+    headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+    body: JSON.stringify({ reason }),
   });
 }
 
@@ -69,6 +70,17 @@ describe('GET /api/approvals', () => {
 
   it('returns 401 without an access token', async () => {
     expect((await getQueue()).status).toBe(401);
+  });
+
+  it('returns 401 access_token_expired for an expired token so silent refresh can recover (US-CW-002 AC-01)', async () => {
+    const token = await login();
+    authService.expireAccessTokensForE2E(user!.email);
+
+    const response = await getQueue(token);
+    expect(response.status).toBe(401);
+    // The recoverable code — NOT a generic invalid_token — so the client's silent-refresh interceptor
+    // engages on the queue endpoint exactly as it does on /api/auth/session.
+    expect(await response.json()).toEqual({ error: 'access_token_expired' });
   });
 
   it('returns 403 forbidden_role for an Employee (server-enforced regardless of UI) — AC-04', async () => {
@@ -126,6 +138,20 @@ describe('POST /api/approvals/:id/reject', () => {
     expect((await reject('exp_4201', token)).status).toBe(200);
     const queue = await (await getQueue(token)).json();
     expect(queue.items.map((i: { id: string }) => i.id)).not.toContain('exp_4201');
+  });
+});
+
+describe('stale action returns 409 with the approver who already actioned it — AC-05', () => {
+  it('returns 409 stale_action when approving an already-approved item', async () => {
+    const token = await login();
+    expect((await approve('exp_4201', token)).status).toBe(200);
+
+    const response = await approve('exp_4201', token);
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({
+      error: 'stale_action',
+      actedBy: user!.displayName,
+    });
   });
 });
 

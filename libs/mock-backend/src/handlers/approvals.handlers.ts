@@ -4,24 +4,24 @@ import type {
   ApprovalErrorResponse,
   ApprovalQueueResponse,
   RejectApprovalRequest,
-  SessionErrorResponse,
 } from '@clearline/contracts';
 import { permissionsForRole } from '@clearline/domain-auth';
 import { AuthService } from '../services/auth.service';
 import { ApprovalsService, type ApprovalActor } from '../services/approvals.service';
 import { sharedAuthService } from '../services/shared-auth-service';
 import { sharedApprovalsService } from '../services/shared-approvals-service';
+import { bearerToken, unauthorizedForSession } from './session-auth';
 
 /**
  * Resolves the acting approver from the request's own access token — never from anything the client
  * claims about itself. checkSession re-reads the live user record, so a role changed mid-session is
- * reflected here on the very next call (US-CW-006 AC-05). Returns null when there's no valid session,
- * which the handlers turn into a 401. Permissions are derived server-side from the resolved role, so
- * the endpoint is independently authoritative regardless of what the UI rendered.
+ * reflected here on the very next call (US-CW-006 AC-05). Returns null when there's no active session,
+ * which the handlers turn into a 401 via unauthorizedForSession (expired → recoverable, US-CW-002
+ * AC-01). Permissions are derived server-side from the resolved role, so the endpoint is
+ * independently authoritative regardless of what the UI rendered.
  */
 function resolveActor(request: Request, authService: AuthService): ApprovalActor | null {
-  const authHeader = request.headers.get('authorization');
-  const accessToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
+  const accessToken = bearerToken(request);
   if (!accessToken) return null;
 
   const session = authService.checkSession(accessToken);
@@ -35,11 +35,6 @@ function resolveActor(request: Request, authService: AuthService): ApprovalActor
   };
 }
 
-const unauthorized = () => {
-  const body: SessionErrorResponse = { error: 'invalid_token' };
-  return HttpResponse.json(body, { status: 401 });
-};
-
 /** Thin HTTP adapter in front of ApprovalsService — the authorization rules live in the service/domain, not here. */
 export function createApprovalsHandlers(
   approvalsService: ApprovalsService = sharedApprovalsService,
@@ -48,7 +43,7 @@ export function createApprovalsHandlers(
   return [
     http.get('*/api/approvals', ({ request }) => {
       const actor = resolveActor(request, authService);
-      if (!actor) return unauthorized();
+      if (!actor) return unauthorizedForSession(request, authService);
 
       const result = approvalsService.getQueue(actor);
       if (result.outcome === 'forbidden') {
@@ -61,7 +56,7 @@ export function createApprovalsHandlers(
 
     http.post('*/api/approvals/:id/approve', ({ request, params }) => {
       const actor = resolveActor(request, authService);
-      if (!actor) return unauthorized();
+      if (!actor) return unauthorizedForSession(request, authService);
 
       const result = approvalsService.approve(String(params.id), actor);
       if (result.outcome === 'not_found') {
@@ -84,7 +79,7 @@ export function createApprovalsHandlers(
 
     http.post('*/api/approvals/:id/reject', async ({ request, params }) => {
       const actor = resolveActor(request, authService);
-      if (!actor) return unauthorized();
+      if (!actor) return unauthorizedForSession(request, authService);
 
       const { reason } = (await request.json()) as RejectApprovalRequest;
       const result = approvalsService.reject(String(params.id), actor, reason);
@@ -105,7 +100,7 @@ export function createApprovalsHandlers(
 
     http.post('*/api/approvals/:id/escalate', ({ request, params }) => {
       const actor = resolveActor(request, authService);
-      if (!actor) return unauthorized();
+      if (!actor) return unauthorizedForSession(request, authService);
 
       const result = approvalsService.escalate(String(params.id), actor);
       if (result.outcome === 'not_found') {
@@ -121,7 +116,7 @@ export function createApprovalsHandlers(
 
     http.post('*/api/approvals/:id/reassign', ({ request, params }) => {
       const actor = resolveActor(request, authService);
-      if (!actor) return unauthorized();
+      if (!actor) return unauthorizedForSession(request, authService);
 
       const result = approvalsService.reassign(String(params.id), actor);
       if (result.outcome === 'not_found') {

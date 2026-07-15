@@ -72,6 +72,17 @@ describe('GET /api/approvals', () => {
     expect((await getQueue()).status).toBe(401);
   });
 
+  it('returns 401 access_token_expired for an expired token so silent refresh can recover (US-CW-002 AC-01)', async () => {
+    const token = await login();
+    authService.expireAccessTokensForE2E(user!.email);
+
+    const response = await getQueue(token);
+    expect(response.status).toBe(401);
+    // The recoverable code — NOT a generic invalid_token — so the client's silent-refresh interceptor
+    // engages on the queue endpoint exactly as it does on /api/auth/session.
+    expect(await response.json()).toEqual({ error: 'access_token_expired' });
+  });
+
   it('returns 403 forbidden_role for an Employee (server-enforced regardless of UI) — AC-04', async () => {
     const token = await login();
     authService.setUserRole(user!.email, { role: 'employee', approvalLimit: null });

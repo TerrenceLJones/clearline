@@ -9,7 +9,7 @@ feature_area: 'payments'
 title: 'Step-Up Authentication for High-Value Payments'
 
 # Lifecycle status
-status: 'APPROVED'
+status: 'IMPLEMENTED'
 story_points: 8
 dependencies: ['US-CW-007']
 
@@ -25,10 +25,13 @@ history:
   - epic_id: 'EPIC-CW-005'
     action: 'approved'
     date: '2026-06-30'
+  - epic_id: 'EPIC-CW-005'
+    action: 'implemented'
+    date: '2026-07-14'
 
 # Status timestamps — set when status transitions occur
 approved_date: '2026-06-30'
-implementation_date: null
+implementation_date: '2026-07-14'
 deprecated_date: null
 removed_date: null
 
@@ -120,5 +123,11 @@ edge_cases: |
 
 # Implementation Status
 implementation_status: |
-  Not yet implemented. This story is APPROVED and ready for implementation planning, transcribed as part of the initial
-  specification pass for clearline-web — no application code exists yet.
+  Implemented on branch CW-010/step-up-authentication. The step-up flow is enforced end-to-end: the mock backend
+  reserves high-value payments in `requires_action` and mints a challenge (AC-01), preserving the idempotency key
+  through verify/resend/commit so a payment commits exactly once (AC-02); abandonment surfaces a retry banner reusing
+  the same key (AC-03); verify failures map to distinct kinds — incorrect (AC-04), expired-and-reissued with
+  server-side invalidation (AC-06), lockout, and client-side connectivity loss (AC-07) — each with non-interchangeable
+  copy; a 30-second timer gates the resend / try-another-method affordances (AC-05). Key modules: domain step-up-policy,
+  mock-backend PaymentsService step-up methods, data-access use-step-up, and the NewPaymentPage step-up components/hook,
+  backed by the @clearline/ui OtpInput and AlertModal molecules. All affected package tests pass (230 in clearline-web).

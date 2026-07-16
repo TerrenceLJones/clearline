@@ -9,7 +9,7 @@ feature_area: 'analytics'
 title: 'Spend Analytics Dashboard'
 
 # Lifecycle status
-status: 'APPROVED'
+status: 'IMPLEMENTED'
 story_points: 8
 dependencies: ['US-CW-006']
 
@@ -25,10 +25,13 @@ history:
   - epic_id: 'EPIC-CW-009'
     action: 'approved'
     date: '2026-06-30'
+  - epic_id: 'EPIC-CW-009'
+    action: 'implemented'
+    date: '2026-07-16'
 
 # Status timestamps — set when status transitions occur
 approved_date: '2026-06-30'
-implementation_date: null
+implementation_date: '2026-07-16'
 deprecated_date: null
 removed_date: null
 
@@ -109,3 +112,27 @@ edge_cases: |
   - Stale data display when last refresh exceeds a noticeable time threshold
   - (inferred) Retry action on a failed section re-fetches only that section's data without reloading the full dashboard
   - (inferred) Concurrent section failures (e.g., both top vendors and budget status fail) each show independent scoped retry states without affecting spend-by-category
+
+# Implementation Status
+implementation_status: |
+  ✅ Implemented 2026-07-16 (EPIC-CW-009, PR #35). Finance Managers view a real-time spend dashboard at
+  /dashboard, gated by a new analytics:view permission (granted to Finance Manager + Controller, re-checked
+  server-side on every /api/analytics/* call); approvers now land here as their role-based home. Each section
+  (summary/KPIs, spend-by-category, by-department, top-vendors, recent-activity) is fetched independently via
+  its own React Query hook in @clearline/data-access-analytics and wrapped in a dedicated SectionErrorBoundary,
+  so one section's backend failure is isolated with a scoped retry while the rest of the page renders. The mock
+  backend's AnalyticsService derives every breakdown and the summary total from one seeded June-2026
+  transaction list, so an out-of-range filter naturally yields the empty state.
+  - AC-01: category/department/vendor breakdowns render for the selected period; monetary values render
+    skeleton-first through @clearline/ui MoneyDisplay (state="loading") and never flash "$0.00" while loading.
+  - AC-02: an anomaly-flagged transaction (WeWork) shows a warning triangle icon + the text "Unusual amount"
+    plus "AI 87% confidence" and the normal amount it deviated from — never conveyed by color alone.
+  - AC-03: a range with no matching transactions (transactionCount === 0) shows the empty state
+    "No transactions in this date range" with a "Reset to June 2026" action, not an error.
+  - AC-04: validateDateRange rejects an end-before-start draft with the inline error "End date must be after
+    the start date."; useDashboardFilter.apply() is a no-op while invalid, so the range never refetches.
+  - AC-05: a single section's 500 (simulated per-section) renders "This section couldn't load." with a scoped
+    Retry inside that section's error boundary; sibling sections continue to render normally.
+  - AC-06: the summary carries a lastRefreshedAt stamp surfaced as a relative "Last updated N minutes ago"
+    freshness label (formatRelativeAge/isStale), with a manual Refresh (useRefreshAnalytics) that restamps and
+    refetches every section.

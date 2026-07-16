@@ -148,10 +148,11 @@ The frontend framework decision is settled (React 19 + Vite) and `clearline-web`
 - **EPIC-CW-006** — Expense submission & approval workflow (separation of duties, limit-based escalation, stale-action reconciliation)
 - **EPIC-CW-007** — Batch operations (partial-failure batch approve/reject, per-item idempotency keys, mid-batch resume)
 - **EPIC-CW-008** — Card management (virtual card issuance with limits + MCC restrictions, real-time WebSocket transaction feed, freeze controls, security-gated declines)
+- **EPIC-CW-009** — Real-time spend dashboard & analytics (category/department/vendor breakdowns, anomaly flags with AI confidence, per-section error boundaries with scoped retry, date-range filtering, data-freshness with manual refresh)
 - **EPIC-CW-019** — Account owner provisioning at KYB approval
 - **EPIC-CW-020** — Reassign approver for blocked approvals
 
-**Planned** (see `specs/epics/clearline-web/`): real-time spend dashboard & analytics, vendor management & reconciliation, AI invoice coding, AI spend insights (streaming), budget management, organization & team management, plus cross-cutting accessibility (WCAG 2.1 AA) and audit logging.
+**Planned** (see `specs/epics/clearline-web/`): vendor management & reconciliation, AI invoice coding, AI spend insights (streaming), budget management, organization & team management, plus cross-cutting accessibility (WCAG 2.1 AA) and audit logging.
 
 ---
 

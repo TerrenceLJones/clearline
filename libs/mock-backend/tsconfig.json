@@ -13,6 +13,7 @@
     { "path": "../domain/expenses" },
     { "path": "../domain/onboarding" },
     { "path": "../domain/payments" },
-    { "path": "../domain/reconciliation" }
+    { "path": "../domain/reconciliation" },
+    { "path": "../domain/budgets" }
   ]
 }

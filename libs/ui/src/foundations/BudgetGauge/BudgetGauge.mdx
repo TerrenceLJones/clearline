@@ -6,7 +6,11 @@ import * as BudgetGaugeStories from './BudgetGauge.stories';
 # BudgetGauge
 
 Shows used-vs-total spend against a label as a filled bar plus a text readout, banding color and
-icon by how close (or over) the ratio is.
+icon by how close (or over) the ratio is. Amounts render through the currency-aware formatter (pass
+`currency`), so a department budgeted in a 0-decimal (JPY) or 3-decimal (BHD) currency reads
+correctly rather than assuming two decimal places. At or over the 80% threshold, `notified` surfaces
+a "Stakeholders notified" line — the visible record that department stakeholders were alerted on the
+crossing (US-CW-019 AC-02).
 
 ## User story
 

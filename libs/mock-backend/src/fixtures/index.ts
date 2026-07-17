@@ -58,3 +58,5 @@ export {
   SEED_RECONCILIATION_ACCOUNT,
   SEED_RECONCILIATION,
 } from './reconciliation.fixture';
+export { SEED_BUDGETS, BUDGET_THRESHOLD_DEMO_DEPARTMENT } from './budgets.fixture';
+export type { BudgetSeed, BudgetSeedDepartment, BudgetSeedPeriod } from './budgets.fixture';

@@ -153,11 +153,12 @@ The frontend framework decision is settled (React 19 + Vite) and `clearline-web`
 - **EPIC-CW-008** — Card management (virtual card issuance with limits + MCC restrictions, real-time WebSocket transaction feed, freeze controls, security-gated declines)
 - **EPIC-CW-009** — Real-time spend dashboard & analytics (category/department/vendor breakdowns, anomaly flags with AI confidence, per-section error boundaries with scoped retry, date-range filtering, data-freshness with manual refresh)
 - **EPIC-CW-010** — Vendor management & reconciliation (nightly bank-feed reconciliation with exact + fuzzy matching, an actionable exceptions queue, confirm/reject fuzzy suggestions with a similarity breakdown, manual split-match with exact-sum validation, and a Fatal-tier ledger-balance-integrity guard that withholds a balance that doesn't net)
+- **EPIC-CW-013** — Budget management (department monthly budgets, real-time gauges with accessible on-track/80%-warning/over-budget states — icon + text, never color alone — threshold-crossing stakeholder notifications, and monthly period rollover with a per-department Budget History view; currency-exact percentage/overage math via minor units)
 - **EPIC-CW-019** — Account owner provisioning at KYB approval
 - **EPIC-CW-020** — Reassign approver for blocked approvals
 - **EPIC-CW-021** — Sidebar navigation shell (top-nav → side-nav migration: persistent left rail with role-scoped vertical nav, a user-identity footer showing role + approval limit, the relocated theme control, and a narrow-viewport off-canvas drawer)
 
-**Planned** (see `specs/epics/clearline-web/`): AI invoice coding, AI spend insights (streaming), budget management, organization & team management, plus cross-cutting accessibility (WCAG 2.1 AA) and audit logging.
+**Planned** (see `specs/epics/clearline-web/`): AI invoice coding, AI spend insights (streaming), organization & team management, plus cross-cutting accessibility (WCAG 2.1 AA) and audit logging.
 
 ---
 

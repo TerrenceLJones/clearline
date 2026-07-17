@@ -23,8 +23,10 @@ import {
   setReconciliationSectionFailure,
   type ReconciliationSection,
 } from './handlers/reconciliation.handlers';
+import { budgetsHandlers } from './handlers/budgets.handlers';
 import { sharedAnalyticsService } from './services/shared-analytics-service';
 import { sharedReconciliationService } from './services/shared-reconciliation-service';
+import { sharedBudgetsService } from './services/shared-budgets-service';
 import { sharedAuthService } from './services/shared-auth-service';
 import { sharedCardsService } from './services/shared-cards-service';
 import {
@@ -51,6 +53,7 @@ export const worker = setupWorker(
   cardsFeedHandler,
   ...analyticsHandlers,
   ...reconciliationHandlers,
+  ...budgetsHandlers,
 );
 
 // Seed the demo user as an already-approved, fully-onboarded business so signing in as it lands on
@@ -363,4 +366,25 @@ export function isReconciliationBalanceFailureArmedForE2E(): boolean {
 /** Re-run the nightly reconciliation on demand — the "Run again" control's demo/e2e entry point. */
 export function runReconciliationForE2E(): void {
   sharedReconciliationService.runReconciliation();
+}
+
+/**
+ * Dev/demo control for US-CW-019 AC-02: pushes a department to exactly its 80% warning threshold,
+ * standing in for the transaction that trips it — there's no real card network accruing spend here.
+ * Records the one-time stakeholder notification for the period, so the overview gauge flips to its
+ * amber "80% of budget used" state with the "Stakeholders notified" chip. Refresh the overview to see
+ * it. Demo-only, behind import.meta.env.DEV.
+ */
+export function simulateBudgetThresholdCrossingForE2E(department?: string): void {
+  sharedBudgetsService.simulateThresholdCrossing(department);
+}
+
+/**
+ * Dev/demo control for US-CW-019 AC-04: ends the current budget period and begins the next, standing in
+ * for the scheduled midnight-of-month-end rollover job that a frontend demo can't run. Every
+ * department's new period starts at $0.00 spent while prior periods stay readable in Budget history.
+ * Refresh the overview/history to see it. Demo-only, behind import.meta.env.DEV.
+ */
+export function simulateBudgetRolloverForE2E(): void {
+  sharedBudgetsService.rolloverPeriod();
 }

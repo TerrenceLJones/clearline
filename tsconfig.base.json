@@ -49,7 +49,9 @@
       "@clearline/data-access-expenses": ["libs/data-access/expenses/src/index.ts"],
       "@clearline/data-access-analytics": ["libs/data-access/analytics/src/index.ts"],
       "@clearline/domain-reconciliation": ["libs/domain/reconciliation/src/index.ts"],
-      "@clearline/data-access-reconciliation": ["libs/data-access/reconciliation/src/index.ts"]
+      "@clearline/data-access-reconciliation": ["libs/data-access/reconciliation/src/index.ts"],
+      "@clearline/domain-budgets": ["libs/domain/budgets/src/index.ts"],
+      "@clearline/data-access-budgets": ["libs/data-access/budgets/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]

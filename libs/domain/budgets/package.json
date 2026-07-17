@@ -1,0 +1,22 @@
+{
+  "name": "@clearline/domain-budgets",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pure, framework-agnostic department-budget rules — the spend-to-budget utilization ratio (exact integer minor units, so it holds for a 0-decimal JPY or 3-decimal BHD department), the on-track/warning/over threshold bands (warning at 80%, over at 100%), the exact overage amount, and one-directional warning-threshold crossing detection (so a stakeholder notification fires exactly once per period). No data-access or UI dependencies, mirrors libs/domain/reconciliation.",
+  "main": "src/index.ts",
+  "scripts": {
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@clearline/contracts": "workspace:*"
+  },
+  "devDependencies": {},
+  "metadata": {
+    "package_type": "shared",
+    "app": "clearline-web",
+    "scope": "Domain lib for EPIC-CW-013 (US-CW-019 Department Budget Management)."
+  }
+}

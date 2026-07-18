@@ -5,8 +5,17 @@ import { Text } from '../../atoms/Text';
 
 export interface BudgetGaugeProps {
   label: string;
+  /** Spend so far, in major units of `currency` (e.g. dollars, not cents). */
   used: number;
+  /** The budget, in major units of `currency`. */
   total: number;
+  /** ISO 4217 currency for the amounts — drives the money formatting (JPY 0-decimal, BHD 3-decimal). @default 'USD' */
+  currency?: string;
+  /**
+   * When true and the gauge is at or over the 80% warning threshold, shows a "Stakeholders notified"
+   * line — the visible record that department stakeholders were alerted on the crossing (US-CW-019 AC-02).
+   */
+  notified?: boolean;
 }
 
 interface Band {
@@ -36,8 +45,13 @@ function bandFor(pct: number): Band {
   return { icon: 'check', textClass: 'text-cl-pos', fillClass: 'bg-cl-pos', status: 'On track' };
 }
 
-/** Threshold bands at normal / 80% / over — percentage and overage are always spelled out in text, color reinforces rather than carries the message. */
-export function BudgetGauge({ label, used, total }: BudgetGaugeProps) {
+/**
+ * Threshold bands at normal / 80% / over — percentage and overage are always spelled out in text, color
+ * reinforces rather than carries the message (US-CW-019 AC-03 / US-CW-023 AC-04). Amounts render through
+ * the currency-aware formatter, so a department budgeted in a 0-decimal (JPY) or 3-decimal (BHD)
+ * currency reads correctly rather than assuming two decimal places.
+ */
+export function BudgetGauge({ label, used, total, currency = 'USD', notified }: BudgetGaugeProps) {
   const safeTotal = total || 1;
   const pctRaw = (used / safeTotal) * 100;
   const pct = Math.round(pctRaw);
@@ -45,7 +59,7 @@ export function BudgetGauge({ label, used, total }: BudgetGaugeProps) {
 
   const footText =
     pctRaw >= 100
-      ? `${pct}% — ${formatMoney(used - total)} over`
+      ? `${pct}% of budget used — ${formatMoney(used - total, currency)} over`
       : pctRaw >= 80
         ? `${pct}% of budget used`
         : `${pct}% used`;
@@ -80,9 +94,17 @@ export function BudgetGauge({ label, used, total }: BudgetGaugeProps) {
           {footText}
         </Text>
         <Text as="span" size="mono" tone="faint">
-          {formatMoney(used)} / {formatMoney(total)}
+          {formatMoney(used, currency)} / {formatMoney(total, currency)}
         </Text>
       </div>
+      {notified && pctRaw >= 80 ? (
+        <span className={`mt-2 inline-flex items-center gap-1 ${band.textClass}`}>
+          <Icon name="bell" size={10} />
+          <Text as="span" size="label" weight="medium">
+            Stakeholders notified
+          </Text>
+        </span>
+      ) : null}
     </div>
   );
 }

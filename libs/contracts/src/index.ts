@@ -8,3 +8,4 @@ export type * from './payments';
 export type * from './expenses';
 export type * from './analytics';
 export type * from './reconciliation';
+export type * from './budgets';

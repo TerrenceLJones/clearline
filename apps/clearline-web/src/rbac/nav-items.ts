@@ -58,7 +58,7 @@ export const NAV_ITEMS: NavItemDef[] = [
     permission: 'budget:view',
     label: 'Budget Management',
     icon: 'bar-chart',
-    path: '/budget',
+    path: '/budgets',
   },
   { id: 'audit', permission: 'audit:view', label: 'Audit Log', icon: 'clock', path: '/audit' },
   { id: 'team', permission: 'team:view', label: 'Team', icon: 'users', path: '/team' },

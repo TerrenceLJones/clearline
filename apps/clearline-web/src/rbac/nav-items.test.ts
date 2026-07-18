@@ -86,6 +86,13 @@ describe('navPathForId / navIdForPath', () => {
     expect(navIdForPath('/expenses/new')).toBe('expenses');
   });
 
+  it('maps Budget Management to /budgets and highlights its nested routes (US-CW-019)', () => {
+    expect(navPathForId('budget')).toBe('/budgets');
+    expect(navIdForPath('/budgets')).toBe('budget');
+    expect(navIdForPath('/budgets/new')).toBe('budget');
+    expect(navIdForPath('/budgets/engineering/history')).toBe('budget');
+  });
+
   it('returns undefined for an unknown path', () => {
     expect(navIdForPath('/nowhere')).toBeUndefined();
   });

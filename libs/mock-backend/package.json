@@ -24,7 +24,8 @@
     "@clearline/domain-expenses": "workspace:*",
     "@clearline/domain-onboarding": "workspace:*",
     "@clearline/domain-payments": "workspace:*",
-    "@clearline/domain-reconciliation": "workspace:*"
+    "@clearline/domain-reconciliation": "workspace:*",
+    "@clearline/domain-budgets": "workspace:*"
   },
   "devDependencies": {
     "msw": "^2.14.6"

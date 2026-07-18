@@ -16,6 +16,9 @@ import { IssueCardPage } from './pages/cards/IssueCardPage';
 import { CardDetailPage } from './pages/cards/CardDetailPage';
 import { DashboardPage } from './pages/dashboard/DashboardPage';
 import { ReconciliationPage } from './pages/reconciliation/ReconciliationPage';
+import { BudgetOverviewPage } from './pages/budget/BudgetOverviewPage';
+import { NewBudgetPage } from './pages/budget/NewBudgetPage';
+import { BudgetHistoryPage } from './pages/budget/BudgetHistoryPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { BusinessInfoStepPage } from './pages/onboarding/BusinessInfoStepPage';
 import { BeneficialOwnersStepPage } from './pages/onboarding/BeneficialOwnersStepPage';
@@ -138,19 +141,15 @@ export function App() {
                   >
                     <Route path="/reconciliation" element={<ReconciliationPage />} />
                   </Route>
+                  {/* Budget management (US-CW-019). Controller-only (budget:view), re-checked
+                    server-side on every /api/budgets call; the overview, set-budget form and
+                    per-department history all sit under the one guard. */}
                   <Route
                     element={<RequirePermission permission="budget:view" apiPath="/api/budgets" />}
                   >
-                    <Route
-                      path="/budget"
-                      element={
-                        <PlaceholderPage
-                          title="Budget Management"
-                          icon="bar-chart"
-                          body="Track department budgets and thresholds here."
-                        />
-                      }
-                    />
+                    <Route path="/budgets" element={<BudgetOverviewPage />} />
+                    <Route path="/budgets/new" element={<NewBudgetPage />} />
+                    <Route path="/budgets/:department/history" element={<BudgetHistoryPage />} />
                   </Route>
                   <Route
                     element={<RequirePermission permission="audit:view" apiPath="/api/audit-log" />}

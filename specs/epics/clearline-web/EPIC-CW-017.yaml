@@ -81,10 +81,11 @@ notes: >
   person for BSA/AML purposes — the beneficial-ownership capture US-CW-004 AC-05 already performs for
   KYC is the same natural person this epic ties Owner to. Owner is a per-organization singleton and
   cannot be removed or self-demoted (US-CW-031 explicitly blocks both), only reassigned via an
-  ownership-transfer flow — deliberately out of scope for this epic and flagged in US-CW-031's
-  technical_notes as a follow-up, since a solo-developer demo has no second Owner-holding scenario to
-  build it against yet (the same "don't build a mechanism nothing exercises end-to-end" reasoning
-  EPIC-CW-001's notes used to relocate its own AC-04).
+  ownership-transfer flow — deliberately out of scope for this epic since a solo-developer demo had no
+  second Owner-holding scenario to build it against yet (the same "don't build a mechanism nothing
+  exercises end-to-end" reasoning EPIC-CW-001's notes used to relocate its own AC-04). That follow-up now
+  has a home: with US-CW-031's roster shipped, EPIC-CW-022 introduces ownership transfer as US-CW-043,
+  mounted in the Settings → Security & Compliance surface and extending this epic's team domain.
 
   Design decision — Admin is a delegable permission, not a fourth approval tier: US-CW-006's existing
   Employee -> Finance Manager -> Controller ladder is entirely about financial approval authority

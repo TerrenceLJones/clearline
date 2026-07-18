@@ -14,7 +14,9 @@ source_reference: >
   Card Program & Connected Accounts, Integrations & Org Notifications, Security & Compliance, Developer
   Settings, Billing & Plan). Formalizes the entire /settings surface, which existed only as design mockups
   and Gherkin specs with no backlog record. Excludes the Team & Members surface, which is already owned by
-  EPIC-CW-018 / US-CW-031.
+  EPIC-CW-017 / US-CW-031, but DOES introduce Ownership Transfer (US-CW-043) — the follow-up EPIC-CW-017
+  deferred — because its UI lives in this Settings surface and, with the US-CW-031 roster now shipped, it is
+  finally buildable end-to-end.
 package_location: 'apps/clearline-web/'
 deployment_unit: 'apps/clearline-web/'
 tdr_reference: 'TDR-CW-WEB-001'
@@ -26,13 +28,15 @@ depends_on_epics:
     'EPIC-CW-016',
     'EPIC-CW-019',
     'EPIC-CW-018',
+    'EPIC-CW-017',
     'EPIC-CW-015',
   ]
 extends_stories: ['US-CW-006', 'US-CW-028', 'US-CW-032']
 reuses_from:
   - 'RBAC permission model (permissionsForRole, hasPermission, Permission/Role in @clearline/contracts, RequirePermission guard, AccessDenied organism, useAuthorization, permission-filtered nav) from EPIC-CW-003 (US-CW-006 / US-CW-028)'
   - 'Persistent sidebar AppShell + role-scoped NavigationShell + user-identity SidebarFooter from EPIC-CW-021 (US-CW-028 / US-CW-032) — the /settings surface mounts inside this shell and the settings entry point lives in it'
-  - 'isOwner / isAdmin flags + owner provisioning from EPIC-CW-019 (US-CW-030) and the Organization entity + team:view = isOwner OR isAdmin gating from EPIC-CW-018 (US-CW-031)'
+  - 'isOwner / isAdmin flags + owner provisioning (US-CW-030) and the Organization entity, team roster + team:view = isOwner OR isAdmin gating (US-CW-031) — both implemented by EPIC-CW-017'
+  - 'The team-membership domain from EPIC-CW-017 — the roster query, owner-provisioning-policy (the owner_protected non-removability/non-self-demotion guard), and the Owner/Admin-gated team handlers (libs/mock-backend/src/handlers/team.handlers.ts) — extended by US-CW-043 (Ownership Transfer) for the atomic Owner swap that is the only sanctioned relaxation of owner_protected'
   - 'Single-use, hashed-at-rest, enumeration-safe token machinery + async email dispatch from US-CW-029 (email verification) and US-CW-003 (password reset), reused for the personal email-change confirmation link'
   - 'PBKDF2-HMAC-SHA256 password-hashing helper from @clearline/domain-auth (US-CW-001) for the Security password-change flow'
   - 'ConfirmationDialog organism (design §11 / §19.9) for every destructive settings action; AuditTrail (US-CW-021, EPIC-CW-015) for security- and org-config audit events'
@@ -73,6 +77,9 @@ changes:
     - story_id: 'US-CW-042'
       story_path: '/specs/user-stories/clearline-web/US-CW-042.yaml'
       title: 'Billing & Plan'
+    - story_id: 'US-CW-043'
+      story_path: '/specs/user-stories/clearline-web/US-CW-043.yaml'
+      title: 'Ownership Transfer'
   updates:
     - story_id: 'US-CW-006'
       story_path: '/specs/user-stories/clearline-web/US-CW-006.yaml'
@@ -112,9 +119,10 @@ notes: >
     Profile group (every authenticated user):
       US-CW-033 shell + nav · US-CW-034 Personal Info + Notifications · US-CW-035 Security
     Organization group (Controller / Admin / Owner — never Employees):
-      US-CW-036 Company Profile · US-CW-031 Team & Members (EXISTING, EPIC-CW-018) · US-CW-037 Approval
+      US-CW-036 Company Profile · US-CW-031 Team & Members (EXISTING, EPIC-CW-017) · US-CW-037 Approval
       Policies & Spend Controls · US-CW-038 Card Program & Connected Accounts · US-CW-039 Integrations & Org
-      Notifications · US-CW-040 Security & Compliance · US-CW-041 Developer · US-CW-042 Billing & Plan
+      Notifications · US-CW-040 Security & Compliance (with US-CW-043 Ownership Transfer mounted inside it,
+      Owner-only) · US-CW-041 Developer · US-CW-042 Billing & Plan
 
   Cross-cutting design requirements (design §19 intro — these are requirements, not preferences, and every
   story restates the ones it touches):
@@ -138,10 +146,16 @@ notes: >
   mounts into and should land first. US-CW-034 establishes the shared unsaved-changes footer + avatar/crop +
   reveal-once/verification-link conventions the later stories reuse. The Organization-group stories
   (US-CW-036…042) each depend on the shell and on the RBAC permission additions declared in the US-CW-006
-  update; they are otherwise independent of one another and can be picked up in any order.
+  update; they are otherwise independent of one another and can be picked up in any order. US-CW-043 (Ownership
+  Transfer) is the exception — it mounts inside US-CW-040 (Security & Compliance) and reuses the US-CW-035
+  step-up re-auth, so it depends on both and should follow them; it is Owner-gated (isOwner), not gated by the
+  org-settings permission set, and extends EPIC-CW-017's team domain.
 
-  Explicitly OUT OF SCOPE: Team & Members management (owned by EPIC-CW-018 / US-CW-031 — this epic only wires
-  its nav item into SettingsNav). Real KYB re-verification, real SSO/SAML brokering, real Plaid/Stripe/
+  Explicitly OUT OF SCOPE: Team & Members management (owned by EPIC-CW-017 / US-CW-031 — this epic only wires
+  its nav item into SettingsNav). Ownership Transfer (US-CW-043) is the one membership-adjacent capability this
+  epic DOES own, because its surface is Settings → Security & Compliance and EPIC-CW-017 explicitly deferred it
+  to a future epic; it extends EPIC-CW-017's team domain rather than duplicating it. Real KYB re-verification,
+  real SSO/SAML brokering, real Plaid/Stripe/
   QuickBooks backends, and real TOTP validation are mocked via the MSW service layer per the project's
   Mock Backend Architecture — these are frontend responsibilities within that system, not a production
   financial/identity stack.

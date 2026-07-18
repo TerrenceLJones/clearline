@@ -134,8 +134,9 @@ technical_notes: |
 
   Ownership transfer (reassigning Owner to a different member, e.g. before the original Owner is
   removed) is explicitly out of scope for this story, consistent with US-CW-030 AC-03's non-removability
-  guarantee having no escape hatch yet. Flagged here as a real follow-up gap, not dropped silently:
-  without it, an Owner who needs to leave the organization entirely has no supported path today.
+  guarantee having no escape hatch yet. That follow-up gap is now closed by EPIC-CW-022's US-CW-043
+  (Ownership Transfer), which extends this story's team domain with an atomic, re-auth-gated Owner swap —
+  the supported path for an Owner who needs to leave the organization.
 
 # Edge Cases
 edge_cases: |
@@ -169,5 +170,5 @@ implementation_status: |
   set-password → role dashboard / expired screen). Data-access lib: @clearline/data-access-team. AC-06's
   "domain match at sign-up does not auto-join" holds by construction — sign-up creates an account with
   orgId: null and routes to standalone onboarding; joining an org is only ever possible via an invite.
-  Out of scope, flagged as follow-ups: ownership transfer, and invite resend/revoke controls (the
-  roster shows pending invites but does not yet action them).
+  Out of scope, flagged as follow-ups: ownership transfer (now owned by EPIC-CW-022 / US-CW-043), and
+  invite resend/revoke controls (the roster shows pending invites but does not yet action them).

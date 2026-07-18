@@ -60,7 +60,7 @@ notes: >
   actions, the distinct Organization entity, team:view via isOwner, the RequireOnboarded invited-member
   bypass, and the non-owner duplicate-EIN branch — all of which live in EPIC-CW-018 (US-CW-031). RequireOnboarded
   is intentionally NOT changed here: with no invited members, every user is a creator who still onboards as
-  today. Ownership transfer is out of scope across both epics.
+  today. Ownership transfer is out of scope across both epics; it is owned by EPIC-CW-022 (US-CW-043).
 
   Implemented 2026-07-07: the creator is elevated to { role: 'controller', approvalLimit: null, isOwner: true }
   atomically on the KYB-approval transition (mock-backend OnboardingService one-time approval side effect →

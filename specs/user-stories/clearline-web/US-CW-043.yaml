@@ -1,0 +1,159 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-043'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'Ownership Transfer'
+
+# Lifecycle status
+status: 'DRAFT'
+story_points: 8
+dependencies: ['US-CW-033', 'US-CW-035', 'US-CW-040', 'US-CW-031']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-022'
+created_date: '2026-07-18'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-022'
+    action: 'created'
+    date: '2026-07-18'
+
+# Status timestamps — set when status transitions occur
+approved_date: null
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'Owner of a Clearline Organization'
+  capability: 'transfer the Owner role to another existing member of my organization from a Settings surface, as a single atomic re-auth-gated action that never leaves the org with zero or two Owners, so I have a supported path to hand over control before I leave the company'
+  business_value: 'Closes the standing gap where an Owner had no way to leave — US-CW-030 AC-03 makes Owner non-removable and non-self-demotable with no escape hatch. Ownership transfer is the only supported route out, and it is gated so it can never be used to accidentally or maliciously orphan the organization.'
+  description: |
+    As the Owner of an Organization
+    I want to transfer the Owner role to another current member from Settings → Security & Compliance
+    So that control of the organization can be handed to an accountable person before I leave, without ever
+    creating a state where the org has no Owner or two Owners
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I am the Owner on Settings → Security & Compliance
+      When I open "Transfer ownership"
+      Then I can select the new Owner only from current members of my organization (excluding myself), and no
+      free-text email entry is offered — transfer targets an existing member, never an invite
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given I am anyone other than the Owner (Admin, Controller, Finance Manager, or Employee)
+      When I look at Settings → Security & Compliance
+      Then the "Transfer ownership" affordance is not rendered, direct navigation to the transfer action shows
+      AccessDenied, and the transfer API returns 403 independently (US-CW-033 AC-03/AC-04) — only the current
+      Owner may initiate a transfer
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given I have selected a new Owner
+      When I proceed to confirm
+      Then a destructive-confirmation dialog names the specific consequence — "Transfer ownership to Jordan Lee?
+      Jordan will become the Owner with full, non-removable control of this organization. You will become an
+      Admin and lose Owner authority. This cannot be undone by you." (§19.9 doctrine — never a bare
+      "Are you sure?")
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given I have confirmed the transfer in the dialog
+      When I submit
+      Then I must re-authenticate before the transfer executes — password re-entry, plus a TOTP challenge if I
+      have 2FA enabled (US-CW-035) — and the transfer is rejected if re-authentication fails
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given re-authentication succeeds
+      When the transfer executes
+      Then in one atomic transition the selected member becomes Owner (isOwner true, Controller tier, unlimited
+      approval limit per US-CW-030) and I am demoted to Admin — at no observable point does the org have zero
+      Owners or two Owners
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given the transfer has completed
+      When the new Owner and I next load the app
+      Then the new Owner sees Owner-gated surfaces (including this transfer action) and I no longer do; my session
+      reflects the Admin role without requiring a full re-login, consistent with the mid-session role-change
+      handling and "Your access changed" banner (US-CW-006 AC-05)
+    status: 'active'
+  - id: 'AC-07'
+    description: |
+      Given a transfer is attempted
+      When the selected target is no longer a member (removed between selection and submit), or the acting user
+      is no longer the Owner (a concurrent transfer already ran)
+      Then the transfer is rejected with a specific reason rather than partially applied, and the org's single
+      Owner is unchanged
+    status: 'active'
+  - id: 'AC-08'
+    description: |
+      Given ownership is transferred
+      When it succeeds
+      Then an immutable audit event records the actor (outgoing Owner), the action (owner_transfer), and the
+      before → after ownership state (US-CW-021 / EPIC-CW-015)
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  This story is the ownership-transfer flow deferred by EPIC-CW-017/US-CW-031 (and mirrored in EPIC-CW-018/
+  EPIC-CW-019). It is buildable end-to-end for the first time once US-CW-031 lands: the team roster now provides
+  real non-Owner members to transfer to, so the "don't build a mechanism nothing exercises end-to-end" reason
+  for the original deferral no longer holds.
+
+  Gating: initiating a transfer is Owner-only — narrower than the `org-security:manage` (Admin | Owner) gate on
+  the rest of US-CW-040. The action surfaces within Settings → Security & Compliance but is guarded by the
+  isOwner flag (EPIC-CW-017), not the org-settings permission set, and the server enforces it independently
+  (AC-02).
+
+  Owner-singleton invariant: the transfer is the ONLY sanctioned way to relax the `owner_protected` guard that
+  changeMemberRole/removeMember enforce (US-CW-030 AC-03, libs/domain/auth/src/owner-provisioning-policy.ts).
+  The swap — promote target to Owner, demote acting Owner to Admin — must execute as one atomic transition so
+  no persisted or observable state ever has zero or two Owners (AC-05), the same "no dangling state" discipline
+  US-CW-030 applied to provisioning. Concurrency/staleness is rejected, not partially applied (AC-07).
+
+  Re-auth: transfer is the highest-blast-radius self-service action in the app, so it is step-up gated (AC-04)
+  reusing the password verification (US-CW-001 PBKDF2-HMAC-SHA256) and, when enrolled, the TOTP challenge from
+  US-CW-035 — the same step-up pattern the Security page uses for sensitive changes.
+
+  Post-transfer session: the outgoing Owner keeps an active session but loses Owner authority; role/flag changes
+  ride the session and surface via the US-CW-006 AC-05 mid-session "Your access changed" handling rather than a
+  forced logout (AC-06). Destructive confirmation names the specific incoming Owner and the specific loss of
+  authority (AC-03, §19.9). Audit via AuditTrail (US-CW-021).
+
+  Backed by the MSW mock service layer per the Mock Backend Architecture — a new Owner-gated transfer endpoint
+  extending the team handlers (libs/mock-backend/src/handlers/team.handlers.ts), not a production identity stack.
+
+# Edge Cases
+edge_cases: |
+  - Transfer initiated by a non-Owner via direct API call, bypassing the hidden UI — rejected 403 server-side (AC-02)
+  - Selected target removed from the org between selection and submit — transfer rejected, Owner unchanged (AC-07)
+  - Two transfers raced from the same Owner session — only one applies; the second sees the acting user is no
+    longer Owner and is rejected (AC-07)
+  - Re-authentication fails (wrong password or wrong TOTP) — transfer does not execute; ownership unchanged (AC-04)
+  - Outgoing Owner mid-session after transfer — Owner-gated UI disappears on next role-aware render, not by
+    forced logout (AC-06)
+  - (inferred) Org with only one member (the Owner) — no eligible transfer target; the action is unavailable
+    rather than presenting an empty picker
+  - (inferred) Target is already an Admin — they gain Owner and retain org-admin authority; the outgoing Owner
+    lands at Admin, so the org never loses an org-administrator in the swap
+
+# Implementation Status
+implementation_status: |
+  🚧 Not yet implemented — DRAFT authored 2026-07-18 (EPIC-CW-022), specs-only for review.
+  Source: the ownership-transfer follow-up gap flagged in US-CW-031 technical_notes and EPIC-CW-017/018/019
+  notes, now given a concrete home in the Settings surface (design §19 Settings & Profile; the destructive-
+  confirmation doctrine §19.9). Anticipated new surface: a Transfer-ownership action within
+  /settings/security-compliance (Owner-only), extending the team domain and MSW handlers from EPIC-CW-017 with
+  an atomic, re-auth-gated owner swap that preserves the single-Owner invariant.

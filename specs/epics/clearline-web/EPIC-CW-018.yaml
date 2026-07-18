@@ -80,7 +80,8 @@ notes: >
 
   Ownership transfer / Owner offboarding is deliberately OUT OF SCOPE here as in EPIC-CW-019: the Owner remains
   non-removable and non-demotable (US-CW-031 AC-06/AC-07 enforce the US-CW-030 AC-03 invariant), and the org
-  always has exactly one Owner. A future epic must introduce ownership transfer before an Owner can ever leave.
+  always has exactly one Owner. That follow-up is now owned by EPIC-CW-022 (US-CW-043, Ownership Transfer),
+  whose Settings surface is its natural home, before an Owner can ever leave.
 
   Status is DRAFT: authored as specs-only for review. The changes.updates entries above are declared but NOT yet
   applied to the already-APPROVED/IMPLEMENTED US-CW-004 / US-CW-006 records — editing those is an

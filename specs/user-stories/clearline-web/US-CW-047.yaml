@@ -1,0 +1,125 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-047'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'Event-Driven Task Completion & Milestone Celebration'
+
+# Lifecycle status
+status: 'DRAFT'
+story_points: 5
+dependencies: ['US-CW-044', 'US-CW-045']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-023'
+created_date: '2026-07-18'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-023'
+    action: 'created'
+    date: '2026-07-18'
+
+# Status timestamps — set when status transitions occur
+approved_date: null
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'active member working through my role''s getting-started tasks'
+  capability: 'have each task tick off the moment I actually perform the action it names — never by me marking it done — and see a single, brief celebration when I complete my role''s signature first action'
+  business_value: 'the checklist reflects what I have genuinely done rather than what I clicked, so it stays trustworthy, and finishing the one action that matters most feels like a real win instead of a formality'
+  description: |
+    As an active member working through getting-started tasks
+    I want each task to complete automatically when the domain event it represents occurs — an expense
+    submitted, an approval actioned, a card issued, a budget created, a teammate invited — and one modest
+    celebration when I complete my role's signature action
+    So that the launchpad never drifts from what the system knows I've done, I'm never asked to self-certify
+    incomplete work, and the moment that matters most is acknowledged without turning into confetti on every
+    click
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given a getting-started task represents a domain action (e.g. "Submit your first expense")
+      When the corresponding domain event occurs (an expense is successfully submitted)
+      Then that task is marked complete
+      And the launchpad progress (US-CW-044) and any on-page spotlight (US-CW-046) update to reflect it
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given the getting-started launcher is showing
+      Then there is no control anywhere to manually mark a task complete or skip it as done
+      And completion is only ever reached by performing the action the task names
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given I complete the task flagged as my role's signature action (US-CW-045 AC-07) — Employee: submit
+        an expense; Finance Manager: action an approval; Controller: issue a card; Owner: invite a teammate
+      When that task's completion is recorded
+      Then a single, brief milestone celebration is shown (a Toast), naming what I accomplished
+      And it is shown at most once per user per organization for that signature action
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given I complete a non-signature getting-started task
+      Then the task ticks off and progress advances
+      And no milestone celebration fires — only the signature action celebrates (AC-03)
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given a getting-started action was performed before this feature could observe it (for example I had
+        already submitted an expense in a prior session)
+      When my task set is computed
+      Then that task is shown as already complete rather than prompting me to repeat work I've done
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given the milestone celebration is shown
+      Then its meaning is carried by an icon and text, not colour alone (Design §17)
+      And it auto-dismisses and is also manually dismissible, never blocking the page
+      And it respects a reduced-motion preference (no motion-based effect when reduced motion is set)
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  Completion is derived from the same domain events the audit trail already records — expense submitted,
+  approval actioned (US-CW-012), card issued (US-CW-014), budget created, teammate invited (US-CW-031) —
+  rather than a client-owned "done" toggle. This is the design's load-bearing choice: it makes the checklist
+  a read model over real activity, so it cannot claim work the system didn't see, and it is why AC-02
+  forbids any manual check-off. AC-05 falls out of the same model — because completion is "has this user's
+  event fired in this org," a task the user already satisfied reads as done on first render without special
+  back-fill logic.
+
+  The signature-action mapping (AC-03) reuses US-CW-045's isSignature flag; the celebration is the existing
+  @clearline/ui Toast, kept intentionally modest (one line + icon) — the research's "celebrate milestones"
+  lesson, deliberately scoped to the single action most tied to activation rather than firing on every step,
+  so it stays a signal rather than noise. The once-per-user-per-org guard shares the persistence model with
+  US-CW-044 AC-05.
+
+  This story owns completion detection and celebration only. It updates state that US-CW-044 renders as
+  progress and US-CW-046 reads to suppress a spotlight; it does not own the launcher UI, the task catalogue,
+  or the on-page pointer.
+
+# Edge Cases
+edge_cases: |
+  - Signature action performed via a path other than the getting-started spotlight (still completes and
+    still celebrates once — completion is event-driven, not spotlight-driven — AC-01/AC-03)
+  - The same action performed twice (task is already complete; no second celebration — AC-03 once-only)
+  - Action performed in another tab/device (task reflects complete on next render here)
+  - A pre-existing action from before the feature shipped (AC-05: shown complete, not re-prompted)
+  - Reduced-motion preference set (celebration shown without motion — AC-06)
+  - The last remaining task is the signature action (completing it both celebrates and retires the launcher
+    per US-CW-044 AC-06)
+
+# Implementation Status
+implementation_status: |
+  🚧 Not yet implemented — DRAFT. Introduced by EPIC-CW-023. Observes domain events already emitted for the
+  audit trail; updates the state rendered by US-CW-044 and read by US-CW-046; uses the isSignature flag from
+  US-CW-045 and the Toast atom for the milestone (Design §17 for non-colour-only status).

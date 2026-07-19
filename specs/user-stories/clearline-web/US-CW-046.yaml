@@ -1,0 +1,130 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-046'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'On-Page Next-Task Spotlight & Empty-State Nudge'
+
+# Lifecycle status
+status: 'DRAFT'
+story_points: 5
+dependencies: ['US-CW-044', 'US-CW-045']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-023'
+created_date: '2026-07-18'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-023'
+    action: 'created'
+    date: '2026-07-18'
+
+# Status timestamps — set when status transitions occur
+approved_date: null
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'active member following a getting-started task to its destination page'
+  capability: 'arrive on the destination page and have the exact next action pointed out to me on the page itself — a spotlight anchored to the primary control, or the page''s own empty state carrying the prompt when there is nothing there yet'
+  business_value: 'the guidance meets me where the work actually happens instead of stranding me on a page to hunt for the control, and an empty page becomes an invitation to act rather than a dead end'
+  description: |
+    As an active member who just chose a getting-started task
+    I want the destination page to point out the primary action for that task — a spotlight on the primary
+    control, or the prompt built into the page's empty state when the page has no data yet
+    So that I can complete the task without searching, and a first-run empty page reads as "here is what to
+    do" rather than a blank surface with no next step
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I chose a getting-started task whose destination page has a primary control (for example
+        "Submit your first expense" → the New Expense action, or "Issue your first virtual card" → the
+        Issue Card action)
+      When the page renders
+      Then a spotlight is anchored to that primary control, naming the action in one short line
+      And the spotlight does not obscure the control it points to
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given a spotlight is showing
+      When I dismiss it (its close control, Escape, or by interacting with the underlying control)
+      Then it disappears and does not reappear on this page for this task on subsequent visits
+      And dismissing the spotlight does not mark the task complete — only performing the action does
+        (US-CW-047)
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given a getting-started task's destination page shows a list/table that is currently empty (for
+        example My Expenses with no expenses, or the Approvals queue with nothing to review)
+      When the page renders for this task
+      Then the guidance is delivered through the page's existing EmptyState (Design §9.2) — its title/body
+        frame the getting-started action and its action button is the primary control
+      And a redundant floating spotlight is not stacked on top of the empty state
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given a spotlight is showing
+      Then it is keyboard-focusable, dismissible with Escape, and does not trap focus
+      And its meaning is carried by text and an icon, not by colour alone (Design §17)
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given I navigated to a page directly (not by choosing its getting-started task from the launchpad)
+      Then no spotlight is shown for that task
+      And the page behaves exactly as it does outside onboarding — the spotlight is a response to following
+        a task, not an ambient decoration on every page
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given a task is already complete (US-CW-047)
+      When I visit its destination page
+      Then no spotlight or empty-state onboarding prompt is shown for it, regardless of how I arrived
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  The spotlight is a net-new molecule (there is no Tooltip/Popover primitive in @clearline/ui). It anchors
+  to a target the page registers by a stable key, supplied per task by the US-CW-045 catalogue — the page
+  exposes an anchor ref for its primary control; the spotlight positions against it and re-anchors on
+  resize/scroll. Pages that are the destination of a getting-started task opt in by declaring their anchor;
+  pages with no task never load spotlight code.
+
+  Empty-state integration (AC-03) reuses the existing EmptyState organism (icon/title/body/action/onAction)
+  rather than layering a second surface — the "no clear next step" empty-page failure mode is fixed by
+  making the empty state itself the nudge (Design §9.2). When a page's list is non-empty, the spotlight
+  path (AC-01) applies instead; the two never stack (AC-03).
+
+  Per-task, per-page dismissal (AC-02) is view state keyed by task id, distinct from task completion
+  (US-CW-047): a user may dismiss the pointer yet not perform the action, and the task correctly stays
+  incomplete. AC-05 keeps the spotlight scoped to intent — it renders only when the user reached the page
+  by choosing that task from the launchpad (carried as navigation intent from US-CW-044 AC-03), never as an
+  always-on hint on every visit.
+
+  This story owns on-page guidance only. The launcher/panel is US-CW-044; task selection/order is US-CW-045;
+  whether a task is complete (which suppresses the spotlight per AC-06) is US-CW-047.
+
+# Edge Cases
+edge_cases: |
+  - Destination page's primary control is below the fold (spotlight scrolls the control into view before
+    anchoring, or anchors on reveal)
+  - Empty list becomes non-empty while the page is open (empty-state nudge gives way to normal content; no
+    orphaned spotlight)
+  - Task completed on another device/tab (AC-06 suppresses the spotlight on next render here)
+  - User dismisses the spotlight, navigates away, returns via the task again (stays dismissed for this
+    task per AC-02)
+  - Reduced-motion preference (spotlight appears without motion; still keyboard-dismissible)
+  - Direct navigation to a task's page without choosing the task (AC-05: page behaves normally, no pointer)
+
+# Implementation Status
+implementation_status: |
+  🚧 Not yet implemented — DRAFT. Introduced by EPIC-CW-023. Consumes the anchor targets and destinations
+  from US-CW-045 and the navigation intent from US-CW-044; suppressed by completion state from US-CW-047.
+  Reuses the EmptyState organism (Design §9.2) for the empty-list path.

@@ -1,0 +1,158 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-044'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'Getting-Started Launchpad (Rail Entry, Panel & Progress)'
+
+# Lifecycle status
+status: 'DRAFT'
+story_points: 5
+dependencies: ['US-CW-001', 'US-CW-006', 'US-CW-028', 'US-CW-032', 'US-CW-045']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-023'
+created_date: '2026-07-18'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-023'
+    action: 'created'
+    date: '2026-07-18'
+
+# Status timestamps — set when status transitions occur
+approved_date: null
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'newly active member of an approved Clearline Organization'
+  capability: 'see a persistent, dismissible "Getting started" entry in the sidebar rail that shows how much of my role''s getting-started work remains and opens a checklist panel of the tasks my role can perform'
+  business_value: 'I am oriented toward the first meaningful thing my role exists to do instead of being dropped onto an empty page, and I can always find my way back to that guidance — or dismiss it — without it ever blocking the app'
+  description: |
+    As a newly active member of an approved Clearline Organization
+    I want a "Getting started" entry pinned in the sidebar rail with a slim progress bar, which opens a
+    panel listing the getting-started tasks my role can actually perform with an "X of N" progress count
+    So that I always know what to do next and how far along I am, can reopen the guidance after
+    dismissing it, and watch it retire itself once my role's tasks are complete — without it ever
+    interrupting or gating my work
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I am an authenticated user whose role has one or more incomplete getting-started tasks
+      When any authenticated page renders inside the app shell
+      Then a "Getting started" entry appears at the foot of the sidebar navigation list, directly above
+        the identity footer (Design §3.1)
+      And it displays a slim ProgressBar and an "X of N" count reflecting my completed vs total tasks
+      And the entry is visually distinct from the permanent navigation destinations
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given the "Getting started" rail entry is visible
+      When I activate it (click, Enter, or Space)
+      Then a launchpad panel opens anchored off the rail
+      And it lists exactly the tasks my role is authorized to perform (US-CW-045), each with a title, a
+        one-line description, a state (done / current / upcoming), and a deep-link action
+      And a ProgressBar with an explicit "X of N complete" label sits at the top of the panel
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given the launchpad panel is open
+      When I choose a task's action
+      Then the panel closes and I am navigated to that task's destination page (US-CW-046 owns what
+        happens on arrival)
+      And no task can be marked complete from within the panel — completion is observed, not self-reported
+        (US-CW-047)
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given the launchpad panel is open
+      When I dismiss it (close control, Escape, or click-away)
+      Then it collapses back to the rail entry
+      And my dismissal never blocks navigation or any page action
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given I have completed some but not all of my role's getting-started tasks
+      When I return in a later session
+      Then the rail entry and panel reflect my prior progress
+      And already-completed tasks render as done rather than resetting
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given every getting-started task for my role is complete
+      Then the rail entry retires: it no longer appears in the sidebar, and the surrounding navigation
+        does not visibly reflow or shift as a result
+      And the space it occupied is reclaimed cleanly by the identity footer
+    status: 'active'
+  - id: 'AC-07'
+    description: |
+      Given my role has no getting-started tasks defined at all
+      When the app shell renders
+      Then no "Getting started" rail entry is shown (the feature adds nothing rather than showing an
+        empty launcher)
+    status: 'active'
+  - id: 'AC-08'
+    description: |
+      Given my access changes mid-session (a role or flag change flows through useAuthorization, as in
+        US-CW-006 AC-05)
+      When the session refetches
+      Then the task set and progress recompute against my new permissions without a full reload
+      And any task I can no longer perform is removed from the list and excluded from the N total
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  The launcher mounts inside the authenticated app shell (AppChrome / AppShell), the one place present
+  on every authenticated page, so it does not need to be added per-route. The rail entry renders as a
+  NavItem-style row placed after NavigationShell and before SidebarFooter; it is deliberately not one of
+  NAV_ITEMS (US-CW-028) because it is transient onboarding state, not a permanent destination, and must
+  be able to retire (AC-06) without disturbing the permission-filtered nav list.
+
+  Progress is the existing @clearline/ui ProgressBar (role="progressbar", tone tokens) in a slim variant
+  on the rail entry and a standard variant in the panel; the "X of N" figure is always rendered as text
+  alongside it so progress is never conveyed by fill alone (accessibility; Design §17). The panel is a
+  net-new organism (there is no Popover/Tooltip primitive in @clearline/ui to reuse) that composes
+  existing atoms — ProgressBar, Button, Icon, and NavItem-like rows. The dev-only demo Beacon
+  (libs/demo-beacon) is a similar rail-anchored launcher but is gated to dev/demo builds and is not
+  reused for this production surface.
+
+  Persistence (AC-05) is per-user and per-organization. Completion is derived from observed domain events
+  (US-CW-047), so the durable record is which task events have fired for this user in this org, not a
+  mutable "dismissed"/"done" bitfield the client owns — reopening in a new session recomputes state from
+  that record. Dismissal (AC-04) is view state only (panel open/closed) and does not need to survive a
+  session; the rail entry persists until AC-06 retires it.
+
+  AC-08 keeps the launcher honest under mid-session access change: because the task set is a pure function
+  of the permission predicate (US-CW-045), recomputing on the same session refetch that already re-renders
+  the nav (US-CW-006 AC-05) is sufficient — there is no independent role cache to invalidate. A task
+  removed because access was revoked leaves the N total, so progress never shows "3 of 5" and then
+  strands the user on two tasks they can no longer reach.
+
+  The rail entry and panel are the container only. Which tasks exist and in what order is US-CW-045; what
+  happens on the destination page is US-CW-046; when a task flips to done and what celebration fires is
+  US-CW-047.
+
+# Edge Cases
+edge_cases: |
+  - A role with a single getting-started task (the panel and "1 of 1" progress must read correctly)
+  - A role with no getting-started tasks (AC-07: the launcher is absent, not empty)
+  - Completing the final task while the panel is open (rail entry retires without nav reflow — AC-06)
+  - Mid-session downgrade that removes an in-progress task (AC-08: task drops out, N shrinks)
+  - Mid-session upgrade that adds new tasks (progress recomputes; newly available tasks appear as upcoming)
+  - Returning in a later session after partial completion (AC-05: prior progress restored, not reset)
+  - Narrow / collapsed-rail and mobile layouts where the rail is a compact brand strip (entry remains
+    reachable; panel adapts)
+
+# Implementation Status
+implementation_status: |
+  🚧 Not yet implemented — DRAFT. Introduced by EPIC-CW-023 alongside US-CW-045 (task set), US-CW-046
+  (on-page spotlight), and US-CW-047 (event-driven completion). Depends on the org/team model from
+  EPIC-CW-017 (Owner/Admin, the Team destination) and the role-based home from US-CW-001.

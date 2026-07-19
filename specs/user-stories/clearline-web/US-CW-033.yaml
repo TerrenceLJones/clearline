@@ -9,7 +9,7 @@ feature_area: 'core'
 title: 'Settings Shell & Role-Scoped SettingsNav'
 
 # Lifecycle status
-status: 'APPROVED'
+status: 'IMPLEMENTED'
 story_points: 8
 dependencies: ['US-CW-006', 'US-CW-028', 'US-CW-032', 'US-CW-031']
 
@@ -22,10 +22,13 @@ history:
   - epic_id: 'EPIC-CW-022'
     action: 'created'
     date: '2026-07-17'
+  - epic_id: 'EPIC-CW-022'
+    action: 'implemented'
+    date: '2026-07-19'
 
 # Status timestamps — set when status transitions occur
 approved_date: '2026-07-18'
-implementation_date: null
+implementation_date: '2026-07-19'
 deprecated_date: null
 removed_date: null
 
@@ -161,9 +164,14 @@ edge_cases: |
 
 # Implementation Status
 implementation_status: |
-  🚧 Not yet implemented — DRAFT authored 2026-07-17 (EPIC-CW-022), specs-only for review.
-  Source: specs/designs/Clearline Design System - Consolidated.dc.html §19.1 (SettingsNav · role-scoped two-tier
-  sidebar; Employee "Profile only" vs Admin/Controller "Profile + Org" views) and Gherkin §20 (Employee cannot
-  see Organization settings; direct nav to an Organization URL returns 403). Anticipated new surface: a
-  SettingsNav organism in @clearline/ui, a /settings route tree with RequirePermission-guarded Organization
-  routes, the settings permission tokens in @clearline/contracts, and MSW handlers that re-check authorization.
+  ✅ Implemented 2026-07-19 (EPIC-CW-022). Delivered: the 8 settings Permission tokens in @clearline/contracts
+  + permissionsForRole grants and the shared SETTINGS_SECTION_PERMISSION policy in @clearline/domain-auth; the
+  SettingsNav organism (+ stories + mdx) and a `settings` gear glyph in @clearline/ui; a /settings route tree
+  (SettingsLayout + role-scoped nav + RequirePermission-guarded Organization routes + in-shell not-found) in
+  clearline-web with placeholders for the section stories (US-CW-034…042); the GET /api/settings/sections/:slug
+  MSW handler (independent 401/403/404/200) and the @clearline/data-access-settings lib backing AC-04's
+  server-side check; the universal Settings entry in the primary sidebar (US-CW-028); and the relocation of Team
+  & Members into Settings at /settings/team (US-CW-031), removing the top-level /team route and nav item.
+  Verified by unit/integration suites across the affected packages plus Playwright e2e (settings.spec.ts).
+  Source: specs/designs/Clearline Design System - Consolidated.dc.html §19.1 and Gherkin §20. Shipped in
+  branch US-CW-033/settings-shell-nav (PR #47).

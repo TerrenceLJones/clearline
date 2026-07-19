@@ -1,0 +1,103 @@
+epic_id: 'EPIC-CW-023'
+title: 'Role-Based Getting-Started Onboarding'
+app: 'clearline-web'
+feature_area: 'core'
+status: 'DRAFT'
+approved_date: null
+implementation_date: null
+created_date: '2026-07-18'
+source_reference: >
+  Not sourced from clearline-user-stories-gherkin.md — added after a review of the post-activation
+  experience found that once a user clears the door (KYB for the Owner in US-CW-030, an accepted
+  invite for everyone else in US-CW-031), the app drops them onto their role-appropriate home
+  (US-CW-001) with no guidance toward the first action their role actually exists to perform. A
+  newly provisioned Owner lands on an empty spend dashboard for an organization with no team, no
+  cards, no budgets and no expenses; an Employee lands on an empty My Expenses list. The registry
+  has a role-scoped *navigation* model (US-CW-006 / US-CW-028) but nothing that turns "here are the
+  pages you can see" into "here is the one thing to do first." This epic adds a role-scoped,
+  permission-derived getting-started layer that names the first (and next) meaningful task for each
+  persona and guides the user to it on the page where that work happens.
+package_location: 'apps/clearline-web/'
+deployment_unit: 'apps/clearline-web/'
+tdr_reference: 'TDR-CW-WEB-001 (not yet created — app baseline TDR pending; inherits TDR-PLATFORM-001 in the interim)'
+depends_on_epics: ['EPIC-CW-001', 'EPIC-CW-017']
+extends_stories: ['US-CW-001', 'US-CW-006', 'US-CW-028', 'US-CW-030']
+reuses_from:
+  - 'US-CW-006 (@clearline/domain-auth) permissionsForRole / the can() predicate — the getting-started task set is derived from the same permission source that drives nav visibility, never from a role string'
+  - 'US-CW-030 (@clearline/domain-auth) owner-provisioning-policy — the isOwner flag distinguishes the empty-org first-run from an invited member joining a populated org'
+  - '@clearline/ui ProgressBar (role="progressbar", tone tokens), EmptyState (icon/title/body/action/onAction), Toast, Button, NavItem, Icon — the launcher composes existing atoms rather than introducing new progress or empty-state primitives'
+has_ui: true
+ui_library: '@clearline/ui'
+changes:
+  adds:
+    - story_id: 'US-CW-044'
+      story_path: '/specs/user-stories/clearline-web/US-CW-044.yaml'
+      title: 'Getting-Started Launchpad (Rail Entry, Panel & Progress)'
+    - story_id: 'US-CW-045'
+      story_path: '/specs/user-stories/clearline-web/US-CW-045.yaml'
+      title: 'Role-Scoped Task Set & Owner First-Run Selection'
+    - story_id: 'US-CW-046'
+      story_path: '/specs/user-stories/clearline-web/US-CW-046.yaml'
+      title: 'On-Page Next-Task Spotlight & Empty-State Nudge'
+    - story_id: 'US-CW-047'
+      story_path: '/specs/user-stories/clearline-web/US-CW-047.yaml'
+      title: 'Event-Driven Task Completion & Milestone Celebration'
+  updates: []
+  deprecates: []
+  removes: []
+notes: >
+  Establishes the in-app onboarding layer that begins the moment a user first reaches an authenticated
+  page and ends when their role's getting-started tasks are complete or dismissed. It is deliberately
+  separated from the existing KYB business-onboarding flow (US-CW-004, the /onboarding/* step routes),
+  which provisions the organization and the Owner: that flow answers "is this business allowed to
+  transact"; this epic answers "now that you're in, what should you do first." The seam between them
+  is exact — KYB approval provisions the Owner (US-CW-030 AC-02) and hands off to their role-appropriate
+  home (US-CW-001), where this layer picks up.
+
+  Design decision — the task set is derived from permissions, never from a role string: the launchpad
+  asks the same can() predicate US-CW-028 uses to filter the nav, so a persona is only ever offered
+  tasks it is actually authorized to perform, and any future change to ROLE_PERMISSIONS re-shapes the
+  onboarding for free with no second list to keep in sync. A Controller-only task (issue a virtual
+  card, cards:manage — US-CW-014) never appears for a Finance Manager because the predicate that gates
+  the nav link gates the onboarding item behind the same permission. This is the whole reason the
+  feature is role-based without a role switch statement.
+
+  Design decision — the Owner first-run is a distinct persona, selected by isOwner, not by tier: an
+  Owner is provisioned as a Controller (US-CW-030), so a naive permission-only task set would hand the
+  Owner the ordinary Controller checklist. But an invited Controller joins an organization that already
+  has a team, cards and budgets around them, whereas the Owner arrives out of KYB into an organization
+  that is genuinely empty and that only they can populate. isOwner (already on the session, orthogonal
+  to the approval ladder, granting only team:view via isAdmin || isOwner) is the input that selects the
+  "stand up your workspace" variant — invite the team first, then set a budget, issue the first card,
+  read the dashboard — over the "here is your role's first action" variant everyone else receives. This
+  mirrors how Ramp / Brex / Mercury treat the workspace creator differently from an invited member, and
+  it is the one place the feature reads a flag beyond the permission set.
+
+  Design decision — completion is observed from real domain events, never a manual check-off: an item
+  is marked done when the action it names actually happens (an expense is submitted, an approval is
+  actioned, a card is issued, a budget is created, a teammate is invited), detected off the same events
+  the audit trail already records, so the checklist can never drift from system truth and the user is
+  never asked to self-certify work they may not have finished. This is what keeps the launchpad honest
+  as "the first action IS the product" rather than a tour that congratulates a click. A single milestone
+  celebration fires on the persona's signature first action (US-CW-047); after that the launcher quiets.
+
+  Design decision — anchored to the left rail, not a top bar: the shell has no top bar (the theme
+  control was relocated into the rail footer per US-CW-032 / Design §3.1), so the launcher's entry point
+  is a pinned "Getting started" row at the foot of the navigation list, directly above the SidebarFooter,
+  carrying a slim ProgressBar. It is visually separated from the permanent nav destinations so it can
+  disappear on completion without reshuffling navigation, and it opens the checklist as a panel anchored
+  off the rail. The dev-only demo Beacon (libs/demo-beacon) is a structurally similar page-aware launcher
+  but is gated to dev/demo builds and is explicitly NOT reused here — this is a first-class, production,
+  user-facing surface with its own component.
+
+  Design decision — always skippable, re-openable, and dead-end-free: senior finance users (Controllers,
+  Finance Managers, Owners) reject mandatory tours, so the launcher is dismissible at any time and never
+  blocks a page; a dismissed launcher collapses to the rail entry and can be reopened until its tasks are
+  done. Every task deep-links to a real destination and, where that destination's primary list is empty,
+  the guidance is delivered through the page's existing EmptyState (Design §9.2) rather than a tour layer,
+  so the user never lands on a blank surface with no next action.
+
+  Accessibility: progress is a real ProgressBar (role="progressbar") with an explicit "X of N" text
+  label, never conveyed by fill alone; completion and milestone states pair colour with an icon and a
+  text label per Design §17 (no meaning by colour alone); the spotlight is keyboard-focusable, dismissible
+  with Escape, and does not trap focus.

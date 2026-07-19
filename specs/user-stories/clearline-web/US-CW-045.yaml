@@ -1,0 +1,163 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-045'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'Role-Scoped Task Set & Owner First-Run Selection'
+
+# Lifecycle status
+status: 'DRAFT'
+story_points: 5
+dependencies: ['US-CW-006', 'US-CW-028', 'US-CW-030']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-023'
+created_date: '2026-07-18'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-023'
+    action: 'created'
+    date: '2026-07-18'
+
+# Status timestamps — set when status transitions occur
+approved_date: null
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'active member of a Clearline Organization holding any role or ownership flag'
+  capability: 'be offered only the getting-started tasks my role is authorized to perform, ordered with my role''s single most important first action first, and — if I am the Owner who just created the organization — be given the workspace-setup path rather than an ordinary member''s path'
+  business_value: 'the guidance is relevant to what I can actually do and to the state my organization is actually in, so I am never shown a task I lack permission for nor an invited-member script when I am the person who has to stand the whole organization up'
+  description: |
+    As an active member holding any role (Employee, Finance Manager, Controller) and any orthogonal flag
+    (isAdmin, isOwner)
+    I want the getting-started task list to be computed from my permission set, led by my role's signature
+    first action, with a distinct "set up your workspace" variant when I am the Owner of a freshly created
+    organization
+    So that I only ever see tasks I'm authorized to do, in an order that puts the most important one first,
+    and the Owner who lands in an empty organization is guided to populate it rather than handed a checklist
+    written for someone joining an organization that already exists
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given a user with permission set P (from permissionsForRole, US-CW-006)
+      When the getting-started task set is computed
+      Then it includes only tasks whose required permission is present in P
+      And no task is derived from a role string — the same can() predicate that gates the nav link for a
+        destination gates its onboarding task
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given I am an Employee (expenses:view, cards:view)
+      Then my task set is, in order: "Submit your first expense" (→ /expenses/new, the signature first
+        action) and "See your cards" (→ /cards)
+      And no additional filler task is invented to reach a target length — a two-task role has a two-task
+        launcher
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given I am a Finance Manager (approvals:act, analytics:view, reconciliation:view, payments:create,
+        plus Employee's permissions)
+      Then my task set leads with "Clear your first approval" (→ /approvals, the role's signature action)
+      And also offers, in order: "Read your spend dashboard" (→ /dashboard), "Send a payment"
+        (→ /payments/new), and "Reconcile transactions" (→ /reconciliation)
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given I am a Controller who was invited into an existing organization (isOwner is false;
+        cards:manage, budget:view, audit:view, plus Finance Manager's permissions)
+      Then my task set leads with "Issue your first virtual card" (→ /cards/new, the Controller-only
+        signature action, cards:manage, US-CW-014)
+      And also offers "Set a budget" (→ /budgets/new) and "Review the audit log" (→ /audit)
+      And it does NOT lead with an empty-organization setup script — the organization around me already
+        has data
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given I am the Owner of the organization (isOwner is true; provisioned as Controller with an
+        unlimited approval limit per US-CW-030)
+      Then I receive the workspace-setup variant, leading with "Invite your team" (→ /team, the signature
+        first action for a founder standing up an empty organization)
+      And also offering, in order: "Set a budget" (→ /budgets/new), "Issue your first virtual card"
+        (→ /cards/new), and "Review your spend dashboard" (→ /dashboard)
+      And this variant is selected by isOwner, not by tier — an invited Controller (AC-04) and the Owner
+        both hold Controller permissions but receive different task sets
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given I hold the isAdmin flag but am not the Owner (org-administration authority delegated to me,
+        granting team:view without owner first-run context)
+      Then an "Invite your team" task (→ /team) is appended to whatever task set my approval-tier role
+        produces
+      And I do not receive the Owner empty-organization first-run ordering — I was appointed into an
+        organization that already exists
+    status: 'active'
+  - id: 'AC-07'
+    description: |
+      Given any computed task set
+      Then it carries at most one task flagged as the "signature" (milestone) action for that persona,
+        used by US-CW-047 to decide when to celebrate
+      And that flag is the first task in the ordered set
+    status: 'active'
+  - id: 'AC-08'
+    description: |
+      Given a task references a destination that requires a permission
+      When the set is computed
+      Then task ordering is stable and deterministic for a given permission set + isOwner value, so the
+        same persona always sees the same order (no run-to-run shuffle)
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  The task catalogue lives beside nav-items.ts as a permission-keyed table (conceptually
+  onboardingTasksForPermissions(can, { isOwner, isAdmin })), mirroring how navItemsForPermissions filters
+  NAV_ITEMS. Each task entry carries: id, requiredPermission, title, one-line description, destinationPath,
+  the anchor target for its on-page spotlight (US-CW-046), and an isSignature flag (AC-07). The set is the
+  subset whose requiredPermission passes can(), ordered by a fixed per-persona ordering.
+
+  The Owner/first-run distinction (AC-05) is the single place the computation reads a flag beyond the
+  permission predicate. It is justified because isOwner is not redundant with permissions here: an Owner
+  and an invited Controller can hold an identical permission set (Owner is a Controller per US-CW-030), yet
+  the *state of the organization* differs — the Owner's org is empty and only they can populate it. isOwner
+  is already on the session (orthogonal to the Employee/Finance-Manager/Controller ladder, granting only
+  team:view via isAdmin || isOwner — US-CW-006 / US-CW-030), so no new session field is needed. Selection
+  is: isOwner → workspace-setup ordering; else → role-signature ordering, with an appended team task when
+  isAdmin (AC-06).
+
+  "Signature" tasks per persona: Employee → submit expense; Finance Manager → clear an approval; Controller
+  (invited) → issue a virtual card; Owner → invite the team. These are the "first action IS the product"
+  anchors; US-CW-047 fires exactly one milestone celebration, on the signature task.
+
+  Deliberately no filler (AC-02): the Employee surface is small (two tasks) and stays two tasks. Padding a
+  short list to hit a "3–5 item" target would manufacture busywork and is explicitly rejected — the count
+  reflects the role's real surface area.
+
+  This story owns only *which* tasks and *what order*. The container that renders them is US-CW-044; the
+  destination-page behaviour is US-CW-046; completion detection is US-CW-047. The /team destination and
+  the invite action this story points the Owner/Admin at come from EPIC-CW-017 (US-CW-031, Design §18.2).
+
+# Edge Cases
+edge_cases: |
+  - Owner vs invited Controller with identical permissions but different isOwner (AC-04 vs AC-05 — the
+    core reason selection reads isOwner)
+  - Employee who is also Admin (two-task expense/cards set plus an appended invite-team task — AC-06)
+  - Employee who is also Owner (unusual, but isOwner still selects workspace-setup ordering layered on the
+    Employee permission set — invite team is reachable via team:view; card/budget tasks are absent because
+    the permissions aren't held)
+  - A Finance Manager promoted to Controller mid-session (task set gains the Controller-only card/budget/
+    audit tasks on the next session refetch — see US-CW-044 AC-08)
+  - A persona whose permission set yields zero tasks (US-CW-044 AC-07 suppresses the launcher entirely)
+
+# Implementation Status
+implementation_status: |
+  🚧 Not yet implemented — DRAFT. Introduced by EPIC-CW-023. Provides the task-set computation consumed by
+  US-CW-044 (launcher), US-CW-046 (spotlight targets), and US-CW-047 (signature/milestone). Depends on the
+  permission model (US-CW-006), the nav catalogue pattern (US-CW-028), and Owner provisioning (US-CW-030).

@@ -27,28 +27,48 @@ export interface ToastProps {
    * failure toast. Either way the message is spoken — meaning is never carried by color alone.
    */
   role?: 'status' | 'alert';
+  /** When provided, a dismiss (×) button is shown so the user can clear the toast before it auto-hides. */
+  onDismiss?: () => void;
 }
 
 /**
- * A transient dark pill for a one-line confirmation of a completed action — e.g. the "10 approved"
- * batch-success toast (US-CW-013 AC-01, design §7.2). Presentational: the caller controls when it
- * appears and dismisses it. Pairs an icon with its color so the outcome reads without relying on hue.
+ * A transient elevated card for a one-line confirmation of a completed action — e.g. the "10
+ * approved" batch-success toast (US-CW-013 AC-01, design §7.2). Presentational: the caller controls
+ * when it appears and dismisses it. It reads on the theme surface (never a hard-coded color) so the
+ * text stays legible in both light and dark, and pairs an icon with its color so the outcome reads
+ * without relying on hue. Provide `onDismiss` for a manual close affordance.
  */
-export function Toast({ message, tone = 'positive', icon, role = 'status' }: ToastProps) {
+export function Toast({
+  message,
+  tone = 'positive',
+  icon,
+  role = 'status',
+  onDismiss,
+}: ToastProps) {
   const def = TONE[tone];
 
   return (
     <div
       role={role}
       aria-live={role === 'alert' ? 'assertive' : 'polite'}
-      className="bg-cl-text inline-flex items-center gap-2.5 rounded-lg px-4.5 py-2.75 font-sans shadow-lg"
+      className="bg-cl-surface border-cl-border inline-flex items-center gap-2.5 rounded-lg border px-4.5 py-2.75 font-sans shadow-lg"
     >
       <span className={`${def.iconClass} flex-shrink-0`}>
         <Icon name={icon ?? def.icon} size={16} />
       </span>
-      <Text as="span" size="label" weight="semibold" tone="default" className="text-cl-surface">
+      <Text as="span" size="label" weight="semibold" tone="default">
         {message}
       </Text>
+      {onDismiss ? (
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label="Dismiss"
+          className="text-cl-text-3 hover:text-cl-text focus-visible:ring-cl-focus -mr-1 ml-1 shrink-0 rounded outline-none focus-visible:ring-2"
+        >
+          <Icon name="x" size={14} />
+        </button>
+      ) : null}
     </div>
   );
 }

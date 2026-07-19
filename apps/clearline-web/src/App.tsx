@@ -4,6 +4,7 @@ import { DemoBeaconProvider } from '@clearline/demo-beacon';
 import { LoginPage } from './pages/LoginPage';
 import { SignUpPage } from './pages/SignUpPage';
 import { VerifyEmailPage } from './pages/VerifyEmailPage';
+import { EmailChangeConfirmPage } from './pages/EmailChangeConfirmPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { ApprovalsPage } from './pages/ApprovalsPage';
@@ -59,6 +60,9 @@ export function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/verify" element={<VerifyEmailPage />} />
+          {/* Public email-change confirmation (US-CW-034 AC-03/04): the link is opened from an email
+              and may arrive with no session, so it sits outside RequireAuth like /verify. */}
+          <Route path="/email-change/confirm" element={<EmailChangeConfirmPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           {/* Public invite acceptance (US-CW-031 AC-02): the invitee has no session yet, so this sits

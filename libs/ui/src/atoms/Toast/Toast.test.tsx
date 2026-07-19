@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Toast } from './Toast';
 
 describe('Toast', () => {
@@ -13,5 +14,15 @@ describe('Toast', () => {
   it('announces assertively when the role is alert', () => {
     render(<Toast message="Something failed" tone="negative" role="alert" />);
     expect(screen.getByRole('alert')).toHaveAttribute('aria-live', 'assertive');
+  });
+
+  it('shows a manual dismiss control only when onDismiss is provided, and fires it (US-CW-034)', async () => {
+    const onDismiss = vi.fn();
+    const { rerender } = render(<Toast message="Saved" />);
+    expect(screen.queryByRole('button', { name: 'Dismiss' })).not.toBeInTheDocument();
+
+    rerender(<Toast message="Saved" onDismiss={onDismiss} />);
+    await userEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+    expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 });

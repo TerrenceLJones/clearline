@@ -19,7 +19,7 @@ import { PageTitleSetterContext } from './hooks/page-title-context';
  * Analytics Dashboard. Resolving both surfaces from one value here keeps the tab and heading in sync.
  */
 export function AppChrome() {
-  const { can, role, isAdmin, approvalLimit, currency, displayName, isLoading } =
+  const { can, role, isAdmin, approvalLimit, currency, displayName, avatarUrl, isLoading } =
     useAuthorization();
   const { accessChanged, dismiss } = useAccessChanged();
   const location = useLocation();
@@ -43,6 +43,7 @@ export function AppChrome() {
       ? {
           name: displayName,
           initials: initialsFromName(displayName),
+          avatarUrl,
           roleLabel: roleLabel(role),
           detail: identityDetail(role, approvalLimit, isAdmin, currency ?? undefined),
         }

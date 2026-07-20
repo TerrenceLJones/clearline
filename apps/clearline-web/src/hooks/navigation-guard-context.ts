@@ -13,6 +13,11 @@ export interface NavigationGuardValue {
   /** Live "there are unsaved changes" flag, set by the active form; read at click time, not render time. */
   blockRef: { current: boolean };
   guardedNavigate: GuardedNavigate;
+  /**
+   * Arms/disarms the guard. Kept separate from `blockRef` so the provider can also observe the change
+   * as state — it needs to (un)install the browser Back/Forward (popstate) guard, not just gate clicks.
+   */
+  setArmed: (active: boolean) => void;
 }
 
 export const NavigationGuardContext = createContext<NavigationGuardValue | null>(null);
@@ -22,9 +27,9 @@ export function useRegisterNavigationGuard(active: boolean) {
   const ctx = useContext(NavigationGuardContext);
   useEffect(() => {
     if (!ctx) return;
-    ctx.blockRef.current = active;
+    ctx.setArmed(active);
     return () => {
-      ctx.blockRef.current = false;
+      ctx.setArmed(false);
     };
   }, [ctx, active]);
 }

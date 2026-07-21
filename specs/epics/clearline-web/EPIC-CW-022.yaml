@@ -80,6 +80,9 @@ changes:
     - story_id: 'US-CW-043'
       story_path: '/specs/user-stories/clearline-web/US-CW-043.yaml'
       title: 'Ownership Transfer'
+    - story_id: 'US-CW-048'
+      story_path: '/specs/user-stories/clearline-web/US-CW-048.yaml'
+      title: 'User Logout'
   updates:
     - story_id: 'US-CW-006'
       story_path: '/specs/user-stories/clearline-web/US-CW-006.yaml'
@@ -118,9 +121,12 @@ changes:
       story_path: '/specs/user-stories/clearline-web/US-CW-032.yaml'
       title: 'Persistent Sidebar App Shell & User-Identity Footer'
       reason: >
-        The user-identity footer gains a link into Personal Info / Security (the natural "manage my account"
-        affordance from the identity chip). No change to the footer's role + approval-limit display; only an
-        added navigation target. Declared here, applied at implementation time.
+        The user-identity footer gains a user menu on the identity chip carrying two actions: a link into
+        Personal Info / Security (the natural "manage my account" affordance) and a "Log out" action (US-CW-048),
+        which is the "main menu to sign out" affordance US-CW-035 already references. SidebarFooter stays
+        presentational — it raises onManageAccount / onLogout intent that AppChrome wires to routing and the
+        US-CW-002 use-logout hook. No change to the footer's role + approval-limit display; only the added menu
+        and its navigation / sign-out targets. Declared here, applied at implementation time.
   deprecates: []
   removes: []
 notes: >
@@ -128,7 +134,8 @@ notes: >
   section, mirroring the SettingsNav two-tier information architecture in design §19.1:
 
     Profile group (every authenticated user):
-      US-CW-033 shell + nav · US-CW-034 Personal Info + Notifications · US-CW-035 Security
+      US-CW-033 shell + nav · US-CW-034 Personal Info + Notifications · US-CW-035 Security ·
+      US-CW-048 User Logout (the "Log out" action in the identity-footer user menu)
     Organization group (Controller / Admin / Owner — never Employees):
       US-CW-036 Company Profile · US-CW-031 Team & Members (EXISTING, EPIC-CW-017 — relocated into Settings at
       /settings/team) · US-CW-037 Approval Policies & Spend Controls · US-CW-038 Card Program & Connected
@@ -174,7 +181,11 @@ notes: >
   Mock Backend Architecture — these are frontend responsibilities within that system, not a production
   financial/identity stack.
 
-  Status APPROVED (2026-07-18); in progress — 6 of 11 stories implemented. US-CW-033 (Settings Shell &
+  Status APPROVED (2026-07-18); in progress — 6 of 12 stories implemented. US-CW-048 (User Logout) was ADDED
+  2026-07-21 (DRAFT): the user-facing sign-out affordance — a "Log out" action in the identity-footer user
+  menu — surfacing the existing US-CW-002 logout/token-revocation machinery, which had no UI owner and which
+  US-CW-035 already assumed ("use the main menu to sign out"). It reuses this epic's US-CW-032 update (the
+  identity-chip user menu). US-CW-033 (Settings Shell &
   Role-Scoped SettingsNav) — the foundation — was IMPLEMENTED 2026-07-19 (branch US-CW-033/settings-shell-nav,
   PR #47). With it, these declared changes.updates were APPLIED: US-CW-006 (the 8 settings Permission tokens +
   permissionsForRole grants), US-CW-028 (universal Settings entry added to the primary sidebar AND the Team item

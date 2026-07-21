@@ -1,0 +1,139 @@
+# User Story Registry Record
+# User stories are the source of truth for what the application supports.
+# Epics declare changes to these records via their changes.adds/updates/deprecates/removes sections.
+
+# Identity
+id: 'US-CW-048'
+app: 'clearline-web'
+feature_area: 'core'
+title: 'User Logout'
+
+# Lifecycle status
+status: 'DRAFT'
+story_points: 3
+dependencies: ['US-CW-002', 'US-CW-032']
+
+# Provenance — immutable after creation
+created_by_epic: 'EPIC-CW-022'
+created_date: '2026-07-21'
+
+# Provenance history — append-only record of every epic that has touched this story
+history:
+  - epic_id: 'EPIC-CW-022'
+    action: 'created'
+    date: '2026-07-21'
+
+# Status timestamps — set when status transitions occur
+approved_date: null
+implementation_date: null
+deprecated_date: null
+removed_date: null
+
+# User Story
+user_story:
+  persona: 'Any authenticated Clearline user'
+  capability: 'explicitly log out of Clearline from a user menu on the sidebar identity footer, ending my session on this device and returning me to the login screen'
+  business_value: 'I can deliberately end my session — on a shared or public machine, or simply when I am done — knowing my tokens are invalidated server-side and the app can no longer act as me, without waiting for an inactivity or expiry timeout'
+
+  description: |
+    As any authenticated user
+    I want a clearly-reachable "Log out" action in the user menu on my identity footer
+    So that I can end my own session on demand, have my tokens revoked so they cannot be replayed, and land back on the login page with no stale authenticated view left behind
+
+# Acceptance Criteria
+acceptance_criteria:
+  - id: 'AC-01'
+    description: |
+      Given I am authenticated and viewing any in-app page
+      When I open the user menu on the sidebar identity footer (US-CW-032)
+      Then it presents a "Log out" action alongside the "manage my account" link into Personal Info / Security
+      And the menu is reachable and operable by keyboard, and closes on Escape or outside click
+    status: 'active'
+  - id: 'AC-02'
+    description: |
+      Given I click "Log out"
+      When the action runs
+      Then Clearline calls POST /api/auth/logout, my in-memory session and tokens are cleared, and I am
+      redirected to the login screen
+      And the button shows an in-flight state and cannot be double-submitted while the request is pending
+    status: 'active'
+  - id: 'AC-03'
+    description: |
+      Given I have logged out
+      When any previously-issued refresh or access token for that session is presented afterward
+      Then it is rejected — the logout revokes the session's token family server-side (US-CW-002), so the session
+      cannot be silently resumed
+    status: 'active'
+  - id: 'AC-04'
+    description: |
+      Given I have been redirected to the login screen after logging out
+      When I use the browser Back button or navigate directly to a protected in-app route
+      Then I am kept on / returned to the login screen — no cached authenticated page, identity footer, or
+      role-scoped nav is shown
+    status: 'active'
+  - id: 'AC-05'
+    description: |
+      Given the POST /api/auth/logout request fails (offline or server error)
+      When I click "Log out"
+      Then my client-side session and tokens are still cleared and I am still returned to the login screen
+      (a failed server call must never strand me in an ambiguous half-authenticated state), and the failure is
+      surfaced to observability rather than blocking the sign-out
+    status: 'active'
+  - id: 'AC-06'
+    description: |
+      Given I am on a narrow / mobile-width viewport where the rail is an off-canvas drawer (US-CW-032 AC-07)
+      When I open the drawer
+      Then the same user menu and "Log out" action are present and operable there
+    status: 'active'
+  - id: 'AC-07'
+    description: |
+      Given I am any authenticated user of any role
+      When I access the user menu
+      Then "Log out" is always present — logging out of my own session requires no permission and is never gated
+      by role
+    status: 'active'
+
+# Technical Notes
+technical_notes: |
+  This story adds only the user-facing logout affordance and its wiring — it does NOT introduce new session
+  machinery. The token/session lifecycle already exists from US-CW-002 (Session & Token Lifecycle): the
+  logout() method on the auth data-access surface, the use-logout hook (libs/data-access/auth), the
+  POST /api/auth/logout endpoint, and full-family token revocation. This story surfaces that machinery in the
+  UI and guarantees a clean post-logout redirect.
+
+  Placement (AC-01): the "Log out" action lives in a user menu anchored on the SidebarFooter identity chip
+  (US-CW-032), the same menu that carries the "manage my account" link into Personal Info / Security declared
+  by this epic's US-CW-032 update. SidebarFooter itself stays presentational — it raises intent (onLogout /
+  onManageAccount) that AppChrome wires to use-logout and navigation, keeping the organism free of
+  auth/routing dependencies (US-CW-032 technical notes). This also fulfils the "use the main menu to sign out"
+  affordance already referenced by US-CW-035 (the disabled current-session card tooltip).
+
+  Client-first teardown (AC-05): treat the server logout as best-effort. Clear the in-memory session/tokens and
+  redirect regardless of the POST result so a failed or offline call can never leave the user in a
+  half-authenticated state; log the failure for observability. This mirrors the forced-logout/redirect
+  mechanism US-CW-002 already establishes for stale-token global revocation.
+
+  Post-logout routing (AC-04): after teardown the unauthenticated user hitting any protected route is bounced to
+  login by the existing route guard; there is no separate logged-out landing surface. No new permission (AC-07):
+  ending one's own session is universal.
+
+# Edge Cases
+edge_cases: |
+  - Server logout call fails or times out — client session is still cleared and the user is still redirected to
+    login; the error goes to observability, not a blocking dialog (AC-05).
+  - Rapid double-click / repeated Enter on "Log out" — the in-flight state disables the action; only one logout
+    request is issued (AC-02).
+  - Back button or direct deep-link to a protected route after logout — route guard returns the user to login;
+    no stale authenticated chrome renders (AC-04).
+  - Already logged out in another tab, then "Log out" clicked in this tab — the redirect to login is idempotent;
+    a second revoke of an already-revoked family is a no-op, not an error.
+  - Logout on the mobile off-canvas drawer — the user menu and action are equally present and operable there
+    (AC-06).
+  - (inferred) A refresh already in flight when logout runs — the cleared session / revoked family causes the
+    in-flight refresh to resolve unauthenticated and also land on login, not resurrect the session.
+
+# Implementation Status
+implementation_status: |
+  ⏳ Not started. Depends on US-CW-002 (session/token lifecycle, logout endpoint + use-logout hook) and
+  US-CW-032 (sidebar identity footer that hosts the user menu). Reuses this epic's US-CW-032 update, which adds
+  the user menu / "manage my account" link to the identity footer — "Log out" is the second action in that menu.

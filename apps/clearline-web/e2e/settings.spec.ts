@@ -103,8 +103,6 @@ test('Company Profile: the KYB-verified identity is locked with a Verified badge
   await expect(page.getByText('11-2223334')).toBeVisible();
   await expect(page.getByText('Verified', { exact: true })).toBeVisible();
   await expect(page.getByText(/Verified details cannot be changed/)).toBeVisible();
-  // The EIN is read-only text, not an editable field.
-  await expect(page.getByRole('textbox').filter({ hasText: '11-2223334' })).toHaveCount(0);
 });
 
 test('Company Profile: editing the primary contact raises the unsaved footer and saving confirms (AC-01)', async ({

@@ -83,6 +83,8 @@ interface StoredCard {
   last4: string;
   exp: string;
   monthlyLimitMinorUnits: number;
+  /** Per-transaction ceiling seeded from the Card Program default at issuance (US-CW-038); absent = none. */
+  perTransactionLimitMinorUnits?: number;
   authorizedSpendMinorUnits: number;
   frozen: boolean;
   allowedMccs: string[];
@@ -197,6 +199,9 @@ export class CardsService {
       last4: this.mintLast4(),
       exp: '09/28',
       monthlyLimitMinorUnits: request.monthlyLimit.amountMinorUnits,
+      ...(request.perTransactionLimit
+        ? { perTransactionLimitMinorUnits: request.perTransactionLimit.amountMinorUnits }
+        : {}),
       authorizedSpendMinorUnits: 0,
       frozen: false,
       allowedMccs: [...request.allowedMccs],
@@ -312,6 +317,9 @@ export class CardsService {
       last4: card.last4,
       exp: card.exp,
       monthlyLimit: this.money(card.monthlyLimitMinorUnits),
+      ...(card.perTransactionLimitMinorUnits != null
+        ? { perTransactionLimit: this.money(card.perTransactionLimitMinorUnits) }
+        : {}),
       authorizedSpend: this.money(card.authorizedSpendMinorUnits),
       status: card.frozen ? 'frozen' : 'active',
       allowedMccs: [...card.allowedMccs],

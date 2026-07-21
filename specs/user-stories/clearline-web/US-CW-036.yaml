@@ -9,7 +9,7 @@ feature_area: 'core'
 title: 'Company Profile'
 
 # Lifecycle status
-status: 'DRAFT'
+status: 'IMPLEMENTED'
 story_points: 5
 dependencies: ['US-CW-033', 'US-CW-004', 'US-CW-034']
 
@@ -22,10 +22,13 @@ history:
   - epic_id: 'EPIC-CW-022'
     action: 'created'
     date: '2026-07-17'
+  - epic_id: 'EPIC-CW-022'
+    action: 'implemented'
+    date: '2026-07-20'
 
 # Status timestamps — set when status transitions occur
-approved_date: null
-implementation_date: null
+approved_date: '2026-07-18'
+implementation_date: '2026-07-20'
 deprecated_date: null
 removed_date: null
 
@@ -99,8 +102,24 @@ edge_cases: |
 
 # Implementation Status
 implementation_status: |
-  🚧 Not yet implemented — DRAFT authored 2026-07-17 (EPIC-CW-022), specs-only for review.
+  ✅ IMPLEMENTED 2026-07-20 (EPIC-CW-022, branch US-CW-036/company-profile, PR #50).
   Source: specs/designs/Clearline Design System - Consolidated.dc.html §19.1 (Company Profile item in the
   Organization group) and Gherkin §20 (Company profile — editable contact/address/fiscal-year, KYB-verified
-  read-only fields, company logo upload). Anticipated new surface: /settings/company page reusing the
-  unsaved-changes footer + logo crop, reading KYB fields from US-CW-002.
+  read-only fields).
+
+  Scope note: the company-logo upload (originally AC-03) was removed from this story before implementation;
+  the app-header brand slot is unchanged and no logo/SessionResponse work was done. The four remaining ACs —
+  editable operational fields behind the shared unsaved-changes footer (AC-01), read-only KYB identity with a
+  Verified badge + support note (AC-02), server-authoritative 403 for non-Controller/Admin/Owner (AC-03), and
+  an immutable audit event per save (AC-04) — are all implemented.
+
+  Delivered: /settings/company as a real page (CompanyProfilePage) replacing the placeholder, gated by
+  org-profile:manage and re-probing GET /api/settings/sections/company so it degrades to AccessDenied on an
+  independent 403. New GET/PATCH /api/company handlers re-derive permissions from the live session, resolve the
+  caller's org server-side, keep the KYB legalName/EIN immutable (never read from the PATCH body), and emit a
+  new `company_profile` AuditCategory event with a before → after diff. Company profile data lives on
+  AuthService's OrganizationRecord (extended with the editable fields + a `verified` flag, seeded from
+  SEED_ORGANIZATION / DEMO_ONBOARDED_BUSINESS) rather than a new service — one org source of truth; the
+  auth-service snapshot version was bumped to 3. New @clearline/data-access-company lib (useCompanyProfile /
+  useUpdateCompanyProfile). Reuses the US-CW-034 UnsavedChangesFooter + leave-guard and a page-level demo
+  Beacon teaching the locked-vs-editable split. Full unit + component + e2e coverage.

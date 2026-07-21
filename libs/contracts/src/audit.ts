@@ -8,9 +8,17 @@ import type { Role } from './rbac';
  * itself is opened (AC-06). A category is never conveyed by colour alone; it always carries a text label.
  * `account_security` covers a user's self-service security actions — password change, 2FA enable/disable,
  * session revocation, trusted-device removal (US-CW-035 AC-11) — never recording the secret itself.
+ * `company_profile` covers org-config edits to the Company Profile — primary contact, business address,
+ * fiscal-year start (US-CW-036 AC-04); the KYB-verified legal name and EIN are immutable and never a target.
  */
 export type AuditCategory =
-  'payment' | 'approval' | 'card_control' | 'role_change' | 'audit_access' | 'account_security';
+  | 'payment'
+  | 'approval'
+  | 'card_control'
+  | 'role_change'
+  | 'audit_access'
+  | 'account_security'
+  | 'company_profile';
 
 /**
  * A before → after diff on an audit event — the prior value and the new value for a card-control or

@@ -26,6 +26,7 @@ import {
   isValidEmail,
 } from '@clearline/domain-profile';
 import type {
+  CompanyProfileResponse,
   DeviceSession,
   NotificationFrequency,
   NotificationPreference,
@@ -131,6 +132,22 @@ interface OrganizationRecord {
   createdAt: number;
   /** Whether the org mandates 2FA for members (US-CW-035 AC-07); stub until US-CW-040 owns it. */
   enforceTwoFactor?: boolean;
+  // --- Company Profile (US-CW-036). All optional so orgs provisioned by
+  // provisionOrganizationForOwner (which sets only the identity fields) and pre-US-CW-036 snapshots
+  // stay valid; getCompanyProfile coalesces the gaps to sensible defaults. ---
+  /** False only for an org that hasn't cleared KYB; absent/true = verified (the seeded/approved case, AC-02). */
+  verified?: boolean;
+  /** KYB-registered business structure, e.g. "C-Corporation" — read-only on Company Profile. */
+  structure?: string;
+  /** Primary contact email — editable (AC-01). */
+  primaryContactEmail?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  /** Fiscal-year start month 1–12; a change applies next budget period, not retroactively (AC-01). */
+  fiscalYearStartMonth?: number;
 }
 
 /**
@@ -1242,6 +1259,65 @@ export class AuthService {
     if (!user) return null;
     user.avatarUrl = null;
     return this.toProfile(user);
+  }
+
+  // ===========================================================================
+  // Company Profile (US-CW-036). Org-scoped, keyed by orgId (the HTTP handler
+  // resolves it from the caller's session and gates on org-profile:manage). The
+  // KYB-verified identity (legalName, ein, structure) is read-only and never
+  // written here; only the operational fields are mutable (AC-01/02).
+  // ===========================================================================
+
+  private toCompanyProfile(org: OrganizationRecord): CompanyProfileResponse {
+    return {
+      legalName: org.legalName,
+      ein: org.ein,
+      structure: org.structure ?? '',
+      // Absent/true = verified (the seeded, KYB-approved case); only an explicit false is pending.
+      verificationStatus: org.verified === false ? 'pending' : 'verified',
+      primaryContactEmail: org.primaryContactEmail ?? '',
+      addressLine1: org.addressLine1 ?? '',
+      addressLine2: org.addressLine2 ?? '',
+      city: org.city ?? '',
+      state: org.state ?? '',
+      postalCode: org.postalCode ?? '',
+      fiscalYearStartMonth: org.fiscalYearStartMonth ?? 1,
+    };
+  }
+
+  /** The org's company profile: KYB-locked identity + editable operational fields (AC-01/02). Null for an unknown org. */
+  getCompanyProfile(orgId: string): CompanyProfileResponse | null {
+    const org = this.orgsById.get(orgId);
+    return org ? this.toCompanyProfile(org) : null;
+  }
+
+  /**
+   * Updates only the editable operational fields in place (AC-01). The KYB identity (legalName, ein,
+   * structure, verified) is deliberately not read from the patch, so a crafted request carrying those
+   * cannot alter them (AC-02). Returns the fresh profile, or null for an unknown org.
+   */
+  updateCompanyProfile(
+    orgId: string,
+    patch: {
+      primaryContactEmail: string;
+      addressLine1: string;
+      addressLine2: string;
+      city: string;
+      state: string;
+      postalCode: string;
+      fiscalYearStartMonth: number;
+    },
+  ): CompanyProfileResponse | null {
+    const org = this.orgsById.get(orgId);
+    if (!org) return null;
+    org.primaryContactEmail = patch.primaryContactEmail;
+    org.addressLine1 = patch.addressLine1;
+    org.addressLine2 = patch.addressLine2;
+    org.city = patch.city;
+    org.state = patch.state;
+    org.postalCode = patch.postalCode;
+    org.fiscalYearStartMonth = patch.fiscalYearStartMonth;
+    return this.toCompanyProfile(org);
   }
 
   private isEmailChangeTokenExpired(issuedAt: number, now: number): boolean {

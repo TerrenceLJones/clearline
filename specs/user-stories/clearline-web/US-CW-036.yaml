@@ -32,12 +32,12 @@ removed_date: null
 # User Story
 user_story:
   persona: 'Controller, Admin, or Owner of an approved Clearline Organization'
-  capability: 'view and edit the organization''s editable company details (primary contact, business address, fiscal year start, logo) while the KYB-verified legal identity fields stay read-only'
+  capability: 'view and edit the organization''s editable company details (primary contact, business address, fiscal year start) while the KYB-verified legal identity fields stay read-only'
   business_value: 'Administrators keep the company record current, but the legally verified identity of the business cannot be silently altered — protecting the integrity of the KYB result'
   description: |
     As a Controller, Admin, or Owner
     I want a Company Profile settings page with editable operational fields and read-only verified identity fields
-    So that I can maintain the company's contact/address/fiscal-year/logo details, while the KYB-verified legal name and EIN are visibly locked with a "Verified" badge and a path to support for corrections
+    So that I can maintain the company's contact/address/fiscal-year details, while the KYB-verified legal name and EIN are visibly locked with a "Verified" badge and a path to support for corrections
 
 # Acceptance Criteria
 acceptance_criteria:
@@ -58,20 +58,14 @@ acceptance_criteria:
     status: 'active'
   - id: 'AC-03'
     description: |
-      Given I am on Company Profile
-      When I upload a valid square image and confirm the crop
-      Then the company logo updates on the settings page and in the app header
-    status: 'active'
-  - id: 'AC-04'
-    description: |
       Given I am an Employee (no org-settings permission)
       When I attempt to reach /settings/company
       Then the item is absent from SettingsNav, I get the AccessDenied screen on direct navigation, and the API
       returns 403 independently (US-CW-033 AC-02/AC-04)
     status: 'active'
-  - id: 'AC-05'
+  - id: 'AC-04'
     description: |
-      Given any Company Profile change is saved (contact, address, fiscal year, logo)
+      Given any Company Profile change is saved (contact, address, fiscal year)
       When it succeeds
       Then an immutable audit event records actor, action, and before → after (US-CW-021 / EPIC-CW-015)
     status: 'active'
@@ -79,27 +73,24 @@ acceptance_criteria:
 # Technical Notes
 technical_notes: |
   Gated by the `org-profile:manage` permission (Controller | Admin | Owner) introduced by the EPIC-CW-022 →
-  US-CW-006 update. Reuses the shared UnsavedChangesFooter and the AvatarCropDialog/logo-crop pattern from
-  US-CW-034, and the KYB result from US-CW-004 / US-CW-005 as the source of the read-only Legal Business Name
-  + EIN.
+  US-CW-006 update. Reuses the shared UnsavedChangesFooter from US-CW-034, and the KYB result from
+  US-CW-004 / US-CW-005 as the source of the read-only Legal Business Name + EIN.
 
   The read-only verified fields (AC-02) are a "no derived/verified value rendered as editable" instance of the
   design §19 doctrine: they render as text, not disabled inputs, with a Verified badge and a support path. The
   Organization entity introduced in EPIC-CW-018/US-CW-031 owns these values.
 
   Fiscal-year-start (AC-01) must not retroactively re-window existing budget periods (EPIC-CW-013); it applies
-  from the next period boundary. Logo (AC-03) shares the crop dialog with the personal avatar but writes the
-  org logo used by the app header (US-CW-032 shell brand slot).
+  from the next period boundary.
 
-  Audit (AC-05) writes to the AuditTrail (US-CW-021). Authorization is server-authoritative (AC-04): the item
+  Audit (AC-04) writes to the AuditTrail (US-CW-021). Authorization is server-authoritative (AC-03): the item
   is filtered out of SettingsNav and the handler re-checks the permission.
 
 # Edge Cases
 edge_cases: |
-  - Employee deep-links /settings/company — absent from nav + AccessDenied + 403 (AC-04)
+  - Employee deep-links /settings/company — absent from nav + AccessDenied + 403 (AC-03)
   - Attempt to edit Legal Business Name or EIN via crafted request — rejected server-side; these are immutable
     post-KYB (AC-02)
-  - Non-square or oversized logo upload — crop dialog constrains; size/MIME validated as in US-CW-034 AC-06
   - Fiscal-year-start changed mid-period — new value applies next period only; current period math unchanged
     (AC-01)
   - Navigate away with unsaved company edits — leave-guard warns (US-CW-034 AC-02)

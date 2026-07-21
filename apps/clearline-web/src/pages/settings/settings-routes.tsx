@@ -8,6 +8,7 @@ import { SettingsNotFound } from './SettingsNotFound';
 import { PersonalInfoPage } from './PersonalInfoPage';
 import { NotificationsPage } from './NotificationsPage';
 import { SecurityPage } from './SecurityPage';
+import { CompanyProfilePage } from './CompanyProfilePage';
 
 /** An Organization route wrapped in its RequirePermission guard, with the matching API path restated
  *  for the 403 line so the client denial and the server's independent 403 read the same (AC-04). The
@@ -40,8 +41,19 @@ export function settingsRoutes() {
       <Route path="personal" element={<PersonalInfoPage />} />
       <Route path="security" element={<SecurityPage />} />
       <Route path="notifications" element={<NotificationsPage />} />
-      {/* Organization group — Controller/Admin/Owner org-config. */}
-      {orgRoute('company', 'Company Profile', 'org-profile:manage')}
+      {/* Organization group — Controller/Admin/Owner org-config. Company Profile is a real page
+        (US-CW-036), guarded by org-profile:manage; the page itself re-probes the server so it still
+        degrades to AccessDenied on an independent 403 (AC-03). */}
+      <Route
+        element={
+          <RequirePermission
+            permission="org-profile:manage"
+            apiPath="/api/settings/sections/company"
+          />
+        }
+      >
+        <Route path="company" element={<CompanyProfilePage />} />
+      </Route>
       {/* Team & Members — the US-CW-031 team surface relocated into Settings; gated by team:view
         (Owner or Admin) and backed by its own /api/team/members endpoint, not a placeholder. */}
       <Route element={<RequirePermission permission="team:view" apiPath="/api/team/members" />}>

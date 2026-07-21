@@ -1,4 +1,4 @@
-import { expect, test } from './support/fixtures';
+import { expect, test, type MockBackend } from './support/fixtures';
 import {
   DEMO_EMAIL,
   DEMO_PASSWORD,
@@ -78,6 +78,59 @@ test('a Controller sees the Organization group and can switch sections without a
 
   await expect(page.getByRole('heading', { name: 'Company Profile' })).toBeVisible();
   await expect(page).toHaveURL(/\/settings\/company/);
+});
+
+// US-CW-036 — Company Profile. A Controller (org-config permission) reaches the page; the KYB
+// identity is locked while the operational fields are editable behind the shared unsaved footer.
+async function openCompany(page: Parameters<typeof fillLoginForm>[0], mockBackend: MockBackend) {
+  await mockBackend.simulateRoleChangeForE2E(DEMO_EMAIL, {
+    role: 'controller',
+    approvalLimit: null,
+  });
+  await signIn(page);
+  await mainNav(page).getByText('Settings').click();
+  await settingsNav(page).getByRole('link', { name: 'Company Profile' }).click();
+  await expect(page.getByRole('heading', { name: 'Company Profile' })).toBeVisible();
+}
+
+test('Company Profile: the KYB-verified identity is locked with a Verified badge (US-CW-036 AC-02)', async ({
+  page,
+  mockBackend,
+}) => {
+  await openCompany(page, mockBackend);
+
+  await expect(page.getByText('Clearline Demo Co')).toBeVisible();
+  await expect(page.getByText('11-2223334')).toBeVisible();
+  await expect(page.getByText('Verified', { exact: true })).toBeVisible();
+  await expect(page.getByText(/Verified details cannot be changed/)).toBeVisible();
+});
+
+test('Company Profile: editing the primary contact raises the unsaved footer and saving confirms (AC-01)', async ({
+  page,
+  mockBackend,
+}) => {
+  await openCompany(page, mockBackend);
+
+  await page.getByLabel('Primary contact email').fill('finance@clearline.dev');
+  const footer = page.getByRole('region', { name: 'Unsaved changes' });
+  await expect(footer).toBeVisible();
+  await footer.getByRole('button', { name: 'Save changes' }).click();
+
+  await expect(page.getByText('Company profile updated')).toBeVisible();
+  await expect(footer).toBeHidden();
+});
+
+test('Company Profile: an Employee deep-linking /settings/company hits access-denied + an independent 403 (AC-03)', async ({
+  page,
+  mockBackend,
+}) => {
+  await mockBackend.simulateRoleChangeForE2E(DEMO_EMAIL, { role: 'employee', approvalLimit: null });
+  await signIn(page);
+
+  await navigateSpa(page, '/settings/company');
+
+  await expect(page.getByText("You don't have access to this")).toBeVisible();
+  await expect(page.getByText('403 Forbidden · GET /api/settings/sections/company')).toBeVisible();
 });
 
 test('an unknown settings section shows the in-shell not-found', async ({ page, mockBackend }) => {

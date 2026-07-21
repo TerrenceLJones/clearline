@@ -48,6 +48,23 @@ function mockRole(role: Role, opts: { isAdmin?: boolean; isOwner?: boolean } = {
       }),
     ),
     http.get('*/api/profile/notifications', () => HttpResponse.json({ preferences: [] })),
+    // Company Profile (US-CW-036) fetches its own record on mount; stub it so the shell tests
+    // exercise routing/nav, not that page's internals (covered by CompanyProfilePage's own tests).
+    http.get('*/api/company', () =>
+      HttpResponse.json({
+        legalName: 'Clearline Demo Co',
+        ein: '11-2223334',
+        structure: 'C-Corporation',
+        verificationStatus: 'verified',
+        primaryContactEmail: 'owner@clearline.dev',
+        addressLine1: '1 Market St',
+        addressLine2: '',
+        city: 'San Francisco',
+        state: 'CA',
+        postalCode: '94105',
+        fiscalYearStartMonth: 1,
+      }),
+    ),
   );
 }
 

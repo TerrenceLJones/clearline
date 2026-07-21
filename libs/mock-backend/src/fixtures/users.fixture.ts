@@ -70,6 +70,20 @@ export const SEED_ORGANIZATION = {
    * Security page hides the "Disable" control and shows the admin-contact message instead.
    */
   enforceTwoFactor: false,
+  // --- Company Profile (US-CW-036). KYB-verified identity (legalName/ein above + structure) plus the
+  // editable operational fields, seeded from DEMO_ONBOARDED_BUSINESS so /settings/company has a real,
+  // populated org to show. `verified` is implicit (absent = verified) — this org has cleared KYB. ---
+  /** KYB-registered structure — read-only on Company Profile (AC-02). */
+  structure: 'C-Corporation',
+  /** Primary contact email — editable (AC-01). */
+  primaryContactEmail: 'owner@clearline.dev',
+  addressLine1: '1 Market St',
+  addressLine2: '',
+  city: 'San Francisco',
+  state: 'CA',
+  postalCode: '94105',
+  /** Fiscal year starts in January (1). Changing it applies next budget period, not retroactively (AC-01). */
+  fiscalYearStartMonth: 1,
 } as const;
 
 const DAY_MS = 24 * 60 * 60 * 1000;

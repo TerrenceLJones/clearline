@@ -9,7 +9,7 @@ const STORAGE_KEY = 'clearline:mock-auth-state';
  * would rehydrate users with no orgId, so the team roster still renders (from an earlier fetch) but a
  * role/removal PATCH 404s because the member can no longer be matched to an org.
  */
-const SNAPSHOT_VERSION = 2;
+const SNAPSHOT_VERSION = 3;
 
 interface VersionedSnapshot {
   version: number;

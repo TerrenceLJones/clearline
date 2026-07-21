@@ -16,6 +16,7 @@ const PLAID_INSTITUTIONS = [
 
 interface StoredAccount {
   id: string;
+  orgId: string;
   institutionName: string;
   last4: string;
   method: 'plaid' | 'manual';
@@ -57,6 +58,7 @@ export class ConnectedAccountsService {
     for (const account of seed) {
       this.accounts.set(account.id, {
         id: account.id,
+        orgId: account.orgId,
         institutionName: account.institutionName,
         last4: account.last4,
         method: account.method,
@@ -67,17 +69,27 @@ export class ConnectedAccountsService {
     }
   }
 
-  list(): ConnectedAccount[] {
-    return [...this.accounts.values()].map((account) => this.toWire(account));
+  /** The accounts owned by one org — every query and mutation is scoped to the caller's org. */
+  list(orgId: string): ConnectedAccount[] {
+    return [...this.accounts.values()]
+      .filter((account) => account.orgId === orgId)
+      .map((account) => this.toWire(account));
+  }
+
+  /** Resolve an account only when it belongs to the given org — the owning-org check every mutation runs. */
+  private owned(orgId: string, id: string): StoredAccount | undefined {
+    const account = this.accounts.get(id);
+    return account && account.orgId === orgId ? account : undefined;
   }
 
   /** Simulate a successful Plaid Link connection — the account lands verified (AC-04). */
-  connectViaPlaid(): ConnectedAccount {
+  connectViaPlaid(orgId: string): ConnectedAccount {
     const institutionName = PLAID_INSTITUTIONS[this.plaidCursor % PLAID_INSTITUTIONS.length]!;
     this.plaidCursor += 1;
     const id = this.nextId('acct');
     const stored: StoredAccount = {
       id,
+      orgId,
       institutionName,
       last4: this.mintLast4(),
       method: 'plaid',
@@ -94,17 +106,25 @@ export class ConnectedAccountsService {
    * duplicate of an already-connected account (same last four) is refused rather than silently added.
    * The account starts `pending_verification` with the two micro-deposits it must be verified against.
    */
-  connectManually(routingNumber: string, accountNumber: string): ConnectManualOutcome {
+  connectManually(
+    orgId: string,
+    routingNumber: string,
+    accountNumber: string,
+  ): ConnectManualOutcome {
     if (!/^\d{9}$/.test(routingNumber)) return { outcome: 'invalid_routing' };
     if (!/^\d{4,17}$/.test(accountNumber)) return { outcome: 'invalid_account' };
 
     const last4 = accountNumber.slice(-4);
-    const duplicate = [...this.accounts.values()].some((account) => account.last4 === last4);
+    // Duplicate detection is scoped to the org — two orgs may each connect an account ending in 1234.
+    const duplicate = [...this.accounts.values()].some(
+      (account) => account.orgId === orgId && account.last4 === last4,
+    );
     if (duplicate) return { outcome: 'already_connected' };
 
     const id = this.nextId('acct');
     const stored: StoredAccount = {
       id,
+      orgId,
       institutionName: 'Manual bank account',
       last4,
       method: 'manual',
@@ -121,8 +141,8 @@ export class ConnectedAccountsService {
    * (order-insensitive) verify it; a mismatch consumes one of three attempts and locks the account once
    * they run out — a locked account must be removed and reconnected to try again.
    */
-  verifyMicroDeposits(id: string, amounts: readonly number[]): VerifyResult {
-    const account = this.accounts.get(id);
+  verifyMicroDeposits(orgId: string, id: string, amounts: readonly number[]): VerifyResult {
+    const account = this.owned(orgId, id);
     if (!account) return { outcome: 'not_found' };
     if (account.status !== 'pending_verification') return { outcome: 'not_pending' };
 
@@ -145,25 +165,25 @@ export class ConnectedAccountsService {
     return { outcome: 'mismatch', account: this.toWire(account), attemptsRemaining };
   }
 
-  /** Remove an account (AC-07). Idempotent-safe: returns not_found if it's already gone. */
-  remove(id: string): SimpleAccountOutcome {
-    const account = this.accounts.get(id);
+  /** Remove an account (AC-07). Idempotent-safe: returns not_found if it's already gone or another org's. */
+  remove(orgId: string, id: string): SimpleAccountOutcome {
+    const account = this.owned(orgId, id);
     if (!account) return { outcome: 'not_found' };
     this.accounts.delete(id);
     return { outcome: 'ok', account: this.toWire(account) };
   }
 
   /** Recover a Plaid account from `reconnect_required` after re-authentication (AC-08). */
-  reconnect(id: string): SimpleAccountOutcome {
-    const account = this.accounts.get(id);
+  reconnect(orgId: string, id: string): SimpleAccountOutcome {
+    const account = this.owned(orgId, id);
     if (!account) return { outcome: 'not_found' };
     account.status = 'connected';
     return { outcome: 'ok', account: this.toWire(account) };
   }
 
   /** Demo/e2e control: push a Plaid account into ITEM_LOGIN_REQUIRED so the reconnect flow is visible. */
-  forceReconnectRequired(id: string): SimpleAccountOutcome {
-    const account = this.accounts.get(id);
+  forceReconnectRequired(orgId: string, id: string): SimpleAccountOutcome {
+    const account = this.owned(orgId, id);
     if (!account) return { outcome: 'not_found' };
     account.status = 'reconnect_required';
     return { outcome: 'ok', account: this.toWire(account) };

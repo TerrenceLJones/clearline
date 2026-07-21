@@ -1,8 +1,11 @@
 import type { ConnectionMethod, ConnectionStatus } from '@clearline/contracts';
+import { SEED_ORGANIZATION } from './users.fixture';
 
 /** A seeded connected bank account. The full number is never stored — only its last four. */
 export interface SeedConnectedAccount {
   id: string;
+  /** The org that owns this account — every query and mutation is scoped to it (owning-org check). */
+  orgId: string;
   institutionName: string;
   last4: string;
   method: ConnectionMethod;
@@ -18,6 +21,7 @@ export interface SeedConnectedAccount {
 export const SEED_CONNECTED_ACCOUNTS: SeedConnectedAccount[] = [
   {
     id: 'acct_chase',
+    orgId: SEED_ORGANIZATION.id,
     institutionName: 'Chase Business Complete',
     last4: '8291',
     method: 'plaid',
@@ -25,6 +29,7 @@ export const SEED_CONNECTED_ACCOUNTS: SeedConnectedAccount[] = [
   },
   {
     id: 'acct_svb',
+    orgId: SEED_ORGANIZATION.id,
     institutionName: 'Silicon Valley Bank',
     last4: '3355',
     method: 'manual',
@@ -32,6 +37,7 @@ export const SEED_CONNECTED_ACCOUNTS: SeedConnectedAccount[] = [
   },
   {
     id: 'acct_novo',
+    orgId: SEED_ORGANIZATION.id,
     institutionName: 'Novo Business',
     last4: '6120',
     method: 'plaid',

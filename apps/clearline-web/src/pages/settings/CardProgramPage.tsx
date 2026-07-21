@@ -2,13 +2,18 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import {
   AccessDenied,
+  Alert,
   SegmentedControl,
   Text,
   TextField,
   UnsavedChangesFooter,
 } from '@clearline/ui';
 import { SettingsForbiddenError, useSettingsSectionAccess } from '@clearline/data-access-settings';
-import { useCardProgram, useUpdateCardProgram } from '@clearline/data-access-card-program';
+import {
+  CardProgramUpdateError,
+  useCardProgram,
+  useUpdateCardProgram,
+} from '@clearline/data-access-card-program';
 import type { CardProgramDefaultsResponse, IssuancePolicy } from '@clearline/contracts';
 import { toMajorUnits, toMinorUnits } from '@clearline/money';
 import { useDemoBeacon } from '@clearline/demo-beacon';
@@ -223,6 +228,14 @@ export function CardProgramPage() {
           issues the card itself.
         </Text>
       </section>
+
+      {updateProgram.error instanceof CardProgramUpdateError ? (
+        <Alert
+          tone="negative"
+          title="Couldn’t save the card program"
+          message="Enter positive limits, and keep the per-transaction limit at or below the monthly limit."
+        />
+      ) : null}
 
       <UnsavedChangesFooter
         visible={dirty}

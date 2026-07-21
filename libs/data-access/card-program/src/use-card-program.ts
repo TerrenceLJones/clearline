@@ -13,6 +13,14 @@ async function getCardProgram(): Promise<CardProgramDefaultsResponse> {
   return response.json();
 }
 
+/** Thrown when a card-program save is rejected (422) — carries the server's code for inline copy. */
+export class CardProgramUpdateError extends Error {
+  constructor(public readonly code: string) {
+    super(code);
+    this.name = 'CardProgramUpdateError';
+  }
+}
+
 /** The org's card-program defaults: default limits, MCC restrictions, issuance policy (AC-01/02/03). */
 export function useCardProgram() {
   return useQuery({
@@ -30,7 +38,10 @@ async function patchCardProgram(
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(request),
   });
-  if (!response.ok) throw new Error('card_program_update_failed');
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => ({}))) as { error?: string };
+    throw new CardProgramUpdateError(payload.error ?? 'card_program_update_failed');
+  }
   return response.json();
 }
 

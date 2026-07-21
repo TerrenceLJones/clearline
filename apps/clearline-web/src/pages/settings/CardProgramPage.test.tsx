@@ -114,6 +114,27 @@ describe('CardProgramPage — searchable MCC restrictions (AC-02)', () => {
   });
 });
 
+describe('CardProgramPage — save rejected (422)', () => {
+  it('shows an inline error when the server rejects the limits', async () => {
+    setAccessToken('access_valid');
+    server.use(
+      http.get('*/api/settings/sections/:slug', ({ params }) =>
+        HttpResponse.json({ slug: params.slug, authorized: true }),
+      ),
+      http.get('*/api/card-program', () => HttpResponse.json(seedProgram())),
+      http.patch('*/api/card-program', () =>
+        HttpResponse.json({ error: 'invalid_limit' }, { status: 422 }),
+      ),
+    );
+    renderPage();
+    const monthly = await screen.findByLabelText('Default monthly limit');
+    await userEvent.clear(monthly);
+    await userEvent.type(monthly, '3000');
+    await userEvent.click(within(footer()!).getByRole('button', { name: 'Save changes' }));
+    expect(await screen.findByText(/Couldn’t save the card program/i)).toBeInTheDocument();
+  });
+});
+
 describe('CardProgramPage — server decides (AC-09)', () => {
   it('renders AccessDenied when the section probe returns 403', async () => {
     mockBackend(seedProgram(), { authorized: false });

@@ -256,6 +256,9 @@ export class CardsService {
       monthlyLimitMinorUnits: card.monthlyLimitMinorUnits,
       authorizedSpendMinorUnits: card.authorizedSpendMinorUnits,
       amountMinorUnits: input.amountMinorUnits,
+      ...(card.perTransactionLimitMinorUnits != null
+        ? { perTransactionLimitMinorUnits: card.perTransactionLimitMinorUnits }
+        : {}),
       ...(input.securityHold ? { securityHold: input.securityHold } : {}),
     });
 

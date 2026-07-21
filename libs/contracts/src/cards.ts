@@ -91,7 +91,12 @@ export interface FreezeCardRequest {
  * `cardholderDeclineMessage`. The true reason is still recorded server-side for support and risk.
  */
 export type CardDeclineReason =
-  'frozen' | 'mcc_restricted' | 'insufficient_limit' | 'lost_or_stolen' | 'fraud';
+  | 'frozen'
+  | 'mcc_restricted'
+  | 'insufficient_limit'
+  | 'over_transaction_limit'
+  | 'lost_or_stolen'
+  | 'fraud';
 
 export type CardTransactionStatus = 'approved' | 'declined';
 

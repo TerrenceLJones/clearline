@@ -9,7 +9,7 @@ feature_area: 'core'
 title: 'Ownership Transfer'
 
 # Lifecycle status
-status: 'DRAFT'
+status: 'IMPLEMENTED'
 story_points: 8
 dependencies: ['US-CW-033', 'US-CW-035', 'US-CW-040', 'US-CW-031']
 
@@ -24,8 +24,8 @@ history:
     date: '2026-07-18'
 
 # Status timestamps — set when status transitions occur
-approved_date: null
-implementation_date: null
+approved_date: '2026-07-23'
+implementation_date: '2026-07-23'
 deprecated_date: null
 removed_date: null
 
@@ -151,9 +151,17 @@ edge_cases: |
 
 # Implementation Status
 implementation_status: |
-  🚧 Not yet implemented — DRAFT authored 2026-07-18 (EPIC-CW-022), specs-only for review.
-  Source: the ownership-transfer follow-up gap flagged in US-CW-031 technical_notes and EPIC-CW-017/018/019
-  notes, now given a concrete home in the Settings surface (design §19 Settings & Profile; the destructive-
-  confirmation doctrine §19.9). Anticipated new surface: a Transfer-ownership action within
-  /settings/security-compliance (Owner-only), extending the team domain and MSW handlers from EPIC-CW-017 with
-  an atomic, re-auth-gated owner swap that preserves the single-Owner invariant.
+  ✅ IMPLEMENTED 2026-07-23 (branch EPIC-CW-022/billing-transfer-logout). An Owner-only Transfer-ownership
+  card mounts inside /settings/security-compliance, rendered only when the live session isOwner (the server
+  enforces the same independently). A new AuthService.transferOwnership is the ONLY sanctioned relaxation of
+  the owner_protected guard — a dedicated path that promotes the target to Owner (Controller tier, unlimited,
+  per US-CW-030) and demotes the acting Owner to Admin in one synchronous transition, so no persisted or
+  observable state ever has zero or two Owners (AC-05); the changeMemberRole/removeMember guards are unchanged.
+  The new POST /api/team/owner-transfer is Owner-gated (an Admin gets 403 not_owner, AC-02), re-checked live so
+  a stale/concurrent transfer is rejected rather than partially applied (AC-07), and step-up re-auth verifies
+  the acting Owner's password plus a TOTP code when 2FA is enrolled before any mutation (AC-04). Success emits
+  two before → after role_change audit events (AC-08). The member-only picker offers no free-text (AC-01); the
+  confirmation names the specific incoming Owner and the specific loss of authority (§19.9 / AC-03). The new
+  useTransferOwnership hook (@clearline/data-access-team) invalidates both the team roster and the session, so
+  the outgoing Owner loses — and the new Owner gains — Owner surfaces on the next session refetch, no re-login
+  (AC-06). A transfer walkthrough was added to the Security & Compliance demo-beacon.

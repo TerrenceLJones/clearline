@@ -2,8 +2,9 @@ epic_id: 'EPIC-CW-022'
 title: 'Settings & Profile'
 app: 'clearline-web'
 feature_area: 'core'
-status: 'APPROVED'
+status: 'IMPLEMENTED'
 approved_date: '2026-07-18'
+implemented_date: '2026-07-23'
 created_date: '2026-07-17'
 source_reference: >
   specs/designs/Clearline Design System - Consolidated.dc.html §19 "Settings & Profile" (the eight
@@ -263,6 +264,22 @@ notes: >
   @clearline/data-access-org-security, an org-security contract + the `org_security` AuditCategory member,
   org-security config persisted on AuthService's OrganizationRecord (superseding the enforceTwoFactor stub)
   behind org-security.handlers.ts, and a demo-beacon guide; the uploaded IdP certificate is never stored,
-  only its fingerprint (AC-10). This applied no further changes.updates. Remaining stories US-CW-041,
-  US-CW-042, and US-CW-043 are unstarted (US-CW-043 Ownership Transfer mounts inside US-CW-040's surface).
-  The epic advances to IMPLEMENTED only once all its stories land.
+  only its fingerprint (AC-10). This applied no further changes.updates. US-CW-041 (Developer Settings —
+  API Keys & Webhooks) was IMPLEMENTED 2026-07-21 (branch US-CW-041/developer-api-keys-webhooks, PR #56).
+  The final three stories were IMPLEMENTED together 2026-07-23 (branch EPIC-CW-022/billing-transfer-logout):
+  US-CW-048 (User Logout) — the SidebarFooter identity chip becomes a keyboard-operable user menu with
+  "Manage account" + "Log out", raising onLogout/onManageAccount intent AppChrome wires to the US-CW-002
+  use-logout hook, with client-first teardown to /login; this APPLIED the epic's US-CW-032 update (the
+  identity-footer user menu + "manage my account" link — the last of this epic's declared changes.updates).
+  US-CW-043 (Ownership Transfer) — an Owner-only Transfer-ownership card in /settings/security-compliance
+  backed by a new atomic, re-auth-gated AuthService.transferOwnership (the one sanctioned relaxation of
+  owner_protected) + POST /api/team/owner-transfer + the useTransferOwnership hook, preserving the
+  single-Owner invariant and riding the mid-session role change (no re-login). US-CW-042 (Billing & Plan) —
+  the real Admin/Owner-only /settings/billing (replacing the placeholder) with plan/usage + approaching-limit
+  indicators, a mocked Stripe-hosted payment-method update, period-named invoice downloads, a
+  type-the-company-name cancellation, and a post-cancellation any-role read-only banner + a representative
+  server-side write-block (payments); introduced @clearline/data-access-billing, BillingService/handlers/
+  fixtures, the `billing` AuditCategory, and a demo-beacon guide (built without a design mockup — §19 ships
+  none for Billing — flagged for design review). With all 12 stories landed, the epic is IMPLEMENTED
+  (2026-07-23). Follow-up flagged: extend the post-cancellation write-block beyond payments to card issuance
+  and approval creation.

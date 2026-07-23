@@ -9,7 +9,7 @@ feature_area: 'core'
 title: 'Billing & Plan'
 
 # Lifecycle status
-status: 'DRAFT'
+status: 'IMPLEMENTED'
 story_points: 13
 dependencies: ['US-CW-033', 'US-CW-006', 'US-CW-027']
 
@@ -24,8 +24,8 @@ history:
     date: '2026-07-17'
 
 # Status timestamps — set when status transitions occur
-approved_date: null
-implementation_date: null
+approved_date: '2026-07-23'
+implementation_date: '2026-07-23'
 deprecated_date: null
 removed_date: null
 
@@ -147,10 +147,21 @@ edge_cases: |
 
 # Implementation Status
 implementation_status: |
-  🚧 Not yet implemented — DRAFT authored 2026-07-17 (EPIC-CW-022), specs-only for review.
-  Source: specs/designs/Clearline Design System - Consolidated.dc.html §19.1 (Billing & Plan item) and Gherkin
-  §26 (current plan + usage with approaching-limit indicators; Stripe Elements payment-method update incl.
-  decline; invoice download; multi-step type-the-company-name cancellation; post-cancellation grace-period
-  read-only access). Anticipated new surface: /settings/billing (Admin/Owner-only) with a plan/usage summary,
-  a Stripe Elements payment form, an invoice history table, and the cancellation flow, backed by MSW +
-  Stripe test mode.
+  ✅ IMPLEMENTED 2026-07-23 (branch EPIC-CW-022/billing-transfer-logout). The /settings/billing placeholder is
+  replaced by the real Admin/Owner-only page (gated by billing:manage, server-authoritative 403 → AccessDenied,
+  AC-08). It shows the plan + usage summary with amber "Approaching limit" indicators carried as icon + text,
+  never colour alone (AC-01, money via the shared minor-unit formatMoneyValue); a payment-method update through
+  a Stripe Elements-style hosted form modelled by a mock token so card data never touches Clearline, with a
+  declined card showing "Your card was declined." and leaving the method intact (AC-02/03); period-named
+  invoice PDF downloads (AC-04); and a deliberate multi-step, type-the-company-name cancellation whose final
+  button stays disabled until the name matches exactly, scheduled for period-end rather than immediate
+  (AC-05/06). Post-cancellation grace (AC-07) surfaces an app-wide, any-role read-only banner via a new
+  GET /api/billing/status and a server-side write-block on new payments keyed off subscription status — the
+  payments create endpoint is the representative "new financial object" path; extending the same guard to card
+  issuance and approval creation is tracked as follow-up (flagged for review). Billing audit events use the new
+  `billing` AuditCategory and never record raw card data (AC-09). Introduced @clearline/data-access-billing,
+  a BillingService + shared singleton + fixtures + billing.handlers.ts over MSW, a billing contract, and a
+  Billing demo-beacon guide. Design note: §19 ships NO screen mockup for Billing, so the page was built from
+  the §19.9 destructive-confirmation doctrine and the shipped sibling settings pages (flagged for design
+  review). The originally-scoped Stripe test-mode real-iframe is mocked per the project's Mock Backend
+  Architecture.

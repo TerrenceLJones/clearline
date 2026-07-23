@@ -9,7 +9,7 @@ feature_area: 'core'
 title: 'User Logout'
 
 # Lifecycle status
-status: 'DRAFT'
+status: 'IMPLEMENTED'
 story_points: 3
 dependencies: ['US-CW-002', 'US-CW-032']
 
@@ -24,8 +24,8 @@ history:
     date: '2026-07-21'
 
 # Status timestamps — set when status transitions occur
-approved_date: null
-implementation_date: null
+approved_date: '2026-07-23'
+implementation_date: '2026-07-23'
 deprecated_date: null
 removed_date: null
 
@@ -134,6 +134,15 @@ edge_cases: |
 
 # Implementation Status
 implementation_status: |
-  ⏳ Not started. Depends on US-CW-002 (session/token lifecycle, logout endpoint + use-logout hook) and
-  US-CW-032 (sidebar identity footer that hosts the user menu). Reuses this epic's US-CW-032 update, which adds
-  the user menu / "manage my account" link to the identity footer — "Log out" is the second action in that menu.
+  ✅ IMPLEMENTED 2026-07-23 (branch EPIC-CW-022/billing-transfer-logout). The SidebarFooter identity chip
+  (@clearline/ui) becomes a keyboard-operable user menu carrying "Manage account" (→ /settings/personal)
+  and "Log out"; it closes on Escape, outside-click, or item-select and restores focus to the trigger
+  (AC-01), works inside the mobile off-canvas drawer (AC-06), and is never role-gated (AC-07). SidebarFooter
+  stays presentational — it raises onLogout / onManageAccount intent that AppChrome wires to the existing
+  US-CW-002 use-logout hook and routing. Client-first teardown: AppChrome fires POST /api/auth/logout and
+  redirects to /login regardless of outcome (postLogout clears the in-memory token), so a failed/offline
+  revoke never strands the user (AC-05); "Log out" is disabled while in flight to prevent double-submit
+  (AC-02). Post-logout, RequireAuth keeps the unauthenticated user on /login (AC-04); token-family
+  revocation is the unchanged US-CW-002 machinery (AC-03). This APPLIES the epic's US-CW-032 update (the
+  identity-footer user menu + "manage my account" link). A logout walkthrough was added to the global
+  demo-beacon. No new session machinery was introduced.

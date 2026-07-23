@@ -163,6 +163,11 @@ implementation_status: |
     - apps/clearline-web/src/pages/LoginPage.beacon.ts — demo guide calls out the sidebar + identity footer.
   🔗 Role→item mapping and mid-session re-evaluation stay upstream in nav-items.ts + AppChrome (US-CW-006);
      the access-changed banner (AC-06) still renders in the content region.
+  🔁 EPIC-CW-022 update APPLIED 2026-07-23 (via US-CW-048): the SidebarFooter identity chip gains a
+     keyboard-operable user menu carrying "Manage account" (→ /settings/personal) and "Log out". SidebarFooter
+     stays presentational — it now raises onLogout / onManageAccount intent (and a loggingOut flag) that
+     AppShell threads through and AppChrome wires to the US-CW-002 use-logout hook + routing. No change to the
+     footer's role + approval-limit display.
   🧪 Test coverage: @clearline/ui suite green (390 tests incl. AppShell drawer/identity + SidebarFooter +
      NavigationShell vertical/active/empty), @clearline/clearline-web green (301 incl. AppChrome per-role footer
      + identity helpers), @clearline/data-access-auth green (displayName). rbac.spec.ts e2e (nav landmark +

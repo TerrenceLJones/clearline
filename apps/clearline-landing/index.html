@@ -1,0 +1,1477 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clearline — B2B spend management, built to be inspected</title>
+    <meta
+      name="description"
+      content="Clearline is a B2B spend-management frontend that models real fintech failure modes — idempotent payments, separation of duties, reconciliation — built with React 19, Nx, and an LLM-assisted, spec-driven workflow."
+    />
+    <meta property="og:title" content="Clearline — B2B spend management, built to be inspected" />
+    <meta
+      property="og:description"
+      content="Idempotent payments, multi-level approvals, RBAC, reconciliation. React 19 · Nx · TypeScript · spec-driven LLM workflow."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#3b6cf6" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233b6cf6'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      // Apply saved theme before paint to avoid a flash.
+      try {
+        var t = localStorage.getItem('cl-theme');
+        if (t) document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    </script>
+    <style>
+      /* Tokens mirror libs/design-tokens (--cl-*) so the landing page matches the product. */
+      :root {
+        --bg: #f5f6f8;
+        --surface: #ffffff;
+        --surface-2: #f0f2f5;
+        --border: #e4e7eb;
+        --border-2: #d3d8df;
+        --text: #161a20;
+        --text-2: #586070;
+        --text-3: #6b7280;
+        --accent: #3b6cf6;
+        --accent-2: #2f5ce0;
+        --accent-weak: #ecf1fe;
+        --accent-text: #2a55cc;
+        --pos: #15805a;
+        --pos-weak: #e4f3eb;
+        --warn: #9a5b00;
+        --warn-weak: #fbf0db;
+        --shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 8px 24px rgba(16, 24, 40, 0.06);
+        --font-ui: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+        --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) {
+          --bg: #0b0d11;
+          --surface: #14171d;
+          --surface-2: #1b1f27;
+          --border: #272c35;
+          --border-2: #363c47;
+          --text: #e8ebf0;
+          --text-2: #a0a8b5;
+          --text-3: #8b93a1;
+          --accent: #6b93fa;
+          --accent-2: #7da0f9;
+          --accent-weak: #172344;
+          --accent-text: #9db8fb;
+          --pos: #4cc59a;
+          --pos-weak: #11261e;
+          --warn: #e9b55a;
+          --warn-weak: #2a2110;
+          --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+          color-scheme: dark;
+        }
+      }
+      :root[data-theme='dark'] {
+        --bg: #0b0d11;
+        --surface: #14171d;
+        --surface-2: #1b1f27;
+        --border: #272c35;
+        --border-2: #363c47;
+        --text: #e8ebf0;
+        --text-2: #a0a8b5;
+        --text-3: #8b93a1;
+        --accent: #6b93fa;
+        --accent-2: #7da0f9;
+        --accent-weak: #172344;
+        --accent-text: #9db8fb;
+        --pos: #4cc59a;
+        --pos-weak: #11261e;
+        --warn: #e9b55a;
+        --warn-weak: #2a2110;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+        color-scheme: dark;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 72px;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 16px/1.6 var(--font-ui);
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        color: var(--accent-text);
+      }
+      :focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+      code,
+      pre,
+      .mono {
+        font-family: var(--font-mono);
+      }
+      code {
+        font-size: 0.88em;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        padding: 0.1em 0.4em;
+        border-radius: 5px;
+      }
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding-inline: 20px;
+      }
+      section {
+        padding-block: 72px;
+      }
+      h1,
+      h2,
+      h3 {
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+      h2 {
+        font-size: clamp(1.6rem, 3vw, 2.1rem);
+        margin-bottom: 12px;
+      }
+      h3 {
+        font-size: 1.05rem;
+        margin-bottom: 8px;
+      }
+      .eyebrow {
+        font: 500 0.78rem/1 var(--font-mono);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--accent-text);
+        margin-bottom: 14px;
+        display: block;
+      }
+      .lede {
+        color: var(--text-2);
+        max-width: 68ch;
+        margin: 0 0 36px;
+        font-size: 1.05rem;
+      }
+      p {
+        margin: 0 0 12px;
+      }
+
+      /* Header */
+      header.site {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: color-mix(in srgb, var(--bg) 88%, transparent);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+      }
+      header.site .wrap {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        height: 60px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        color: var(--text);
+        text-decoration: none;
+      }
+      .brand svg {
+        width: 26px;
+        height: 26px;
+      }
+      nav.links {
+        margin-left: auto;
+        display: flex;
+        gap: 4px;
+        align-items: center;
+      }
+      nav.links a {
+        color: var(--text-2);
+        text-decoration: none;
+        font-size: 0.92rem;
+        padding: 6px 10px;
+        border-radius: 8px;
+      }
+      nav.links a:hover {
+        background: var(--surface-2);
+        color: var(--text);
+      }
+      .theme-btn {
+        border: 1px solid var(--border-2);
+        background: var(--surface);
+        color: var(--text);
+        border-radius: 8px;
+        height: 34px;
+        width: 34px;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+      @media (max-width: 760px) {
+        nav.links a.hide-sm {
+          display: none;
+        }
+      }
+
+      /* Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 18px;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid var(--border-2);
+        background: var(--surface);
+        color: var(--text);
+      }
+      .btn:hover {
+        border-color: var(--accent);
+      }
+      .btn.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      .btn.primary:hover {
+        background: var(--accent-2);
+      }
+      html[data-theme='dark'] .btn.primary,
+      html:not([data-theme='light']) .btn.primary {
+        color: #0b0d11;
+      }
+      @media (prefers-color-scheme: light) {
+        html:not([data-theme='dark']) .btn.primary {
+          color: #fff;
+        }
+      }
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 28px;
+      }
+
+      /* Hero */
+      .hero {
+        padding-block: 84px 56px;
+      }
+      .hero h1 {
+        font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+        max-width: 18ch;
+      }
+      .hero h1 em {
+        font-style: normal;
+        color: var(--accent-text);
+      }
+      .hero p.sub {
+        font-size: 1.15rem;
+        color: var(--text-2);
+        max-width: 62ch;
+        margin-top: 20px;
+      }
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 24px;
+      }
+      .pill {
+        font: 500 0.8rem/1 var(--font-mono);
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text-2);
+      }
+
+      /* Stats */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+      }
+      .stat {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px;
+      }
+      .stat b {
+        display: block;
+        font-size: 1.9rem;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+      }
+      .stat span {
+        color: var(--text-2);
+        font-size: 0.88rem;
+      }
+
+      /* Cards */
+      .grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 22px;
+      }
+      .card p {
+        color: var(--text-2);
+        font-size: 0.95rem;
+      }
+      .card p:last-child {
+        margin-bottom: 0;
+      }
+      .tag {
+        display: inline-block;
+        font: 500 0.72rem/1 var(--font-mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 5px 8px;
+        border-radius: 6px;
+        background: var(--accent-weak);
+        color: var(--accent-text);
+        margin-bottom: 12px;
+      }
+      .tag.pos {
+        background: var(--pos-weak);
+        color: var(--pos);
+      }
+      .tag.warn {
+        background: var(--warn-weak);
+        color: var(--warn);
+      }
+      .alt {
+        background: var(--surface);
+        border-block: 1px solid var(--border);
+      }
+      .alt .card {
+        background: var(--bg);
+      }
+      .alt .stat {
+        background: var(--bg);
+      }
+
+      /* Architecture */
+      .arch {
+        display: grid;
+        gap: 0;
+        border: 1px solid var(--border-2);
+        border-radius: 14px;
+        overflow: hidden;
+        background: var(--surface);
+      }
+      .arch > div {
+        padding: 18px 22px;
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 16px;
+        align-items: start;
+      }
+      .arch > div + div {
+        border-top: 1px dashed var(--border-2);
+      }
+      .arch .layer {
+        font: 600 0.8rem/1.4 var(--font-mono);
+        color: var(--accent-text);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .arch .rule {
+        color: var(--text-2);
+        font-size: 0.93rem;
+      }
+      .arch .rule b {
+        color: var(--text);
+      }
+      .arch .cross {
+        background: var(--surface-2);
+      }
+      @media (max-width: 620px) {
+        .arch > div {
+          grid-template-columns: 1fr;
+          gap: 4px;
+        }
+      }
+
+      /* Stack table */
+      .table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--surface);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.94rem;
+        min-width: 520px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 12px 18px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      th {
+        background: var(--surface-2);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-2);
+      }
+      td:first-child {
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      td span {
+        color: var(--text-2);
+      }
+
+      /* Decisions */
+      .decision h3 {
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+      }
+      .decision .n {
+        font: 500 0.8rem var(--font-mono);
+        color: var(--text-3);
+      }
+      .decision dl {
+        margin: 12px 0 0;
+        font-size: 0.92rem;
+      }
+      .decision dt {
+        font: 600 0.72rem/1 var(--font-mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-3);
+        margin-top: 12px;
+      }
+      .decision dd {
+        margin: 4px 0 0;
+        color: var(--text-2);
+      }
+
+      /* LLM */
+      .split {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 1fr 1fr;
+      }
+      .split > * {
+        min-width: 0;
+      }
+      @media (max-width: 760px) {
+        .split {
+          grid-template-columns: 1fr;
+        }
+      }
+      ul.clean {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      ul.clean li {
+        padding: 9px 0 9px 26px;
+        position: relative;
+        color: var(--text-2);
+        font-size: 0.95rem;
+        border-top: 1px solid var(--border);
+      }
+      ul.clean li:first-child {
+        border-top: 0;
+      }
+      ul.clean li::before {
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: 17px;
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        background: var(--accent);
+      }
+      ul.clean.human li::before {
+        background: var(--pos);
+      }
+      ul.clean li b {
+        color: var(--text);
+      }
+      ol.pipeline {
+        list-style: none;
+        counter-reset: step;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 12px;
+      }
+      ol.pipeline li {
+        counter-increment: step;
+        display: grid;
+        grid-template-columns: 44px 1fr;
+        gap: 14px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px 18px;
+      }
+      .alt ol.pipeline li {
+        background: var(--bg);
+      }
+      ol.pipeline li::before {
+        content: counter(step);
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: var(--accent-weak);
+        color: var(--accent-text);
+        font: 600 0.95rem/36px var(--font-mono);
+        text-align: center;
+      }
+      ol.pipeline.cols {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      }
+      ol.pipeline h3 {
+        margin-bottom: 2px;
+      }
+      ol.pipeline p {
+        color: var(--text-2);
+        font-size: 0.93rem;
+        margin: 0;
+      }
+      .callout {
+        margin-top: 24px;
+        border: 1px solid var(--border-2);
+        border-left: 4px solid var(--accent);
+        background: var(--surface);
+        border-radius: 12px;
+        padding: 18px 20px;
+        color: var(--text-2);
+      }
+      .callout b {
+        color: var(--text);
+      }
+      pre {
+        margin: 0;
+        padding: 18px;
+        overflow-x: auto;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        font-size: 0.82rem;
+        line-height: 1.6;
+        color: var(--text-2);
+      }
+
+      footer {
+        border-top: 1px solid var(--border);
+        padding-block: 40px 56px;
+        color: var(--text-2);
+        font-size: 0.9rem;
+      }
+      footer .wrap {
+        display: grid;
+        gap: 10px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site">
+      <div class="wrap">
+        <a class="brand" href="#top" aria-label="Clearline home">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <rect width="32" height="32" rx="8" fill="var(--accent)" />
+            <path
+              d="M9 16.5l4.5 4.5L23 11"
+              stroke="#fff"
+              stroke-width="3"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Clearline
+        </a>
+        <nav class="links" aria-label="Sections">
+          <a class="hide-sm" href="#product">Product</a>
+          <a class="hide-sm" href="#architecture">Architecture</a>
+          <a class="hide-sm" href="#decisions">Decisions</a>
+          <a href="#llm">LLM workflow</a>
+          <a href="https://clearline-web-delta.vercel.app/" rel="noopener">Live demo</a>
+          <button class="theme-btn" id="theme" type="button" aria-label="Toggle color theme">
+            ◐
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- HERO -->
+      <section class="hero">
+        <div class="wrap">
+          <span class="eyebrow">Portfolio project · B2B fintech frontend</span>
+          <h1>Spend management where <em>correctness</em> is the feature.</h1>
+          <p class="sub">
+            Clearline is a corporate spend platform in the style of Ramp and Brex. It's not
+            happy-path CRUD: it models idempotent payments, separation of duties, role-based access,
+            KYB onboarding, and bank-feed reconciliation — the places where real money software
+            breaks — and surfaces those failure modes honestly in the UI.
+          </p>
+          <div class="cta-row">
+            <a class="btn primary" href="https://clearline-web-delta.vercel.app/" rel="noopener"
+              >Open the live demo →</a
+            >
+            <a class="btn" href="https://clearline-component-library.vercel.app" rel="noopener"
+              >Component library (Storybook)</a
+            >
+            <a class="btn" href="https://github.com/TerrenceLJones/clearline" rel="noopener"
+              >Source on GitHub</a
+            >
+          </div>
+          <div class="pill-row" aria-label="Core technologies">
+            <span class="pill">React 19</span><span class="pill">TypeScript 6</span
+            ><span class="pill">Vite 7</span><span class="pill">Nx monorepo</span
+            ><span class="pill">TanStack Query</span><span class="pill">Tailwind v4</span
+            ><span class="pill">MSW v2</span><span class="pill">Vitest · Playwright</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- STATS -->
+      <section style="padding-block: 0 72px">
+        <div class="wrap">
+          <div class="stats">
+            <div class="stat"><b>24</b><span>epics specified, 22 shipped</span></div>
+            <div class="stat"><b>48</b><span>user stories, 46 implemented</span></div>
+            <div class="stat"><b>~2,000</b><span>unit &amp; component test cases</span></div>
+            <div class="stat"><b>14</b><span>Playwright e2e specs</span></div>
+            <div class="stat"><b>40+</b><span>Nx libraries, layered</span></div>
+            <div class="stat"><b>~4 wks</b><span>commit history, Jun 30 – Jul 24, 2026</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRODUCT -->
+      <section id="product" class="alt">
+        <div class="wrap">
+          <span class="eyebrow">What's in the app</span>
+          <h2>A full spend platform, scoped by role.</h2>
+          <p class="lede">
+            Three personas (Employee, Finance Manager, Controller) see different navigation and
+            different permissions, all derived from one permission predicate — never a role string.
+          </p>
+          <div class="grid">
+            <article class="card">
+              <span class="tag">Payments</span>
+              <h3>Idempotent vendor payments</h3>
+              <p>
+                One validation gate (balance, daily limit, self-transfer, recipient status), an
+                <code>Idempotency-Key</code> per intent, 30s timeout, and full-jitter retry on 5xx.
+                3DS step-up for high-value payments; holds, reversals, and unknown-status handling.
+              </p>
+            </article>
+            <article class="card">
+              <span class="tag">Approvals</span>
+              <h3>Multi-level approvals &amp; batches</h3>
+              <p>
+                Separation of duties, limit-based escalation, stale-action reconciliation, and
+                partial-failure batch approve/reject with per-item keys and mid-batch resume.
+              </p>
+            </article>
+            <article class="card">
+              <span class="tag">Cards</span>
+              <h3>Virtual cards, live feed</h3>
+              <p>
+                Issuance with limits and MCC restrictions, a real-time WebSocket transaction feed,
+                freeze controls, and security-gated declines.
+              </p>
+            </article>
+            <article class="card">
+              <span class="tag">Reconciliation</span>
+              <h3>Bank-feed matching</h3>
+              <p>
+                Exact + fuzzy matching with a similarity breakdown, an actionable exceptions queue,
+                exact-sum split matching, and a Fatal-tier guard that withholds a balance that
+                doesn't net.
+              </p>
+            </article>
+            <article class="card">
+              <span class="tag">Analytics</span>
+              <h3>Dashboards &amp; budgets</h3>
+              <p>
+                Spend by category, department, and vendor with anomaly flags and AI-confidence
+                labels; per-section error boundaries with scoped retry; budget gauges with
+                80%-warning and over-budget states and period rollover.
+              </p>
+            </article>
+            <article class="card">
+              <span class="tag">Platform</span>
+              <h3>Onboarding, settings, audit</h3>
+              <p>
+                KYB onboarding, sign-up and sessions, 2FA, an append-only Controller-only audit log
+                (opening it is itself audited), a full settings surface with re-auth-gated ownership
+                transfer, and role-based getting-started checklists driven by real domain events.
+              </p>
+            </article>
+          </div>
+          <div class="callout">
+            <b>Exploring the demo:</b> everything runs in your browser against a stateful mock
+            backend — no sign-up needed. Use the floating <b>Demo Beacon</b> (bottom-right) on any
+            page for seeded credentials, one-click role switching (watch the nav and permissions
+            re-scope), the inputs that trip each guardrail, and a reset control.
+          </div>
+        </div>
+      </section>
+
+      <!-- ARCHITECTURE -->
+      <section id="architecture">
+        <div class="wrap">
+          <span class="eyebrow">Architecture</span>
+          <h2>Business rules never depend on React, HTTP, or the DOM.</h2>
+          <p class="lede">
+            An Nx + pnpm monorepo with one rule of thumb: if it's an invariant it lives in
+            <code>domain</code>; if it touches the network it lives in <code>data-access</code>; if
+            it renders it lives in <code>ui</code> or the app.
+          </p>
+          <div class="arch" role="list">
+            <div role="listitem">
+              <span class="layer">UI layer</span>
+              <span class="rule"
+                ><b>apps/clearline-web</b> — React 19 + Vite. Pages, route guards
+                (<code>RequireAuth</code>, <code>RequirePermission</code>…), permission-driven nav.
+                Renders typed errors; decides nothing.</span
+              >
+            </div>
+            <div role="listitem">
+              <span class="layer">Data-access</span>
+              <span class="rule"
+                ><b>libs/data-access/* (23)</b> — TanStack Query hooks over <code>/api/*</code>.
+                Mints idempotency keys, applies timeouts and retry/backoff, surfaces 4xx as typed
+                errors.</span
+              >
+            </div>
+            <div role="listitem">
+              <span class="layer">Domain</span>
+              <span class="rule"
+                ><b>libs/domain/* (11)</b> — pure TypeScript: validation gates, state machines,
+                policies. No React, no fetch. Unit-testable alone.</span
+              >
+            </div>
+            <div role="listitem" class="cross">
+              <span class="layer">Cross-cutting</span>
+              <span class="rule"
+                ><b>ui</b> (Radix-backed, Storybook) · <b>design-tokens</b> (generated
+                <code>--cl-*</code> theme) · <b>icons</b> · <b>money</b> (minor-unit math) ·
+                <b>contracts</b> (shared API types) · <b>demo-beacon</b></span
+              >
+            </div>
+            <div role="listitem" class="cross">
+              <span class="layer">Backend seam</span>
+              <span class="rule"
+                ><b>libs/mock-backend</b> — MSW v2. Stateful TypeScript services hold the
+                invariants; HTTP/WebSocket handlers are thin adapters.</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STACK -->
+      <section id="stack" class="alt">
+        <div class="wrap">
+          <span class="eyebrow">Technology</span>
+          <h2>The stack, and why each piece is there.</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Concern</th>
+                  <th>Choice</th>
+                  <th>Why</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Framework / build</td>
+                  <td>React 19 + Vite 7</td>
+                  <td><span>Web-only SPA behind auth; no SEO need, so no SSR complexity.</span></td>
+                </tr>
+                <tr>
+                  <td>Language</td>
+                  <td>TypeScript 6 (strict)</td>
+                  <td><span>Shared contract types across UI, data-access, and mock backend.</span></td>
+                </tr>
+                <tr>
+                  <td>Routing</td>
+                  <td>react-router 7</td>
+                  <td>
+                    <span
+                      >Nested layout routes carry the guard chain; version pinned below the 8.x major
+                      on purpose.</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Server state</td>
+                  <td>TanStack Query 5</td>
+                  <td><span>Cache, retry, and mutation lifecycles instead of hand-rolled effects.</span></td>
+                </tr>
+                <tr>
+                  <td>Forms</td>
+                  <td>react-hook-form + Zod</td>
+                  <td><span>Schema-validated input with errors tied to fields for accessibility.</span></td>
+                </tr>
+                <tr>
+                  <td>Styling</td>
+                  <td>Tailwind v4 + Radix</td>
+                  <td>
+                    <span>Tokens in <code>@theme</code>, light/dark; accessible primitives underneath.</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Mock backend</td>
+                  <td>MSW v2</td>
+                  <td><span>Same handlers run in the browser demo and in tests.</span></td>
+                </tr>
+                <tr>
+                  <td>Testing</td>
+                  <td>Vitest · Testing Library · Playwright</td>
+                  <td><span>Domain unit tests, component tests, and role-based e2e flows.</span></td>
+                </tr>
+                <tr>
+                  <td>Design system</td>
+                  <td>Storybook 10 + Chromatic</td>
+                  <td><span>Every component ships stories and docs; visual regression in CI.</span></td>
+                </tr>
+                <tr>
+                  <td>Tooling / CI</td>
+                  <td>Nx 23 · pnpm · GitHub Actions · Husky · commitlint</td>
+                  <td><span>Affected-only builds and tests; conventional commits tied to story IDs.</span></td>
+                </tr>
+                <tr>
+                  <td>Hosting</td>
+                  <td>Vercel</td>
+                  <td><span>Git-driven previews; CI verifies, Vercel deploys.</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- DECISIONS -->
+      <section id="decisions">
+        <div class="wrap">
+          <span class="eyebrow">Engineering</span>
+          <h2>Technical decisions</h2>
+          <p class="lede">The choices that shaped the codebase, and why I made them.</p>
+          <div class="grid">
+            <article class="card decision">
+              <h3><span class="n">01</span> Services-first mock backend</h3>
+              <dl>
+                <dt>Decision</dt>
+                <dd>
+                  MSW handlers are thin; stateful TypeScript services own balances, idempotency
+                  records, and approval state.
+                </dd>
+                <dt>Why</dt>
+                <dd>
+                  Replayed keys, validation 4xx, and partial batch failures behave like a real server
+                  — in the hosted demo and in tests — with no backend to run.
+                </dd>
+                <dt>Cost</dt>
+                <dd>Server logic is re-implemented in the mock; contracts must stay honest.</dd>
+              </dl>
+            </article>
+            <article class="card decision">
+              <h3><span class="n">02</span> Pure domain libraries</h3>
+              <dl>
+                <dt>Decision</dt>
+                <dd>
+                  <code>validatePayment</code>, retry policy, match classifier, and auth rules are
+                  framework-free TypeScript.
+                </dd>
+                <dt>Why</dt>
+                <dd>
+                  Invariants are the product. They're testable in milliseconds and can't be
+                  accidentally coupled to a component.
+                </dd>
+              </dl>
+            </article>
+            <article class="card decision">
+              <h3><span class="n">03</span> Idempotency by default</h3>
+              <dl>
+                <dt>Decision</dt>
+                <dd>
+                  Every payment intent mints an <code>Idempotency-Key</code>; 5xx retries use
+                  full-jitter backoff; batches use per-item keys.
+                </dd>
+                <dt>Why</dt>
+                <dd>
+                  A network retry must never move money twice. Unknown status is shown as unknown,
+                  not guessed.
+                </dd>
+              </dl>
+            </article>
+            <article class="card decision">
+              <h3><span class="n">04</span> Permissions, not roles</h3>
+              <dl>
+                <dt>Decision</dt>
+                <dd>
+                  Nav, route guards, and even the getting-started checklist derive from one
+                  permission predicate.
+                </dd>
+                <dt>Why</dt>
+                <dd>
+                  A persona is only ever offered what it can do. "Client hides, server decides":
+                  the UI is never the enforcement point.
+                </dd>
+              </dl>
+            </article>
+            <article class="card decision">
+              <h3><span class="n">05</span> Money as minor units</h3>
+              <dl>
+                <dt>Decision</dt>
+                <dd>
+                  A single <code>@clearline/money</code> lib owns currency conversion; budget
+                  percentages and overages are computed on integers.
+                </dd>
+                <dt>Why</dt>
+                <dd>Floating point has no place near a ledger. Shared once, not re-derived per feature.</dd>
+              </dl>
+            </article>
+            <article class="card decision">
+              <h3><span class="n">06</span> Fail loudly, withhold bad data</h3>
+              <dl>
+                <dt>Decision</dt>
+                <dd>
+                  A Fatal-tier integrity state withholds a ledger balance that doesn't net; dashboards
+                  use per-section error boundaries with scoped retry.
+                </dd>
+                <dt>Why</dt>
+                <dd>A wrong number shown confidently is worse than a clear "can't show this."</dd>
+              </dl>
+            </article>
+            <article class="card decision">
+              <h3><span class="n">07</span> Accessibility as a cross-cutting epic</h3>
+              <dl>
+                <dt>Decision</dt>
+                <dd>
+                  WCAG 2.1 AA: status never by color alone, ≥3px focus ring with forced-colors
+                  fallback, spoken money labels, field-linked errors, focus-trapped dialogs.
+                </dd>
+                <dt>Why</dt>
+                <dd>Built into the component library and checked in e2e, not retrofitted.</dd>
+              </dl>
+            </article>
+            <article class="card decision">
+              <h3><span class="n">08</span> Append-only audit trail</h3>
+              <dl>
+                <dt>Decision</dt>
+                <dd>
+                  One central audit store that payments, approvals, and card controls emit into;
+                  no update or delete path at any layer.
+                </dd>
+                <dt>Why</dt>
+                <dd>Corrections are appended, never edited — and viewing the log is itself logged.</dd>
+              </dl>
+            </article>
+            <article class="card decision">
+              <h3><span class="n">09</span> Demo Beacon as a product tool</h3>
+              <dl>
+                <dt>Decision</dt>
+                <dd>
+                  A standalone, page-aware helper library documents seed data and scenarios in place;
+                  gated by <code>VITE_ENABLE_MOCKS</code>.
+                </dd>
+                <dt>Why</dt>
+                <dd>
+                  A reviewer shouldn't read fixture files to find what to try. A production build
+                  never loads the UI chunk.
+                </dd>
+              </dl>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- LLM -->
+      <section id="llm" class="alt">
+        <div class="wrap">
+          <span class="eyebrow">Building with an LLM</span>
+          <h2>How I run an AI-assisted development cycle.</h2>
+          <p class="lede">
+            I set the architecture, make every technical and product decision, and built the
+            development system that three AI tools work inside. Nothing moves from one stage to the
+            next until I have read the actual text and said yes. It's the process a good product
+            team runs — written specs, recorded decisions, tests first, code review, and a check on
+            the real screen — defined in the repo and directed the way a tech lead directs a team.
+          </p>
+
+          <div class="callout" style="margin: 0 0 32px">
+            <b>Why a system at all:</b> an assistant starts every session with no memory of the
+            last one. Left alone, that produces work that contradicts last week's decisions and
+            specs that describe a product you don't have. So the project is run like a team: a
+            registry of user stories and epics (Clearline has 24 epics and 48 stories in
+            <code>specs/</code>), a numbered record for each technical decision, and a fixed cycle
+            every feature goes through.
+          </div>
+
+          <h3 style="margin-bottom: 14px">Three tools, three roles</h3>
+          <p class="lede" style="margin-bottom: 18px">
+            Each tool has one job and one thing it is never allowed to do. The tool that writes the
+            code is not the one that judges it.
+          </p>
+          <div class="table-wrap" style="margin-bottom: 14px">
+            <table>
+              <thead>
+                <tr>
+                  <th>Who</th>
+                  <th>Role</th>
+                  <th>Does</th>
+                  <th>Never</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Me</td>
+                  <td><span>Architect, tech lead, product owner</span></td>
+                  <td>
+                    <span
+                      >Set architecture and constraints, design the workflow and its rules, make every
+                      engineering decision, review specs and code, test on the real screen,
+                      merge</span
+                    >
+                  </td>
+                  <td><span>Approve a summary instead of the actual text</span></td>
+                </tr>
+                <tr>
+                  <td>Claude Desktop</td>
+                  <td><span>Reviewer &amp; planner</span></td>
+                  <td>
+                    <span
+                      >Reads reports against the specs and decision records, recommends a ruling,
+                      drafts the next prompt, runs the design work</span
+                    >
+                  </td>
+                  <td><span>Touches the repository</span></td>
+                </tr>
+                <tr>
+                  <td>Claude Code</td>
+                  <td><span>Executor</span></td>
+                  <td>
+                    <span
+                      >Runs the repo's commands to write specs, tests, code, commits and pull
+                      requests; uses subagents for review, deviation audits and context
+                      loading</span
+                    >
+                  </td>
+                  <td><span>Continues past an approval gate on its own</span></td>
+                </tr>
+                <tr>
+                  <td>Claude Design</td>
+                  <td><span>Designer</span></td>
+                  <td>
+                    <span
+                      >Holds the design system and draws every screen state on a design canvas</span
+                    >
+                  </td>
+                  <td>
+                    <span>Invents a state no story asks for, or adds a token without approval</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color: var(--text-2); max-width: 70ch; margin-bottom: 36px">
+            A typical exchange: Claude Code stops at a gate and reports what it did, found, and
+            needs decided. I paste that report into Claude Desktop, which checks it against the
+            records and returns one recommendation and one complete prompt. I approve, change or
+            reject it, and paste it back. One prompt at a time, because the first result changes
+            what the second should say. Prompts stay short because the procedure lives in the
+            repo's own commands, versioned with the code.
+          </p>
+
+          <h3 style="margin-bottom: 14px">The feature cycle</h3>
+          <p class="lede" style="margin-bottom: 18px">
+            Every feature follows the same path from idea to merged code. Each step is a command in
+            the repo, so the process is identical in every session.
+          </p>
+          <ol class="pipeline cols">
+            <li>
+              <div>
+                <h3>Brief</h3>
+                <p>
+                  What the app should do, why now, what's out of scope, what done looks like. Open
+                  product questions are settled first.
+                </p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>Spec</h3>
+                <p>
+                  <code>/spec-feature</code> turns the brief into an epic and user stories with
+                  acceptance criteria, all draft. <code>/validate-registry</code> checks structure.
+                </p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>Approval</h3>
+                <p>
+                  I read the full acceptance criteria and run <code>/approve-epic</code> myself. The
+                  build command checks for approval and stops without it.
+                </p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>Design</h3>
+                <p>
+                  Claude Design draws every state the stories imply.
+                  <code>/validate-design-export</code> checks it against the design system.
+                </p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>Load context</h3>
+                <p>
+                  <code>/load-spec-context</code> gathers the epic, stories, decisions and designs
+                  once, so every session starts from the same picture.
+                </p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>Reconcile decisions</h3>
+                <p>
+                  <code>/reconcile-decisions</code> finds every earlier decision that applies and
+                  says whether this work follows, amends or replaces it.
+                </p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>Resolve open choices</h3>
+                <p>
+                  <code>/assess-tradeoffs</code> lays out any real engineering choice with its
+                  consequences. I decide; the decision is written down.
+                </p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>Build</h3>
+                <p>
+                  <code>/implement-feature</code> works one story at a time, test first — each test
+                  must fail for the right reason before any code exists.
+                  <code>/apply-design</code> translates designs into components, listing every
+                  state first.
+                </p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>Review functionality</h3>
+                <p>
+                  I test the built functionality in a real browser against the design, state by state.
+                </p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>Code review</h3>
+                <p>
+                  <code>/review-code</code> checks the change against the project's binding rules
+                  and quotes any rule it breaks.
+                </p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>Deviation audit</h3>
+                <p>
+                  <code>/review-deviations</code> compares what was built with what was specified
+                  across the whole epic.
+                </p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>Pull request</h3>
+                <p>
+                  <code>/create-pull-request</code> writes the description, including manual test
+                  steps and any declared deviations.
+                </p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>Merge &amp; close</h3>
+                <p>
+                  I merge. Stories are marked implemented only if every criterion is met.
+                </p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>Explainer</h3>
+                <p>
+                  <code>/explain-implementation</code> writes up how the feature works and what was
+                  learned while it's fresh.
+                </p>
+              </div>
+            </li>
+          </ol>
+          <p style="color: var(--text-2); margin-top: 14px">
+            Small fixes skip most of this. Anything touching money, permissions or personal data
+            gets the full cycle whatever its size.
+          </p>
+
+          <h3 style="margin: 40px 0 14px">The design pipeline</h3>
+          <div class="grid">
+            <div class="card">
+              <h3>One source, one copy</h3>
+              <p>
+                A design system holds tokens, icons, component guidelines and contrast
+                documentation. The repo holds a read-only copy, updated only by syncing from the
+                source and never edited by hand. Code reads only that copy.
+              </p>
+            </div>
+            <div class="card">
+              <h3>One canvas per epic</h3>
+              <p>
+                Every state gets its own artboard: empty, loading, error, offline, light and dark.
+                Every visual value is a token; new tokens are approved into the system as a
+                separate step.
+              </p>
+            </div>
+            <div class="card">
+              <h3>No open questions</h3>
+              <p>
+                There's no designer to leave questions for, so every product and data question is
+                settled before the brief is written. An open question produces invented scope.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Differences are recorded</h3>
+              <p>
+                If the app and the design differ, the difference goes in a hand-kept log. Nobody
+                edits a design file to make it match. After merge, approved artboards replace the
+                library's.
+              </p>
+            </div>
+          </div>
+
+          <h3 style="margin: 40px 0 14px">The rules that keep it trustworthy</h3>
+          <p class="lede" style="margin-bottom: 18px">
+            Written in the repo's <code>CLAUDE.md</code> as binding constraints. Review commands
+            check work against them and quote the rule that was broken.
+          </p>
+          <div class="split">
+            <div class="card">
+              <ul class="clean">
+                <li>
+                  <b>Approval means the exact text.</b> Silence, enthusiasm or "sounds good" doesn't
+                  count, and nothing is approved after work has started.
+                </li>
+                <li>
+                  <b>The repo beats memory.</b> No tool states what a file contains without reading
+                  it fresh.
+                </li>
+                <li>
+                  <b>The spec is the contract.</b> If it's wrong, the assistant stops and the spec
+                  is amended with a reason and history entry first.
+                </li>
+                <li>
+                  <b>Decisions are written down</b> — a numbered record with options and the reason.
+                </li>
+                <li>
+                  <b>Tests come first and must prove something.</b> Mocks stand in for outside
+                  services, never for the code under test.
+                </li>
+              </ul>
+            </div>
+            <div class="card">
+              <ul class="clean human">
+                <li>
+                  <b>Deviations are declared.</b> A partly-met criterion is marked partial with a
+                  follow-up story; incidental findings go to an audit file, not a quiet fix.
+                </li>
+                <li>
+                  <b>A person checks the functionality</b> before any UI pull request opens.
+                </li>
+                <li>
+                  <b>Git stays readable.</b> One branch per epic, one concern per commit, squash
+                  merges, no rewriting shared history, never commit on main.
+                </li>
+                <li>
+                  <b>Raise decisions, don't make them quietly</b> — new dependencies, schema shape,
+                  anything with a real alternative.
+                </li>
+                <li>
+                  <b>Report accurately,</b> including on its own work and shortcuts.
+                </li>
+              </ul>
+            </div>
+          </div>
+          <p style="color: var(--text-2); margin-top: 14px; max-width: 70ch">
+            When a gate or review catches a defect, the fix isn't only the code — I change the rule
+            and record why, so the same failure costs less next time.
+          </p>
+
+          <h3 style="margin: 40px 0 14px">What I learned</h3>
+          <div class="grid">
+            <div class="card">
+              <h3>The records matter more than the model</h3>
+              <p>
+                Output quality followed the quality of the spec, the decision history and the rules
+                file, not how cleverly I worded a prompt.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Separate doing from judging</h3>
+              <p>
+                The session that wrote the code carries its own assumptions about what it built. A
+                separate session doesn't, so it checks the work against the spec and the rules
+                instead, and catches gaps the builder can't see.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Gates are cheap</h3>
+              <p>
+                Reviewing the acceptance criteria before the build takes minutes. Fixing a
+                misunderstanding after the code is written means rework.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Put the process in the repo</h3>
+              <p>
+                Commands, templates and rules are versioned and reviewed like code, so the process
+                improves with each change and survives every new session.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Keep the specs next to the code</h3>
+              <p>
+                Epics and user stories live in the repo as versioned files, not in a separate
+                tool. The assistant reads the same requirements I do in every session, a change to
+                a requirement goes through review like any code change, and each commit traces back
+                to a story.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Honest status beats clean status</h3>
+              <p>
+                A registry that says "implemented" about partial work is confidently wrong, and
+                every later decision inherits the error.
+              </p>
+            </div>
+          </div>
+
+          <div class="callout">
+            <b>This works on a team too.</b> Nothing here is specific to solo work. Stories with
+            acceptance criteria, decision records, pull requests with test steps, and design files
+            tied to tokens are what teams already use. On a team, a product manager and a designer
+            would share the product and design decisions, and I'd stay in the technical lead role.
+            Colleagues could review the assistants' output the same way they review each other's
+            work.
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section>
+        <div class="wrap">
+          <span class="eyebrow">Take a look</span>
+          <h2>Inspect it the way you'd inspect a teammate's PR.</h2>
+          <p class="lede">
+            Try the flows, then read the code. The domain libraries and their tests are the best
+            place to start.
+          </p>
+          <div class="cta-row" style="margin-top: 0">
+            <a class="btn primary" href="https://clearline-web-delta.vercel.app/" rel="noopener"
+              >Open the live demo →</a
+            >
+            <a class="btn" href="https://clearline-component-library.vercel.app" rel="noopener"
+              >Component library</a
+            >
+            <a class="btn" href="https://github.com/TerrenceLJones/clearline" rel="noopener"
+              >Source on GitHub</a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <div><b style="color: var(--text)">Built by Terrence L. Jones.</b></div>
+        <div>
+          Clearline is a portfolio demonstration running entirely on a mock backend; no real money or
+          customer data is involved. Source-available for evaluation and discussion only —
+          © 2026 Terrence L. Jones, all rights reserved.
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var btn = document.getElementById('theme');
+        btn.addEventListener('click', function () {
+          var root = document.documentElement;
+          var current =
+            root.getAttribute('data-theme') ||
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          var next = current === 'dark' ? 'light' : 'dark';
+          root.setAttribute('data-theme', next);
+          try {
+            localStorage.setItem('cl-theme', next);
+          } catch (e) {}
+        });
+      })();
+    </script>
+  </body>
+</html>

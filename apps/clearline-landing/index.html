@@ -406,40 +406,17 @@
         max-width: 1040px;
       }
       .grid.wide {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
       }
-      /* Feature rows: text on the left, a screenshot rendered at exactly 640px (2x = 1280px) on the right. */
       .card.has-shot {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 640px;
-        grid-template-rows: auto auto 1fr;
-        column-gap: 32px;
-        align-items: start;
-      }
-      .card.has-shot > :not(figure) {
-        grid-column: 1;
+        display: flex;
+        flex-direction: column;
       }
       .card.has-shot p {
-        margin-bottom: 0;
+        margin-bottom: 16px;
       }
-      .card.has-shot figure.shot {
-        grid-column: 2;
-        grid-row: 1 / span 3;
-        width: 640px;
-        max-width: 100%;
-        justify-self: end;
-      }
-      @media (max-width: 960px) {
-        .card.has-shot {
-          grid-template-columns: minmax(0, 1fr);
-          grid-template-rows: none;
-        }
-        .card.has-shot figure.shot {
-          grid-column: 1;
-          grid-row: auto;
-          width: 100%;
-          margin-top: 16px;
-        }
+      .card.has-shot .shot {
+        margin-top: auto;
       }
       .roles-pair {
         margin-top: 32px;
@@ -913,9 +890,9 @@
             ><span class="pill">MSW v2</span><span class="pill">Vitest · Playwright</span>
           </div>
           <figure class="shot hero-shot">
-              <a class="shot-link" data-lightbox href="img/dashboard-full.webp" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Clearline spend dashboard: total spend, pending approvals, budget remaining, and spend by category and department">
+              <a class="shot-link" data-lightbox href="img/dashboard-full-2x.webp" data-srcset="img/dashboard-full-1x.webp 1x, img/dashboard-full-2x.webp 2x, img/dashboard-full-3x.webp 3x" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Clearline spend dashboard: total spend, pending approvals, budget remaining, and spend by category and department">
                 <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
-                <img src="img/dashboard.webp" width="2076" height="1298" alt="Clearline spend dashboard: total spend, pending approvals, budget remaining, and spend by category and department" fetchpriority="high" />
+                <img src="img/dashboard-1x.webp" srcset="img/dashboard-1x.webp 1x, img/dashboard-2x.webp 2x, img/dashboard-3x.webp 3x" width="1038" height="649" alt="Clearline spend dashboard: total spend, pending approvals, budget remaining, and spend by category and department" fetchpriority="high" />
               </a>
             </figure>
         </div>
@@ -954,9 +931,9 @@
                 3DS step-up for high-value payments; holds, reversals, and unknown-status handling.
               </p>
               <figure class="shot">
-              <a class="shot-link" data-lightbox href="img/payments-full.webp" target="_blank" rel="noopener" aria-label="Enlarge screenshot: New payment form: pay-from account, recipient list with verified and closed statuses, amount and method, and a review panel showing the idempotency key">
+              <a class="shot-link" data-lightbox href="img/payments-full-2x.webp" data-srcset="img/payments-full-1x.webp 1x, img/payments-full-2x.webp 2x, img/payments-full-3x.webp 3x" target="_blank" rel="noopener" aria-label="Enlarge screenshot: New payment form: pay-from account, recipient list with verified and closed statuses, amount and method, and a review panel showing the idempotency key">
                 <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
-                <img src="img/payments.webp" width="1276" height="1162" alt="New payment form: pay-from account, recipient list with verified and closed statuses, amount and method, and a review panel showing the idempotency key" loading="lazy" decoding="async" />
+                <img src="img/payments-1x.webp" srcset="img/payments-1x.webp 1x, img/payments-2x.webp 2x, img/payments-3x.webp 3x" width="484" height="434" alt="New payment form: pay-from account, recipient list with verified and closed statuses, amount and method, and a review panel showing the idempotency key" loading="lazy" decoding="async" />
               </a>
             </figure>
             </article>
@@ -968,9 +945,9 @@
                 partial-failure batch approve/reject with per-item keys and mid-batch resume.
               </p>
               <figure class="shot">
-              <a class="shot-link" data-lightbox href="img/approvals-full.webp" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Approvals queue with four pending expenses, each with Reject and Approve actions, and the approver limit shown">
+              <a class="shot-link" data-lightbox href="img/approvals-full-2x.webp" data-srcset="img/approvals-full-1x.webp 1x, img/approvals-full-2x.webp 2x, img/approvals-full-3x.webp 3x" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Approvals queue with four pending expenses, each with Reject and Approve actions, and the approver limit shown">
                 <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
-                <img src="img/approvals.webp" width="1276" height="633" alt="Approvals queue with four pending expenses, each with Reject and Approve actions, and the approver limit shown" loading="lazy" decoding="async" />
+                <img src="img/approvals-1x.webp" srcset="img/approvals-1x.webp 1x, img/approvals-2x.webp 2x, img/approvals-3x.webp 3x" width="484" height="236" alt="Approvals queue with four pending expenses, each with Reject and Approve actions, and the approver limit shown" loading="lazy" decoding="async" />
               </a>
             </figure>
             </article>
@@ -982,9 +959,9 @@
                 freeze controls, and security-gated declines.
               </p>
               <figure class="shot">
-              <a class="shot-link" data-lightbox href="img/cards-full.webp" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Virtual card wallet with four active cards and one frozen card that is not authorizing">
+              <a class="shot-link" data-lightbox href="img/cards-full-2x.webp" data-srcset="img/cards-full-1x.webp 1x, img/cards-full-2x.webp 2x, img/cards-full-3x.webp 3x" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Virtual card wallet with four active cards and one frozen card that is not authorizing">
                 <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
-                <img src="img/cards.webp" width="1276" height="956" alt="Virtual card wallet with four active cards and one frozen card that is not authorizing" loading="lazy" decoding="async" />
+                <img src="img/cards-1x.webp" srcset="img/cards-1x.webp 1x, img/cards-2x.webp 2x, img/cards-3x.webp 3x" width="484" height="499" alt="Virtual card wallet with four active cards and one frozen card that is not authorizing" loading="lazy" decoding="async" />
               </a>
             </figure>
             </article>
@@ -997,9 +974,9 @@
                 doesn't net.
               </p>
               <figure class="shot">
-              <a class="shot-link" data-lightbox href="img/reconciliation-full.webp" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Reconciliation exceptions queue: a 78 percent fuzzy match to review, two unmatched items, and a split candidate">
+              <a class="shot-link" data-lightbox href="img/reconciliation-full-2x.webp" data-srcset="img/reconciliation-full-1x.webp 1x, img/reconciliation-full-2x.webp 2x, img/reconciliation-full-3x.webp 3x" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Reconciliation exceptions queue: a 78 percent fuzzy match to review, two unmatched items, and a split candidate">
                 <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
-                <img src="img/reconciliation.webp" width="1276" height="1015" alt="Reconciliation exceptions queue: a 78 percent fuzzy match to review, two unmatched items, and a split candidate" loading="lazy" decoding="async" />
+                <img src="img/reconciliation-1x.webp" srcset="img/reconciliation-1x.webp 1x, img/reconciliation-2x.webp 2x, img/reconciliation-3x.webp 3x" width="484" height="391" alt="Reconciliation exceptions queue: a 78 percent fuzzy match to review, two unmatched items, and a split candidate" loading="lazy" decoding="async" />
               </a>
             </figure>
             </article>
@@ -1012,9 +989,9 @@
                 80%-warning and over-budget states and period rollover.
               </p>
               <figure class="shot">
-              <a class="shot-link" data-lightbox href="img/budgets-full.webp" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Department budgets showing on-track, 80 percent warning, and over-budget states with icons and text, not color alone">
+              <a class="shot-link" data-lightbox href="img/budgets-full-2x.webp" data-srcset="img/budgets-full-1x.webp 1x, img/budgets-full-2x.webp 2x, img/budgets-full-3x.webp 3x" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Department budgets showing on-track, 80 percent warning, and over-budget states with icons and text, not color alone">
                 <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
-                <img src="img/budgets.webp" width="1276" height="768" alt="Department budgets showing on-track, 80 percent warning, and over-budget states with icons and text, not color alone" loading="lazy" decoding="async" />
+                <img src="img/budgets-1x.webp" srcset="img/budgets-1x.webp 1x, img/budgets-2x.webp 2x, img/budgets-3x.webp 3x" width="484" height="286" alt="Department budgets showing on-track, 80 percent warning, and over-budget states with icons and text, not color alone" loading="lazy" decoding="async" />
               </a>
             </figure>
             </article>
@@ -1027,9 +1004,9 @@
                 transfer, and role-based getting-started checklists driven by real domain events.
               </p>
               <figure class="shot">
-              <a class="shot-link" data-lightbox href="img/audit-full.webp" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Audit log marked append-only, listing who did what and when, with before-and-after changes, including the entry for viewing the log itself">
+              <a class="shot-link" data-lightbox href="img/audit-full-2x.webp" data-srcset="img/audit-full-1x.webp 1x, img/audit-full-2x.webp 2x, img/audit-full-3x.webp 3x" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Audit log marked append-only, listing who did what and when, with before-and-after changes, including the entry for viewing the log itself">
                 <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
-                <img src="img/audit.webp" width="1276" height="684" alt="Audit log marked append-only, listing who did what and when, with before-and-after changes, including the entry for viewing the log itself" loading="lazy" decoding="async" />
+                <img src="img/audit-1x.webp" srcset="img/audit-1x.webp 1x, img/audit-2x.webp 2x, img/audit-3x.webp 3x" width="484" height="289" alt="Audit log marked append-only, listing who did what and when, with before-and-after changes, including the entry for viewing the log itself" loading="lazy" decoding="async" />
               </a>
             </figure>
             </article>
@@ -1042,16 +1019,16 @@
             </p>
             <div class="roles-grid">
             <figure class="shot">
-              <a class="shot-link" data-lightbox href="img/role-employee-full.webp" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Employee view: the sidebar has only My Expenses, My Cards, and Settings">
+              <a class="shot-link" data-lightbox href="img/role-employee-full-2x.webp" data-srcset="img/role-employee-full-1x.webp 1x, img/role-employee-full-2x.webp 2x, img/role-employee-full-3x.webp 3x" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Employee view: the sidebar has only My Expenses, My Cards, and Settings">
                 <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
-                <img src="img/role-employee.webp" width="1060" height="1040" alt="Employee view: the sidebar has only My Expenses, My Cards, and Settings" loading="lazy" decoding="async" />
+                <img src="img/role-employee-1x.webp" srcset="img/role-employee-1x.webp 1x, img/role-employee-2x.webp 2x, img/role-employee-3x.webp 3x" width="530" height="520" alt="Employee view: the sidebar has only My Expenses, My Cards, and Settings" loading="lazy" decoding="async" />
               </a>
               <figcaption><b>Employee</b> — 3 nav items</figcaption>
             </figure>
             <figure class="shot">
-              <a class="shot-link" data-lightbox href="img/role-controller-full.webp" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Controller view: the sidebar adds Dashboard, Approvals, Payments, Reconciliation, Budget Management, and Audit Log">
+              <a class="shot-link" data-lightbox href="img/role-controller-full-2x.webp" data-srcset="img/role-controller-full-1x.webp 1x, img/role-controller-full-2x.webp 2x, img/role-controller-full-3x.webp 3x" target="_blank" rel="noopener" aria-label="Enlarge screenshot: Controller view: the sidebar adds Dashboard, Approvals, Payments, Reconciliation, Budget Management, and Audit Log">
                 <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
-                <img src="img/role-controller.webp" width="1060" height="1040" alt="Controller view: the sidebar adds Dashboard, Approvals, Payments, Reconciliation, Budget Management, and Audit Log" loading="lazy" decoding="async" />
+                <img src="img/role-controller-1x.webp" srcset="img/role-controller-1x.webp 1x, img/role-controller-2x.webp 2x, img/role-controller-3x.webp 3x" width="530" height="520" alt="Controller view: the sidebar adds Dashboard, Approvals, Payments, Reconciliation, Budget Management, and Audit Log" loading="lazy" decoding="async" />
               </a>
               <figcaption><b>Controller</b> — 9 nav items</figcaption>
             </figure>
@@ -1799,6 +1776,7 @@
           var a = links[current];
           var thumb = a.querySelector('img');
           img.alt = thumb ? thumb.alt : '';
+          img.srcset = a.getAttribute('data-srcset') || '';
           img.src = a.href;
           cap.innerHTML = '<b>' + (current + 1) + ' / ' + links.length + '</b> — ' + img.alt;
           var box = img.parentNode;
@@ -1839,6 +1817,7 @@
         });
         dlg.addEventListener('close', function () {
           img.removeAttribute('src');
+          img.removeAttribute('srcset');
         });
       })();
     </script>

@@ -240,9 +240,66 @@
         cursor: pointer;
         font-size: 1rem;
       }
+      .theme-btn {
+        margin-left: 4px;
+      }
+      .menu-btn {
+        display: none;
+        place-items: center;
+        border: 1px solid var(--border-2);
+        background: var(--surface);
+        color: var(--text);
+        border-radius: 8px;
+        height: 34px;
+        width: 34px;
+        padding: 0;
+        cursor: pointer;
+      }
+      .menu-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .menu-btn .icon-close {
+        display: none;
+      }
+      .menu-btn[aria-expanded='true'] .icon-open {
+        display: none;
+      }
+      .menu-btn[aria-expanded='true'] .icon-close {
+        display: block;
+      }
       @media (max-width: 760px) {
-        nav.links a.hide-sm {
+        header.site .wrap {
+          gap: 10px;
+        }
+        .menu-btn {
+          display: grid;
+        }
+        .theme-btn {
+          margin-left: auto;
+        }
+        /* The links collapse into a dropdown under the header bar, opened by the hamburger. */
+        nav.links {
           display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          margin: 0;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 2px;
+          padding: 8px 16px 16px;
+          background: var(--bg);
+          border-bottom: 1px solid var(--border);
+          box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+        }
+        header.site.menu-open nav.links {
+          display: flex;
+        }
+        nav.links a {
+          font-size: 1rem;
+          padding: 12px 10px;
         }
       }
 
@@ -862,16 +919,29 @@
           </svg>
           Clearline
         </a>
-        <nav class="links" aria-label="Sections">
-          <a class="hide-sm" href="#product">Product</a>
-          <a class="hide-sm" href="#architecture">Architecture</a>
-          <a class="hide-sm" href="#decisions">Decisions</a>
+        <nav class="links" id="site-nav" aria-label="Sections">
+          <a href="#product">Product</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#decisions">Decisions</a>
           <a href="#llm">LLM workflow</a>
           <a href="https://clearline-demo.terrenceljones.com/" rel="noopener">Live demo</a>
-          <button class="theme-btn" id="theme" type="button" aria-label="Toggle color theme">
-            ◐
-          </button>
         </nav>
+        <button class="theme-btn" id="theme" type="button" aria-label="Toggle color theme">◐</button>
+        <button
+          class="menu-btn"
+          id="menu"
+          type="button"
+          aria-label="Open menu"
+          aria-expanded="false"
+          aria-controls="site-nav"
+        >
+          <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+          <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
       </div>
     </header>
 
@@ -1765,6 +1835,35 @@
           try {
             localStorage.setItem('cl-theme', next);
           } catch (e) {}
+        });
+      })();
+    </script>
+    <script>
+      (function () {
+        var header = document.querySelector('header.site');
+        var btn = document.getElementById('menu');
+        var nav = document.getElementById('site-nav');
+        if (!header || !btn || !nav) return;
+        function setOpen(open, returnFocus) {
+          header.classList.toggle('menu-open', open);
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+          if (!open && returnFocus) btn.focus();
+        }
+        btn.addEventListener('click', function () {
+          setOpen(!header.classList.contains('menu-open'));
+        });
+        nav.addEventListener('click', function (e) {
+          if (e.target.closest && e.target.closest('a')) setOpen(false);
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && header.classList.contains('menu-open')) setOpen(false, true);
+        });
+        document.addEventListener('click', function (e) {
+          if (header.classList.contains('menu-open') && !header.contains(e.target)) setOpen(false);
+        });
+        window.addEventListener('resize', function () {
+          if (window.innerWidth > 760) setOpen(false);
         });
       })();
     </script>

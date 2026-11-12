@@ -32,7 +32,8 @@ function useInjectedStyles() {
 /**
  * The launcher pill + the Radix-dialog panel. Rendered only when the Beacon is enabled (mounted by
  * the provider). Open state lives here and survives navigation because this component stays mounted
- * across route changes; it's intentionally not persisted, so a fresh page load always starts closed.
+ * across route changes; it's intentionally not persisted, so a fresh page load starts closed unless
+ * the active page sets `openByDefault`.
  * The dialog is non-modal — the page stays scrollable and interactive behind the panel, which is the
  * point of a demo helper — while Radix still gives us Escape-to-close, focus-on-open, and
  * focus-return plus the aria wiring.
@@ -51,6 +52,18 @@ export function BeaconUI({ appName, position, offset, theme }: BeaconUIProps) {
   useEffect(() => {
     if (bodyRef.current) bodyRef.current.scrollTop = 0;
   }, [pageId]);
+
+  // Auto-open a page that asks for it, once per page load. Tracked by pageId so closing the panel
+  // isn't undone by re-renders, and navigating away and back within the same load doesn't reopen it.
+  const autoOpenedRef = useRef(new Set<string>());
+  const openingAutomaticallyRef = useRef(false);
+  const wantsAutoOpen = Boolean(config?.openByDefault);
+  useEffect(() => {
+    if (!pageId || !wantsAutoOpen || autoOpenedRef.current.has(pageId)) return;
+    autoOpenedRef.current.add(pageId);
+    openingAutomaticallyRef.current = true;
+    setOpen(true);
+  }, [pageId, wantsAutoOpen]);
 
   // Nothing registered and no fallback → hide entirely.
   if (!config) return null;
@@ -87,6 +100,14 @@ export function BeaconUI({ appName, position, offset, theme }: BeaconUIProps) {
           style={panelStyle}
           // Non-modal: don't trap the page or lock scroll — testers need the app behind the panel.
           onInteractOutside={(e) => e.preventDefault()}
+          // An automatic open must not pull focus off the page (e.g. the sign-in email field); a
+          // tester's own click on the launcher still moves focus into the panel as usual.
+          onOpenAutoFocus={(e) => {
+            if (openingAutomaticallyRef.current) {
+              e.preventDefault();
+              openingAutomaticallyRef.current = false;
+            }
+          }}
         >
           <div className="dbc-header">
             <div className="dbc-header-titles">

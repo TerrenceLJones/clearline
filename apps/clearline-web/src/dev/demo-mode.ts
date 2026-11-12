@@ -10,3 +10,12 @@
 export function demoModeEnabled(): boolean {
   return import.meta.env.DEV || import.meta.env.VITE_ENABLE_MOCKS === 'true';
 }
+
+/**
+ * True only for a hosted demo build (`VITE_ENABLE_MOCKS=true`) — not local dev. Used for demo-visitor
+ * conveniences that must not run under the e2e suite, which drives the dev server: an auto-opened
+ * Beacon panel adds a "Sign in as any role" button that collides with substring role selectors.
+ */
+export function hostedDemoBuild(): boolean {
+  return import.meta.env.VITE_ENABLE_MOCKS === 'true';
+}

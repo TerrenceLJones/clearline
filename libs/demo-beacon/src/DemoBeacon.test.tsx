@@ -312,6 +312,60 @@ describe('DemoBeacon sections', () => {
   });
 });
 
+describe('DemoBeacon openByDefault', () => {
+  it('opens a page that asks for it, without stealing focus from the page', async () => {
+    render(
+      <DemoBeaconProvider appName="Clearline">
+        <input aria-label="Email" autoFocus />
+        <Page config={cfg('login', 'Sign in', { openByDefault: true })} />
+      </DemoBeaconProvider>,
+    );
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveTextContent('Sign in');
+    expect(screen.getByLabelText('Email')).toHaveFocus();
+  });
+
+  it('stays closed for a page that does not ask for it', async () => {
+    render(
+      <DemoBeaconProvider appName="Clearline">
+        <Page config={cfg('expenses', 'Expenses')} />
+      </DemoBeaconProvider>,
+    );
+    await screen.findByRole('button', { name: /demo guide/i });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('does not reopen after the tester closes it, even if the page re-registers', async () => {
+    const user = userEvent.setup();
+    function Harness() {
+      const [n, setN] = useState(0);
+      return (
+        <DemoBeaconProvider appName="Clearline">
+          <Page config={cfg('login', `Sign in ${n}`, { openByDefault: true })} />
+          <button onClick={() => setN((v) => v + 1)}>rerender</button>
+        </DemoBeaconProvider>
+      );
+    }
+    render(<Harness />);
+    await screen.findByRole('dialog');
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: 'rerender' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('still moves focus into the panel when the tester opens it themselves', async () => {
+    const user = userEvent.setup();
+    render(
+      <DemoBeaconProvider appName="Clearline">
+        <Page config={cfg('expenses', 'Expenses')} />
+      </DemoBeaconProvider>,
+    );
+    const dialog = await openPanel(user);
+    expect(dialog.contains(document.activeElement)).toBe(true);
+  });
+});
+
 describe('useDemoBeacon without a provider', () => {
   it('is a no-op (no throw) when no provider is mounted', () => {
     expect(() => render(<Page config={cfg('x', 'X')} />)).not.toThrow();

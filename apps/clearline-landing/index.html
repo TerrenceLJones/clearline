@@ -408,6 +408,7 @@
       .grid.wide {
         grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
       }
+      /* Screenshot sits directly under the text (top-aligned), not pinned to the card bottom. */
       .card.has-shot {
         display: flex;
         flex-direction: column;
@@ -415,8 +416,23 @@
       .card.has-shot p {
         margin-bottom: 16px;
       }
-      .card.has-shot .shot {
-        margin-top: auto;
+      .card.has-shot .tag {
+        align-self: flex-start;
+      }
+      /* Where subgrid is supported, the cards in a row share row tracks so their screenshots line up. */
+      @supports (grid-template-rows: subgrid) {
+        .card.has-shot {
+          display: grid;
+          grid-template-rows: subgrid;
+          grid-row: span 4;
+          row-gap: 0;
+        }
+        .card.has-shot > * {
+          min-width: 0;
+        }
+        .card.has-shot .tag {
+          justify-self: start;
+        }
       }
       .roles-pair {
         margin-top: 32px;

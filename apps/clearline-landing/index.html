@@ -361,6 +361,80 @@
       .card p:last-child {
         margin-bottom: 0;
       }
+      /* Screenshots: browser-style frame around real captures of the demo. */
+      figure.shot {
+        margin: 0;
+        border: 1px solid var(--border-2);
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: var(--shadow);
+      }
+      .shot-link {
+        display: block;
+        color: inherit;
+      }
+      .shot .bar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 24px;
+        padding: 0 10px;
+        background: #e4e7eb;
+      }
+      .shot .bar i {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #c3c9d2;
+        display: block;
+      }
+      .shot img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .shot figcaption {
+        padding: 10px 14px;
+        font-size: 0.88rem;
+        color: #586070;
+        background: #f5f6f8;
+        border-top: 1px solid #e4e7eb;
+      }
+      figure.hero-shot {
+        margin-top: 44px;
+        max-width: 1040px;
+      }
+      .grid.wide {
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+      }
+      .card.has-shot {
+        display: flex;
+        flex-direction: column;
+      }
+      .card.has-shot p {
+        margin-bottom: 16px;
+      }
+      .card.has-shot .shot {
+        margin-top: auto;
+      }
+      .roles-pair {
+        margin-top: 32px;
+      }
+      .roles-pair h3 {
+        margin-bottom: 4px;
+      }
+      .roles-pair > p {
+        color: var(--text-2);
+        max-width: 68ch;
+        margin-bottom: 16px;
+      }
+      .roles-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+      }
+
       .tag {
         display: inline-block;
         font: 500 0.72rem/1 var(--font-mono);
@@ -684,6 +758,12 @@
             ><span class="pill">TanStack Query</span><span class="pill">Tailwind v4</span
             ><span class="pill">MSW v2</span><span class="pill">Vitest · Playwright</span>
           </div>
+          <figure class="shot hero-shot">
+              <a class="shot-link" href="img/dashboard.webp" target="_blank" rel="noopener" aria-label="Open full-size screenshot: Clearline spend dashboard: total spend, pending approvals, budget remaining, and spend by category and department">
+                <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
+                <img src="img/dashboard.webp" width="1200" height="750" alt="Clearline spend dashboard: total spend, pending approvals, budget remaining, and spend by category and department" fetchpriority="high" />
+              </a>
+            </figure>
         </div>
       </section>
 
@@ -710,8 +790,8 @@
             Three personas (Employee, Finance Manager, Controller) see different navigation and
             different permissions, all derived from one permission predicate — never a role string.
           </p>
-          <div class="grid">
-            <article class="card">
+          <div class="grid wide">
+            <article class="card has-shot">
               <span class="tag">Payments</span>
               <h3>Idempotent vendor payments</h3>
               <p>
@@ -719,24 +799,42 @@
                 <code>Idempotency-Key</code> per intent, 30s timeout, and full-jitter retry on 5xx.
                 3DS step-up for high-value payments; holds, reversals, and unknown-status handling.
               </p>
+              <figure class="shot">
+              <a class="shot-link" href="img/payments.webp" target="_blank" rel="noopener" aria-label="Open full-size screenshot: New payment form: pay-from account, recipient list with verified and closed statuses, amount and method, and a review panel showing the idempotency key">
+                <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
+                <img src="img/payments.webp" width="960" height="587" alt="New payment form: pay-from account, recipient list with verified and closed statuses, amount and method, and a review panel showing the idempotency key" loading="lazy" decoding="async" />
+              </a>
+            </figure>
             </article>
-            <article class="card">
+            <article class="card has-shot">
               <span class="tag">Approvals</span>
               <h3>Multi-level approvals &amp; batches</h3>
               <p>
                 Separation of duties, limit-based escalation, stale-action reconciliation, and
                 partial-failure batch approve/reject with per-item keys and mid-batch resume.
               </p>
+              <figure class="shot">
+              <a class="shot-link" href="img/approvals.webp" target="_blank" rel="noopener" aria-label="Open full-size screenshot: Approvals queue with four pending expenses, each with Reject and Approve actions, and the approver limit shown">
+                <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
+                <img src="img/approvals.webp" width="960" height="334" alt="Approvals queue with four pending expenses, each with Reject and Approve actions, and the approver limit shown" loading="lazy" decoding="async" />
+              </a>
+            </figure>
             </article>
-            <article class="card">
+            <article class="card has-shot">
               <span class="tag">Cards</span>
               <h3>Virtual cards, live feed</h3>
               <p>
                 Issuance with limits and MCC restrictions, a real-time WebSocket transaction feed,
                 freeze controls, and security-gated declines.
               </p>
+              <figure class="shot">
+              <a class="shot-link" href="img/cards.webp" target="_blank" rel="noopener" aria-label="Open full-size screenshot: Virtual card wallet with four active cards and one frozen card that is not authorizing">
+                <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
+                <img src="img/cards.webp" width="960" height="494" alt="Virtual card wallet with four active cards and one frozen card that is not authorizing" loading="lazy" decoding="async" />
+              </a>
+            </figure>
             </article>
-            <article class="card">
+            <article class="card has-shot">
               <span class="tag">Reconciliation</span>
               <h3>Bank-feed matching</h3>
               <p>
@@ -744,8 +842,14 @@
                 exact-sum split matching, and a Fatal-tier guard that withholds a balance that
                 doesn't net.
               </p>
+              <figure class="shot">
+              <a class="shot-link" href="img/reconciliation.webp" target="_blank" rel="noopener" aria-label="Open full-size screenshot: Reconciliation exceptions queue: a 78 percent fuzzy match to review, two unmatched items, and a split candidate">
+                <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
+                <img src="img/reconciliation.webp" width="960" height="534" alt="Reconciliation exceptions queue: a 78 percent fuzzy match to review, two unmatched items, and a split candidate" loading="lazy" decoding="async" />
+              </a>
+            </figure>
             </article>
-            <article class="card">
+            <article class="card has-shot">
               <span class="tag">Analytics</span>
               <h3>Dashboards &amp; budgets</h3>
               <p>
@@ -753,8 +857,14 @@
                 labels; per-section error boundaries with scoped retry; budget gauges with
                 80%-warning and over-budget states and period rollover.
               </p>
+              <figure class="shot">
+              <a class="shot-link" href="img/budgets.webp" target="_blank" rel="noopener" aria-label="Open full-size screenshot: Department budgets showing on-track, 80 percent warning, and over-budget states with icons and text, not color alone">
+                <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
+                <img src="img/budgets.webp" width="960" height="307" alt="Department budgets showing on-track, 80 percent warning, and over-budget states with icons and text, not color alone" loading="lazy" decoding="async" />
+              </a>
+            </figure>
             </article>
-            <article class="card">
+            <article class="card has-shot">
               <span class="tag">Platform</span>
               <h3>Onboarding, settings, audit</h3>
               <p>
@@ -762,7 +872,36 @@
                 (opening it is itself audited), a full settings surface with re-auth-gated ownership
                 transfer, and role-based getting-started checklists driven by real domain events.
               </p>
+              <figure class="shot">
+              <a class="shot-link" href="img/audit.webp" target="_blank" rel="noopener" aria-label="Open full-size screenshot: Audit log marked append-only, listing who did what and when, with before-and-after changes, including the entry for viewing the log itself">
+                <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
+                <img src="img/audit.webp" width="960" height="347" alt="Audit log marked append-only, listing who did what and when, with before-and-after changes, including the entry for viewing the log itself" loading="lazy" decoding="async" />
+              </a>
+            </figure>
             </article>
+          </div>
+          <div class="roles-pair">
+            <h3>Same app, different role</h3>
+            <p>
+              Navigation and permissions re-scope from one permission predicate. An Employee gets
+              three items; a Controller gets the full finance surface.
+            </p>
+            <div class="roles-grid">
+            <figure class="shot">
+              <a class="shot-link" href="img/role-employee.webp" target="_blank" rel="noopener" aria-label="Open full-size screenshot: Employee view: the sidebar has only My Expenses, My Cards, and Settings">
+                <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
+                <img src="img/role-employee.webp" width="760" height="275" alt="Employee view: the sidebar has only My Expenses, My Cards, and Settings" loading="lazy" decoding="async" />
+              </a>
+              <figcaption><b>Employee</b> — 3 nav items</figcaption>
+            </figure>
+            <figure class="shot">
+              <a class="shot-link" href="img/role-controller.webp" target="_blank" rel="noopener" aria-label="Open full-size screenshot: Controller view: the sidebar adds Dashboard, Approvals, Payments, Reconciliation, Budget Management, and Audit Log">
+                <span class="bar" aria-hidden="true"><i></i><i></i><i></i></span>
+                <img src="img/role-controller.webp" width="760" height="275" alt="Controller view: the sidebar adds Dashboard, Approvals, Payments, Reconciliation, Budget Management, and Audit Log" loading="lazy" decoding="async" />
+              </a>
+              <figcaption><b>Controller</b> — 9 nav items</figcaption>
+            </figure>
+            </div>
           </div>
           <div class="callout">
             <b>Exploring the demo:</b> everything runs in your browser against a stateful mock

@@ -4,6 +4,7 @@ import { DEMO_USER_PASSWORD, EXPENSE_CURRENCY, SEED_USERS } from '@clearline/moc
 import { formatMoneyValue } from '@clearline/ui';
 import { EXAMPLE_SIGNUP_EMAIL, loadControls } from '../dev/beacon/shared';
 import { resetSection } from '../dev/beacon/global.beacon';
+import { hostedDemoBuild } from '../dev/demo-mode';
 
 const ROLE_LABEL: Record<Role, string> = {
   employee: 'Employee',
@@ -63,6 +64,9 @@ const credentialSections = SEED_USERS_BY_ACCESS.map((user) => ({
 export const loginBeacon: DemoBeaconPageConfig = {
   pageId: 'login',
   title: 'Sign in',
+  // First thing a hosted-demo visitor sees: the seeded credentials, without having to find the
+  // launcher. Hosted builds only — local dev and e2e start closed (see `hostedDemoBuild`).
+  openByDefault: hostedDemoBuild(),
   summary:
     'Pre-seeded, already-onboarded accounts — one per role. They all share the same password; pick an email to tour that role and its role-based home.',
   sections: [

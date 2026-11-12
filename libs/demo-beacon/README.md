@@ -39,6 +39,13 @@ page overrides a layout-level config while mounted and the layout resurfaces on 
 the same `pageId` replaces rather than stacks. With no provider mounted (or `enabled={false}`),
 `useDemoBeacon` is a safe no-op, and the launcher/panel UI chunk is lazy-loaded only when enabled.
 
+### Opening by default
+
+Set `openByDefault: true` on a page config to open the panel when that page becomes the active
+guide (Clearline does this on the sign-in page, so reviewers see the seeded credentials first). It
+opens once per page load — closing it isn't undone by navigation — and never moves focus off the
+page, so an `autoFocus` field keeps its focus. Open state is still not persisted across reloads.
+
 ### Section kinds
 
 A config's `sections` is a discriminated union:

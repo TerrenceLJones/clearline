@@ -13,6 +13,11 @@ export interface DemoBeaconPageConfig {
   title: string;
   /** One-paragraph orientation (markdown-lite: **bold**, `code`, [text](href)). */
   summary?: string;
+  /**
+   * Open the panel automatically when this page becomes the active guide — once per page load, so
+   * closing it isn't undone by later navigation. Opening never moves focus away from the page.
+   */
+  openByDefault?: boolean;
   sections: DemoBeaconSection[];
 }
 
